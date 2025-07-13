@@ -1,9 +1,9 @@
-theme = GruvboxDark
+theme = tokyonight_night
 
 # background = 282c34
 # foreground= ffffff
 
-background-opacity = 0.75
+background-opacity = 0.80
 background-blur-radius = 20
 
 window-decoration = false

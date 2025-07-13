@@ -45,14 +45,14 @@ return {
   {
     "folke/tokyonight.nvim",
     opts = {
-      transparent = false,
+      transparent = true,
       styles = {
         -- sidebars = "transparent",
         -- floats = "transparent",
       },
       on_highlights = function(highlights, _)
         highlights.LineNr = { fg = "#bbbbbb" }
-        -- highlights.ColorColumn = { bg = "#BBBBBF" }
+        highlights.ColorColumn = { bg = "#BBBBBF" }
       end,
     },
   },
@@ -60,7 +60,7 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "gruvbox",
+      colorscheme = "tokyonight-night",
     },
   },
 }

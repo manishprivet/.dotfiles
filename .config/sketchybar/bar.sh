@@ -3,9 +3,11 @@
 bar=(
   position=top
   height=37
-  margin=12
+  margin=18
   y_offset=10
-  corner_radius=16
+  corner_radius="$CORNER_RADIUS"
+  border_color="$ACCENT_COLOR"
+  border_width=1
   blur_radius=30
   color="$BAR_COLOR"
 )

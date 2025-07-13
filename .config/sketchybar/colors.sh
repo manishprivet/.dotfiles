@@ -5,9 +5,17 @@ export WHITE=0xffffffff
 export TRANSPARENT=0x00000000
 
 # -- Gruv Box --
-export BAR_COLOR=0x70282828
+# export CORNER_RADIUS=16
+# export BAR_COLOR=0x70282828
+# export ITEM_BG_COLOR=0xff1d2021
+# export ACCENT_COLOR=0xffd79921
+# export BACKGROUND=0xff282828
+
+# -- Nord Scheme --
+export CORNER_RADIUS=8
+export BAR_COLOR=0xcc1a1c26
 export ITEM_BG_COLOR=0xff1d2021
-export ACCENT_COLOR=0xffd79921
+export ACCENT_COLOR=0xff80a8fc
 export BACKGROUND=0xff282828
 
 # -- Teal Scheme --
