@@ -1,5 +1,5 @@
 [tools]
-go = "1.20.14"
+go = "1.23.1"
 node = "22"
 
 [settings]
