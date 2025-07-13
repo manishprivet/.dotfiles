@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/50d80a2c-bf99-4868-9ebe-2502b7cc8bb6)
+<img width="2560" height="1440" alt="Screenshot 2025-07-14 at 1 16 03" src="https://github.com/user-attachments/assets/642997a8-a49f-4e44-a702-3e21166ed08b" />
 
 # Installation
 
