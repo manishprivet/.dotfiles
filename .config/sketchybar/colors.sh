@@ -13,7 +13,7 @@ export TRANSPARENT=0x00000000
 
 # -- Nord Scheme --
 export CORNER_RADIUS=8
-export BAR_COLOR=0xcc1a1c26
+export BAR_COLOR=0xaa1a1c26
 export ITEM_BG_COLOR=0xff1d2021
 export ACCENT_COLOR=0xff80a8fc
 export BACKGROUND=0xff282828

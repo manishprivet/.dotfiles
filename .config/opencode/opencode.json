@@ -4,6 +4,15 @@
     "anthropic": {
       "models": {},
       "options": { "baseURL": "{env:AI_BASE_URL}/v1" }
+    },
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "llama3.2": {}
+      }
     }
   }
 }
