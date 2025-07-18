@@ -1,4 +1,4 @@
-function cl --wraps='ANTHROPIC_AUTH_TOKEN=$AI_API_KEY ANTHROPIC_BASE_URL=$AI_BASE_URL claude' --description 'alias cl=ANTHROPIC_AUTH_TOKEN=$AI_API_KEY ANTHROPIC_BASE_URL=$AI_BASE_URL claude'
-  ANTHROPIC_AUTH_TOKEN=$AI_API_KEY ANTHROPIC_BASE_URL=$AI_BASE_URL claude $argv
+function cl --wraps='claude' --description 'alias cl=claude'
+  claude $argv
         
 end
