@@ -67,3 +67,6 @@ end
 # pnpm end
 
 if [ -f '/Users/manishprivet/.config/fish/secrets.fish' ]; source /Users/manishprivet/.config/fish/secrets.fish; end
+
+# opencode
+fish_add_path /Users/manishprivet/.opencode/bin
