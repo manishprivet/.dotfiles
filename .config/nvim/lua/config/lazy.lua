@@ -56,7 +56,3 @@ require("lazy").setup({
 -- })
 --
 require("gitlinker").setup()
-
-require('nvim-biscuits').setup({
-  show_on_start = true -- defaults to false
-})
