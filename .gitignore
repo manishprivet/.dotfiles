@@ -3,3 +3,6 @@
 .config/gcloud/
 .config/configstore/
 .DS_Store
+.config/kargo
+.config/merctl
+.config/octopus
