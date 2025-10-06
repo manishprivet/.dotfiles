@@ -32,3 +32,5 @@ vim.cmd
 ]]
 
 vim.g.autoformat = false
+
+vim.g.lazyvim_picker = "telescope"
