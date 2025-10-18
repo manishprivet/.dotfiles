@@ -1,48 +1,42 @@
 # Dotfiles Repository Agent Guidelines
 
-## Setup and Installation
-- Primary setup script: `./scripts/setup.sh`
-- Requires MacOS
-- Uses Homebrew, Stow for package and config management
-- Requires manual execution: `chmod +x ./scripts/setup.sh && ./scripts/setup.sh`
-
 ## Development Commands
+- Setup: `./scripts/setup.sh`
 - Install dependencies: `brew bundle --file .Brewfile`
 - Symlink configs: `stow .`
 - Fish plugin management: `./scripts/fish.sh`
 
-## Code Style Guidelines
-- Configuration files use native format (`.toml`, `.conf`, `.yml`)
-- Shell scripts: Use `shellcheck` for linting
-- Bash scripts: 
-  - Use `#!/bin/bash` shebang
-  - Prefer `[[ ]]` over `[ ]`
-  - Quote variables
-- Fish shell scripts:
-  - Follow fish-specific conventions
-  - Use `set` for variable declarations
-  - Prefer function definitions over aliases
+## Code Style & Conventions
+### Shell Scripts
+- Use `#!/bin/bash` for bash, `#!/usr/bin/env fish` for fish
+- Linting: Always run `shellcheck` before committing
+- Bash conventions:
+  - Use `[[ ]]` for conditionals
+  - Quote all variables: `"$variable"`
+  - Use `set -euo pipefail` for robust error handling
+- Fish conventions:
+  - Use `set` for variable declaration
+  - Prefer functions over aliases
+  - Use type annotations where possible
 
 ## Error Handling
-- Use `set -e` in bash scripts to exit on errors
-- Add error logging and exit codes
-- Validate input and dependencies before execution
+- Always include error logging
+- Use exit codes (0 for success, non-zero for errors)
+- Validate inputs and dependencies
+- Provide clear error messages
 
-## Testing
-- No formal test suite detected
+## Testing & Verification
 - Manual testing recommended
-- Verify configurations after setup
+- Verify configuration changes manually
+- Use `stow --adopt` for careful config management
 
-## Repository Structure
-- `scripts/`: Utility and setup scripts
-- `.config/`: Application configurations
-- Prefer declarative configuration over complex scripts
+## Best Practices
+- Keep configurations declarative
+- Minimize complex scripting
+- Prioritize readability and maintainability
+- Personal configs may require customization
 
 ## Recommended Tools
-- ShellCheck for shell script linting
-- Stow for dotfile management
-- Homebrew for package management
-
-## Notes
-- Configurations are personal and may require customization
-- Always review scripts before execution
+- ShellCheck for script linting
+- Stow for config management
+- Homebrew for package installation
