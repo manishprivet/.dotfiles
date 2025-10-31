@@ -6,3 +6,6 @@
 .config/kargo
 .config/merctl
 .config/octopus
+.config/graphite
+.config/fish/functions/ssvm.fish
+.config/fish/functions/vm_toggle.fish

@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ "$(id -u)" -eq 0 ]]; then
+  echo "Please run this script as a regular user with sudo privileges." >&2
+  exit 1
+fi
+
+log() {
+  printf '\n[%s] %s\n' "$(date '+%H:%M:%S')" "$*"
+}
+
+APT_PACKAGES=(
+  software-properties-common
+  build-essential
+  git
+  curl
+  wget
+  gnupg
+  ca-certificates
+  fish
+)
+
+log "Updating apt package index..."
+sudo apt-get update
+
+log "Installing base packages: ${APT_PACKAGES[*]}"
+sudo apt-get install -y "${APT_PACKAGES[@]}"
+
+log "Adding Neovim stable PPA (if missing)..."
+if [[ ! -f /etc/apt/sources.list.d/neovim-ppa-ubuntu-stable.list ]]; then
+  sudo add-apt-repository -y ppa:neovim-ppa/stable
+fi
+
+log "Installing Neovim..."
+sudo apt-get update
+sudo apt-get install -y neovim
+
+DOTFILES_REPO="https://github.com/manishprivet/.dotfiles"
+DOTFILES_DIR="${HOME}/.dotfiles"
+
+if [[ ! -d "${DOTFILES_DIR}/.git" ]]; then
+  log "Cloning dotfiles repository..."
+  git clone "${DOTFILES_REPO}" "${DOTFILES_DIR}"
+else
+  log "Updating dotfiles repository..."
+  git -C "${DOTFILES_DIR}" pull --ff-only || log "Skipping dotfiles pull (non-fast-forward)."
+fi
+
+log "Linking dotfiles-managed configs..."
+mkdir -p "${HOME}/.config"
+ln -sfn "${DOTFILES_DIR}/.config/nvim" "${HOME}/.config/nvim"
+ln -sfn "${DOTFILES_DIR}/.config/fish" "${HOME}/.config/fish"
+
+MISE_BIN="${HOME}/.local/bin/mise"
+if [[ ! -x "${MISE_BIN}" ]]; then
+  log "Installing mise version manager..."
+  curl -fsSL https://mise.run | sh
+else
+  log "mise already installed."
+fi
+
+MISE_ENV_LINE="eval \"\$(${MISE_BIN} activate bash)\""
+BASHRC="${HOME}/.bashrc"
+touch "${BASHRC}"
+if ! grep -Fxq "${MISE_ENV_LINE}" "${BASHRC}"; then
+  log "Adding mise activation to ~/.bashrc..."
+  printf '\n%s\n' "${MISE_ENV_LINE}" >> "${BASHRC}"
+fi
+
+if [[ -f "${DOTFILES_DIR}/.config/mise/config.toml" ]]; then
+  log "Trusting mise configuration..."
+  "${MISE_BIN}" trust "${DOTFILES_DIR}/.config/mise/config.toml"
+fi
+
+log "Installing mise toolchains..."
+"${MISE_BIN}" install node
+"${MISE_BIN}" install go
+
+if [[ "${SHELL}" != "/usr/bin/fish" ]]; then
+  log "Setting fish as the default shell (requires sudo password)..."
+  sudo chsh -s /usr/bin/fish "${USER}"
+fi
+
+if ! command -v gh >/dev/null 2>&1; then
+  log "Configuring GitHub CLI apt repository..."
+  sudo mkdir -p -m 755 /etc/apt/keyrings
+  if [[ ! -f /etc/apt/keyrings/githubcli-archive-keyring.gpg ]]; then
+    tmp_key="$(mktemp)"
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o "${tmp_key}"
+    sudo install -m 644 "${tmp_key}" /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    rm -f "${tmp_key}"
+  fi
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+  sudo apt-get update
+  sudo apt-get install -y gh
+else
+  log "GitHub CLI already installed."
+fi
+
+if ! command -v docker >/dev/null 2>&1; then
+  log "Configuring Docker repository and installing packages..."
+  sudo mkdir -p -m 755 /etc/apt/keyrings
+  if [[ ! -f /etc/apt/keyrings/docker.gpg ]]; then
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  fi
+  # shellcheck disable=SC1091
+  source /etc/os-release
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu ${UBUNTU_CODENAME:-$VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+  sudo apt-get update
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  sudo systemctl enable --now docker
+  sudo usermod -aG docker "${USER}"
+else
+  log "Docker already installed."
+fi
+
+log "Setup complete. Log out/in for shell and docker group changes to apply."
