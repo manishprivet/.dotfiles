@@ -6,6 +6,9 @@
 # Install all Homebrew packages
 brew bundle --file .Brewfile
 
+which fish | sudo tee -a /etc/shells
+chsh -s "$(which fish)"
+
 # Install all fish packages
 chmod +x ./scripts/fish.sh
 ./scripts/fish.sh
