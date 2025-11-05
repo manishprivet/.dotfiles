@@ -58,11 +58,21 @@ execute(`
 `);
 
 // Extract data from IndexedDB
-const python = execute("python3 -m site --user-base").toString().trim();
+const pythonUserBase = execute("python3 -m site --user-base").toString().trim();
+const dfIndexedDbPath = `${pythonUserBase}/bin/dfindexeddb`;
+let hasDfIndexedDb = existsSync(dfIndexedDbPath);
 
-const binPath = existsSync(python)
-  ? `${python}/bin/dfindexeddb`
-  : `dfindexeddb`;
+if (!hasDfIndexedDb) {
+  execute(
+    `CPPFLAGS="-I/opt/homebrew/include -L/opt/homebrew/lib" python3 -m pip install --user dfindexeddb --break-system-packages`,
+  );
+  execute(
+    `CPPFLAGS="-I/opt/homebrew/include -L/opt/homebrew/lib" python3 -m pip install --user 'dfindexeddb[plugins]' --break-system-packages`,
+  );
+  hasDfIndexedDb = existsSync(dfIndexedDbPath);
+}
+
+const binPath = hasDfIndexedDb ? dfIndexedDbPath : `dfindexeddb`;
 
 execute(`
   ${binPath} db \
@@ -131,7 +141,8 @@ rd.on("line", function (line) {
 
     state.isInMyCalendar = data.value.value.calendarId?.includes("manish");
 
-    state.iAmAttending = (state.iAmInAttendees || state.iAmCreator) && state.isInMyCalendar;
+    state.iAmAttending =
+      (state.iAmInAttendees || state.iAmCreator) && state.isInMyCalendar;
 
     if (
       // The data is not stale
