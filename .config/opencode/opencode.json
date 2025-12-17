@@ -1,6 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "provider": {
+    "anthropic": {
+      "options": {
+        "baseURL": "{env:AI_BASE_URL}/v1",
+        "apiKey": "{env:AI_API_KEY}"
+      }
+    },
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
       "options": {

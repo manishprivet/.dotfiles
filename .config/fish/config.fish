@@ -56,9 +56,6 @@ alias tailscale /Applications/Tailscale.app/Contents/MacOS/Tailscale
 
 abbr --add gitp git push -u origin HEAD
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/manishprivet/Downloads/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/Downloads/google-cloud-sdk/path.fish.inc'; end
-
 # pnpm
 set -gx PNPM_HOME "/Users/manishprivet/Library/pnpm"
 if not string match -q -- $PNPM_HOME $PATH
@@ -70,3 +67,7 @@ if [ -f '/Users/manishprivet/.config/fish/secrets.fish' ]; source /Users/manishp
 
 # opencode
 fish_add_path /Users/manishprivet/.opencode/bin
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/manishprivet/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/google-cloud-sdk/path.fish.inc'; end
+export PATH="$HOME/.local/bin:$PATH"
