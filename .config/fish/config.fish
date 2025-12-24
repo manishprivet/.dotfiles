@@ -53,6 +53,7 @@ fzf_configure_bindings --directory=\c] --git_log= --git_status=\co --processes=\
 eval "$(direnv hook fish)"
 
 alias tailscale /Applications/Tailscale.app/Contents/MacOS/Tailscale
+alias kubectl kubecolor
 
 abbr --add gitp git push -u origin HEAD
 
