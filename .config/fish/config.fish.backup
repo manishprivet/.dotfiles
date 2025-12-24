@@ -39,22 +39,34 @@ set -g fish_pager_color_description $comment
 set -g fish_pager_color_selected_background --background=$selection
 
 starship init fish | source
-# # enable_transience
-# 
+enable_transience
+
 zoxide init fish | source
-# 
-# # bun
+
+# bun
 # set --export BUN_INSTALL "$HOME/.bun"
 # set --export PATH $BUN_INSTALL/bin $PATH
-# 
-# # FZF bindings
+
+# FZF bindings
 fzf_configure_bindings --directory=\c] --git_log= --git_status=\co --processes=\cp
-# 
+
 eval "$(direnv hook fish)"
-eval "$(goenv init -)"
-eval "$(nodenv init -)"
-# 
-# alias tailscale /Applications/Tailscale.app/Contents/MacOS/Tailscale
+
+alias tailscale /Applications/Tailscale.app/Contents/MacOS/Tailscale
+
+abbr --add gitp git push -u origin HEAD
 
 # The next line updates PATH for the Google Cloud SDK.
-# if [ -f '/Users/manish.kumar/google-cloud-sdk/path.fish.inc' ]; . '/Users/manish.kumar/google-cloud-sdk/path.fish.inc'; end
+if [ -f '/Users/manishprivet/Downloads/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/Downloads/google-cloud-sdk/path.fish.inc'; end
+
+# pnpm
+set -gx PNPM_HOME "/Users/manishprivet/Library/pnpm"
+if not string match -q -- $PNPM_HOME $PATH
+  set -gx PATH "$PNPM_HOME" $PATH
+end
+# pnpm end
+
+if [ -f '/Users/manishprivet/.config/fish/secrets.fish' ]; source /Users/manishprivet/.config/fish/secrets.fish; end
+
+# opencode
+fish_add_path /Users/manishprivet/.opencode/bin

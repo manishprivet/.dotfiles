@@ -1,0 +1,16 @@
+theme = Tokyonight
+
+# background = 282c34
+# foreground= ffffff
+
+background-opacity = 0.80
+background-blur-radius = 20
+
+window-decoration = false
+macos-titlebar-style = hidden
+
+font-family = JetBrainsMono Nerd Font
+font-size = 15
+
+clipboard-read = allow
+clipboard-write = allow
