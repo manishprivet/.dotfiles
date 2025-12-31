@@ -20,9 +20,9 @@ for sid in $(aerospace list-workspaces --all); do
     --set space."$sid" \
     display="$monitor" \
     padding_right=0 \
-    icon="$sid" \
+    icon="" \
     label.padding_right=7 \
-    icon.padding_left=7 \
+    icon.padding_left=0 \
     icon.padding_right=4 \
     background.drawing=on \
     label.font="sketchybar-app-font:Regular:16.0" \

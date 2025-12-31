@@ -67,6 +67,7 @@ if [ -z "$icons" ]; then
       drawing=on \
       label="$icons" \
       label.color="$BACKGROUND" \
+      label.padding_right=20 \
       icon.color="$BACKGROUND" \
       background.color="$ACCENT_COLOR"
   else
@@ -83,6 +84,7 @@ else
       display="$monitor" \
       drawing=on \
       label="$icons" \
+      label.padding_right=7 \
       label.color="$BACKGROUND" \
       icon.color="$BACKGROUND" \
       background.color="$ACCENT_COLOR"
@@ -91,6 +93,7 @@ else
       display="$monitor" \
       drawing=on \
       label="$inactive_icons" \
+      label.padding_right=11 \
       background.drawing=off \
       label.color="$ACCENT_COLOR" \
       icon.color="$ACCENT_COLOR" \
