@@ -127,6 +127,9 @@ function icon_map() {
   "Brave Browser")
     icon_result=":brave_browser:"
     ;;
+  "Dia")
+    icon_result=":google_chrome:"
+    ;;
   "Spotlight")
     icon_result=":spotlight:"
     ;;

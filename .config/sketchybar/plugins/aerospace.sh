@@ -34,10 +34,16 @@ icons=""
 
 APPS_INFO=$(aerospace list-windows --workspace "$1" --json --format "%{monitor-appkit-nsscreen-screens-id}%{app-name}")
 
+if [ -z "$APPS_INFO" ]; then
+  APPS_INFO="[]"
+fi
+
+inactive_icons=""
 IFS=$'\n'
 for sid in $(echo "$APPS_INFO" | jq -r "map ( .\"app-name\" ) | .[]"); do
   icons+=$("$CONFIG_DIR/plugins/icon_map_fn.sh" "$sid")
   icons+="  "
+  inactive_icons+="●  "
 done
 
 for monitor_id in $(echo "$APPS_INFO" | jq -r "map ( .\"monitor-appkit-nsscreen-screens-id\" ) | .[]"); do
@@ -84,7 +90,7 @@ else
     sketchybar --set "$NAME" \
       display="$monitor" \
       drawing=on \
-      label="$icons" \
+      label="$inactive_icons" \
       background.drawing=off \
       label.color="$ACCENT_COLOR" \
       icon.color="$ACCENT_COLOR" \
