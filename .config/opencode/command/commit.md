@@ -1,7 +1,6 @@
 ---
 description: Commit the changes in the repository
 agent: build
-subtask: true
 ---
 
 check the staged changes in this repository and generate a commit message. Use 
