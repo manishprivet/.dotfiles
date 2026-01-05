@@ -12,6 +12,11 @@
     }
   },
   "provider": {
-    "anthropic": {}
+    "anthropic": {},
+    "openai": {
+      "options": {
+        "apiKey": "{env:OPENAI_API_KEY}"
+      }
+    }
   }
 }
