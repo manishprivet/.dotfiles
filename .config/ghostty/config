@@ -10,7 +10,7 @@ window-decoration = false
 macos-titlebar-style = hidden
 
 font-family = JetBrainsMono Nerd Font
-font-size = 15
+font-size = 18
 
 clipboard-read = allow
 clipboard-write = allow
