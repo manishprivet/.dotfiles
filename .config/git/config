@@ -13,6 +13,7 @@
   preloadindex = true
   excludesfile = /Users/manishprivet/.config/git/ignore
   pager = diff-so-fancy | less --tabs=4 -RFX
+  editor = nvim
 
 [pager]
   branch = false

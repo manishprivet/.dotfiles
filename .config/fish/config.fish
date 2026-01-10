@@ -38,6 +38,8 @@ set -g fish_pager_color_completion $foreground
 set -g fish_pager_color_description $comment
 set -g fish_pager_color_selected_background --background=$selection
 
+set -gx EDITOR nvim
+
 starship init fish | source
 enable_transience
 
@@ -69,3 +71,7 @@ fish_add_path /Users/manishprivet/.opencode/bin
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/manishprivet/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/google-cloud-sdk/path.fish.inc'; end
 export PATH="$HOME/.local/bin:$PATH"
+
+# bun
+set --export BUN_INSTALL "$HOME/.bun"
+set --export PATH $BUN_INSTALL/bin $PATH

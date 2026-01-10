@@ -12,11 +12,14 @@
     }
   },
   "provider": {
-    "anthropic": {},
-    "openai": {
-      "options": {
-        "apiKey": "{env:OPENAI_API_KEY}"
-      }
+    "openai": {}
+  },
+  "permission": {
+    "external_directory": {
+      "*": "ask",
+      "/Users/manishprivet/.config/opencode/*": "allow",
+      "/Users/manishprivet/.dotfiles/.config/opencode/*": "allow"
     }
-  }
+  },
+  "plugin": ["@mohak34/opencode-notifier@0.1.8"]
 }
