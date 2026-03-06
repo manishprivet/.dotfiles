@@ -1,0 +1,59 @@
+# Data Source Catalog
+
+Use this reference to choose the exact Octopus Deploy Terraform data source name.
+
+## Full data source list
+
+```text
+octopusdeploy_accounts
+octopusdeploy_azure_cloud_service_deployment_targets
+octopusdeploy_azure_service_fabric_cluster_deployment_targets
+octopusdeploy_azure_web_app_deployment_targets
+octopusdeploy_certificates
+octopusdeploy_channels
+octopusdeploy_cloud_region_deployment_targets
+octopusdeploy_community_step_template
+octopusdeploy_deployment_freezes
+octopusdeploy_deployment_targets
+octopusdeploy_environments
+octopusdeploy_feeds
+octopusdeploy_git_credentials
+octopusdeploy_kubernetes_agent_deployment_targets
+octopusdeploy_kubernetes_agent_workers
+octopusdeploy_kubernetes_cluster_deployment_targets
+octopusdeploy_library_variable_sets
+octopusdeploy_lifecycles
+octopusdeploy_listening_tentacle_deployment_targets
+octopusdeploy_machine
+octopusdeploy_machine_policies
+octopusdeploy_machine_proxies
+octopusdeploy_offline_package_drop_deployment_targets
+octopusdeploy_polling_tentacle_deployment_targets
+octopusdeploy_project_groups
+octopusdeploy_projects
+octopusdeploy_script_modules
+octopusdeploy_service_account_oidc_identity
+octopusdeploy_space
+octopusdeploy_space_default_lifecycle_release_retention_policy
+octopusdeploy_space_default_lifecycle_tentacle_retention_policy
+octopusdeploy_space_default_runbook_retention_policy
+octopusdeploy_spaces
+octopusdeploy_ssh_connection_deployment_targets
+octopusdeploy_step_template
+octopusdeploy_tag_sets
+octopusdeploy_teams
+octopusdeploy_tenant_projects
+octopusdeploy_tenants
+octopusdeploy_user_roles
+octopusdeploy_users
+octopusdeploy_variables
+octopusdeploy_worker_pools
+octopusdeploy_workers
+```
+
+## Fast selection cues
+
+- Most lookup types are plural, even when the user mentions a single object.
+- `octopusdeploy_space` and `octopusdeploy_spaces` both exist, so choose carefully.
+- Target lookups are split by target family when the provider supports a specialized data source.
+- If a classic object has no specialized singular data source, prefer the plural list/query data source.

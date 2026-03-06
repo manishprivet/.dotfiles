@@ -1,0 +1,23 @@
+{
+  "skill_name": "octopusdeploy-terraform-provider",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need Terraform for Octopus Deploy that creates a project group called Finance and a project called Billing Service, but the lifecycle already exists and should be looked up instead of managed. Pick the right Octopus resources and data sources and show me the HCL.",
+      "expected_output": "Chooses `octopusdeploy_project_group` and `octopusdeploy_project` as resources, uses the correct lifecycle lookup data source, and explains the resource-vs-data-source split.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Which Octopus Terraform types should I use if I want to manage a polling tentacle deployment target, but only read existing worker pools and environments? Please give me the exact `octopusdeploy_*` names and a small HCL example.",
+      "expected_output": "Selects the exact polling tentacle resource and the correct worker pool and environment data sources without inventing names.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I am building a deployment process in Terraform and I keep mixing up the Octopus process resources. Explain when to use `octopusdeploy_deployment_process` versus the `octopusdeploy_process*` resources for steps, child steps, and ordering.",
+      "expected_output": "Explains the process-related resource family clearly, references the exact process resource names, and avoids drifting into provider setup guidance.",
+      "files": []
+    }
+  ]
+}
