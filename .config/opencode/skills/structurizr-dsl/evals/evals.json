@@ -1,0 +1,23 @@
+{
+  "skill_name": "structurizr-dsl",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Create a Structurizr DSL workspace for an e-commerce platform with one person (Customer), one software system (Storefront), and three containers (Web App, API, PostgreSQL). Include system context and container views with stable view keys.",
+      "expected_output": "A valid DSL workspace that defines model elements, relationships, and two correctly scoped views with explicit keys.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "I have this DSL and it fails: `workspace { model { api = container \"API\" } views { container shop { include * } } }`. Fix it with minimal edits and explain the error.",
+      "expected_output": "A corrected DSL that places container inside a software system, uses valid identifiers/scope, and a concise explanation of the structural issue.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Refactor my noisy Structurizr container view to avoid `include *`, keep only user-facing and data-flow-relevant elements, and add a style block for Person and Container tags.",
+      "expected_output": "A focused container view using targeted include/exclude logic plus a clean styles block with meaningful defaults.",
+      "files": []
+    }
+  ]
+}

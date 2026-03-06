@@ -1,0 +1,23 @@
+{
+  "skill_name": "sourcegraph-cli",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Use `src` to find Go files in repo github.com/sourcegraph/sourcegraph mentioning `Parse` and return a JSON-formatted command plus a short summary of what the output fields mean.",
+      "expected_output": "A correct `src search -json` command for the repo/query and a concise explanation of key JSON result fields.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "I get unauthorized errors with Sourcegraph CLI. Give me a step-by-step terminal flow to verify endpoint, auth state, and then run a simple API query to confirm access.",
+      "expected_output": "A practical troubleshooting flow using `src version`, auth guidance, endpoint checks, and a minimal `src api` verification query.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Write commands to list repos, inspect one repo, and add metadata key `team` value `platform` using `src repos`, with a warning about mutation safety.",
+      "expected_output": "A sequence of `src repos` commands for list/get/add-metadata and a clear warning before mutation.",
+      "files": []
+    }
+  ]
+}
