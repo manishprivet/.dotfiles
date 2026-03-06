@@ -1,0 +1,23 @@
+{
+  "skill_name": "gh-cli",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Create a pull request with `gh` from the current branch using title `feat: add audit logging` and body `Adds audit logs for admin actions`, then show how to view it in browser.",
+      "expected_output": "Commands for `gh pr create` and `gh pr view --web` with sensible non-interactive flags.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "I need to inspect CI failures for the last 5 workflow runs in this repo. Give the exact `gh` commands to list runs and view logs for one failed run.",
+      "expected_output": "Commands using `gh run list` and `gh run view <run-id> --log` with clear guidance on selecting a failed run.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Use `gh api` to run a GraphQL query for the current viewer login, and include a short note on auth troubleshooting if it fails.",
+      "expected_output": "A valid `gh api graphql` command and concise fallback steps using `gh auth status`/`gh auth login`.",
+      "files": []
+    }
+  ]
+}

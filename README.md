@@ -17,3 +17,39 @@ This script will:
 - [ ] Install all Homebrew packages
 - [ ] Install all fish plugins
 - [ ] Setup symlinks for configurations
+
+# OpenCode skills
+
+This repo keeps Anthropic skills as a git submodule and only stows selected skills into `~/.config/opencode/skills`.
+
+- Submodule location: `submodules/anthropic-skills`
+- Stow ignores `submodules/` via `.stow-local-ignore`, so the full skills tree is never linked to your home directory
+- Selected skills are exposed through symlinks in `.config/opencode/skills/`
+
+## Clone with submodules
+
+```bash
+git clone --recurse-submodules <your-dotfiles-repo-url>
+```
+
+If already cloned:
+
+```bash
+git submodule update --init --recursive
+```
+
+## Add or update a single skill link
+
+Example (`skill-creator`):
+
+```bash
+mkdir -p .config/opencode/skills
+ln -sfn "../../../submodules/anthropic-skills/skills/skill-creator" \
+  ".config/opencode/skills/skill-creator"
+```
+
+Then apply symlinks:
+
+```bash
+stow .
+```
