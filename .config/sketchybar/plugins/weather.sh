@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 LOCATION=$(shortcuts run getCoreLocationData -o /dev/stdout)
 CITY=$(echo "$LOCATION" | jq -r ".city")

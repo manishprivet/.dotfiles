@@ -75,3 +75,6 @@ export PATH="$HOME/.local/bin:$PATH"
 # bun
 set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
+
+# Added by `rbenv init` on Mon Jan 12 09:03:47 JST 2026
+status --is-interactive; and rbenv init - --no-rehash fish | source

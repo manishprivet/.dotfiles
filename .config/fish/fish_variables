@@ -6,4 +6,8 @@ SETUVAR Z_DATA:/Users/manishprivet/\x2elocal/share/z/data
 SETUVAR Z_DATA_DIR:/Users/manishprivet/\x2elocal/share/z
 SETUVAR Z_EXCLUDE:\x5e/Users/manishprivet\x24
 SETUVAR __fish_initialized:4300
-SETUVAR fish_user_paths:/Users/manishprivet/\x2eopencode/bin
+SETUVAR _fisher_jorgebucaran_2F_nvm_2E_fish_files:\x7e/\x2econfig/fish/functions/_nvm_index_update\x2efish\x1e\x7e/\x2econfig/fish/functions/_nvm_list\x2efish\x1e\x7e/\x2econfig/fish/functions/_nvm_version_activate\x2efish\x1e\x7e/\x2econfig/fish/functions/_nvm_version_deactivate\x2efish\x1e\x7e/\x2econfig/fish/functions/nvm\x2efish\x1e\x7e/\x2econfig/fish/conf\x2ed/nvm\x2efish\x1e\x7e/\x2econfig/fish/completions/nvm\x2efish
+SETUVAR _fisher_plugins:jorgebucaran/nvm\x2efish
+SETUVAR _fisher_upgraded_to_4_4:\x1d
+SETUVAR _tide_prompt_40943:\x1d
+SETUVAR fish_user_paths:/Users/manishprivet/\x2eopencode/bin\x1e/Applications/Ghostty\x2eapp/Contents/MacOS
