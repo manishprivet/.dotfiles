@@ -1,0 +1,23 @@
+{
+  "skill_name": "worktrunk-cli",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I installed worktrunk with Homebrew but `wt switch feature-auth` only prints a path and does not actually move my shell there. I use Fish. Help me fix it and explain what changed.",
+      "expected_output": "Diagnoses missing shell integration for Fish and uses Worktrunk-native setup steps to fix or verify it.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I want three parallel agent worktrees in this repo: one for auth, one for a pagination bug, and one for docs cleanup. Show me the `wt` commands you would use to create them and launch agents directly in each worktree.",
+      "expected_output": "Uses `wt switch` with create and execute flags, with clear branch naming and agent-launch commands.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Create a shared Worktrunk project config so every new worktree runs `pnpm install` before start and every merge runs `pnpm test`. Put the shared settings in the right config file and explain why that file is the right one.",
+      "expected_output": "Chooses `.config/wt.toml`, adds appropriate project hooks, and explains the shared-vs-personal config distinction.",
+      "files": []
+    }
+  ]
+}

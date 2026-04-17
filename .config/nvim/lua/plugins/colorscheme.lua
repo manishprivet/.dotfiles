@@ -9,6 +9,7 @@ return {
     transparent_mode = true
   } },
   { "EdenEast/nightfox.nvim" },
+  { "tckmn/hotdog.vim" },
   { "marko-cerovac/material.nvim" },
   {
     "catppuccin/nvim",
@@ -60,7 +61,7 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "tokyonight-night",
+      colorscheme = "hotdog",
     },
   },
 }

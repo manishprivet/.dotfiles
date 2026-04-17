@@ -12,11 +12,11 @@ export TRANSPARENT=0x00000000
 # export BACKGROUND=0xff282828
 
 # -- Nord Scheme --
-export CORNER_RADIUS=8
-export BAR_COLOR=0xaa1a1c26
-export ITEM_BG_COLOR=0xff1d2021
-export ACCENT_COLOR=0xff80a8fc
-export BACKGROUND=0xff282828
+# export CORNER_RADIUS=8
+# export BAR_COLOR=0xaa1a1c26
+# export ITEM_BG_COLOR=0xff1d2021
+# export ACCENT_COLOR=0xff80a8fc
+# export BACKGROUND=0xff282828
 
 # -- Teal Scheme --
 # export BAR_COLOR=0xff001f30
@@ -37,10 +37,10 @@ export BACKGROUND=0xff282828
 # export BACKGROUND=$BAR_COLOR
 
 # -- Red Scheme ---
-# export BAR_COLOR=0xff23090e
-# export ITEM_BG_COLOR=0xff591221
-# export ACCENT_COLOR=0xffff2453
-# export BACKGROUND=$BAR_COLOR
+export BAR_COLOR=0xff23090e
+export ITEM_BG_COLOR=0xff591221
+export ACCENT_COLOR=0xffff2453
+export BACKGROUND=$BAR_COLOR
 
 # -- Blue Scheme ---
 # export BAR_COLOR=0xff021254
