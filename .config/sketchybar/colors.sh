@@ -18,6 +18,13 @@ export TRANSPARENT=0x00000000
 # export ACCENT_COLOR=0xff80a8fc
 # export BACKGROUND=0xff282828
 
+# -- Everforest Dark Hard --
+export CORNER_RADIUS=8
+export BAR_COLOR=0xaa272e33
+export ITEM_BG_COLOR=0xff2e383c
+export ACCENT_COLOR=0xffa7c080
+export BACKGROUND=0xff1e2326
+
 # -- Teal Scheme --
 # export BAR_COLOR=0xff001f30
 # export ITEM_BG_COLOR=0xff003547
@@ -37,10 +44,10 @@ export TRANSPARENT=0x00000000
 # export BACKGROUND=$BAR_COLOR
 
 # -- Red Scheme ---
-export BAR_COLOR=0xff23090e
-export ITEM_BG_COLOR=0xff591221
-export ACCENT_COLOR=0xffff2453
-export BACKGROUND=$BAR_COLOR
+# export BAR_COLOR=0xff23090e
+# export ITEM_BG_COLOR=0xff591221
+# export ACCENT_COLOR=0xffff2453
+# export BACKGROUND=$BAR_COLOR
 
 # -- Blue Scheme ---
 # export BAR_COLOR=0xff021254
@@ -65,4 +72,3 @@ export BACKGROUND=$BAR_COLOR
 # export ITEM_BG_COLOR=0xff8e7e0a
 # export ACCENT_COLOR=0xfff7fc17
 # export BACKGROUND=$BAR_COLOR
-

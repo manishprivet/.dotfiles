@@ -6,6 +6,11 @@ vim.opt.winbar = "%=%m %f"
 -- vim.opt.colorcolumn = "80"
 vim.opt.scrolloff = 10
 vim.opt.incsearch = true
+vim.g.lazygit_config = false
+vim.env.LG_CONFIG_FILE = table.concat({
+  vim.fn.expand("~/.config/lazygit/config.yml"),
+  vim.fn.expand("~/.config/lazygit/themes/everforest-dark-hard.yml"),
+}, ",")
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")

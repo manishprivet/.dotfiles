@@ -47,7 +47,7 @@
 [color "diff"]
   meta = white bold
   frag = magenta
-  context = white
+  context = default
   whitespace = yellow reverse
   old = red
 

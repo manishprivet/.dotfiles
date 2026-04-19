@@ -3,17 +3,17 @@ if status is-interactive
 end
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# TokyoNight Color Palette
-set -l foreground c0caf5
-set -l selection 33467c
-set -l comment 565f89
-set -l red f7768e
-set -l orange ff9e64
-set -l yellow e0af68
-set -l green 9ece6a
-set -l purple 9d7cd8
-set -l cyan 7dcfff
-set -l pink bb9af7
+# Everforest Dark Hard Color Palette
+set -l foreground d3c6aa
+set -l selection 384b55
+set -l comment 859289
+set -l red e67e80
+set -l orange e69875
+set -l yellow dbbc7f
+set -l green a7c080
+set -l purple d699b6
+set -l cyan 83c092
+set -l pink 7fbbb3
 
 # Syntax Highlighting Colors
 set -g fish_color_normal $foreground
@@ -75,6 +75,8 @@ export PATH="$HOME/.local/bin:$PATH"
 # bun
 set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
+
+set --export LG_CONFIG_FILE "$HOME/.config/lazygit/config.yml,$HOME/.config/lazygit/themes/everforest-dark-hard.yml"
 
 # Added by `rbenv init` on Mon Jan 12 09:03:47 JST 2026
 status --is-interactive; and rbenv init - --no-rehash fish | source
