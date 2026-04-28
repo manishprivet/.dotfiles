@@ -22,7 +22,7 @@ return {
       -- https://code.claude.com/docs/en/permissions#read-and-edit
       tmp_dir = "/tmp/_99",
 
-      model = "openai/gpt-5.4",
+      model = "openai/gpt-5.5",
 
       --- Completions: #rules and @files in the prompt buffer
       completion = {
