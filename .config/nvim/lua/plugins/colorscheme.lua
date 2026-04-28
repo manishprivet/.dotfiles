@@ -40,7 +40,7 @@ return {
       vim.o.background = "dark"
       require("everforest").setup({
         background = "hard",
-        transparent_background_level = 0,
+        transparent_background_level = 2,
       })
 
       local group = vim.api.nvim_create_augroup("everforest_terminal_colors", { clear = true })

@@ -3,7 +3,7 @@ theme = Everforest Dark Hard
 # background = 282c34
 # foreground= ffffff
 
-background-opacity = 0.80
+background-opacity = 0.90
 background-blur-radius = 20
 
 window-decoration = false
