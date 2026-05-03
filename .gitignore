@@ -10,3 +10,5 @@
 .config/fish/functions/ssvm.fish
 .config/fish/functions/vm_toggle.fish
 .brewfile-exclude
+.pi/agent/auth.json
+.pi/agent/sessions/

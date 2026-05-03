@@ -1,0 +1,17 @@
+{
+  "lastChangelogVersion": "0.72.1",
+  "defaultProvider": "openrouter",
+  "defaultModel": "minimax/minimax-m2.5",
+  "defaultThinkingLevel": "medium",
+  "compaction": {
+    "enabled": false
+  },
+  "showHardwareCursor": false,
+  "editorPaddingX": 0,
+  "terminal": {
+    "showTerminalProgress": false
+  },
+  "enableInstallTelemetry": false,
+  "doubleEscapeAction": "tree",
+  "theme": "everforest"
+}
