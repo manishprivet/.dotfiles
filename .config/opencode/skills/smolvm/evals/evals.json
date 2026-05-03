@@ -1,0 +1,65 @@
+{
+  "skill_name": "smolvm",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Run an ephemeral Alpine Linux VM that executes `echo 'Hello from VM' && uname -a` and returns the output.",
+      "expected_output": "Commands using `smolvm machine run --image alpine` with the echo and uname commands, plus expected VM output showing Linux kernel info.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "Create a persistent VM named 'devbox' with network enabled, then install nginx inside it and show how to start an interactive shell.",
+      "expected_output": "Commands using `smolvm machine create --net devbox`, `smolvm machine start`, `smolvm machine exec` for package installation, and `smolvm machine exec -it` for interactive shell.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Show how to create a portable .smolmachine artifact from the python:3.12-slim image and then run Python to print its version.",
+      "expected_output": "Commands using `smolvm pack create --image python:3.12-slim -o ` and then running the packed artifact with `./ run -- python3 --version`.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Explain how to securely run untrusted code in an isolated VM where the code cannot access the network, but allow access to just github.com for git operations.",
+      "expected_output": "Explanation that network is off by default, and using `--allow-host github.com` to whitelist specific domains while keeping other network access blocked.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Show how to forward the host SSH agent into a VM to use git with the host's SSH keys, without the keys being extractable from the guest.",
+      "expected_output": "Commands using `--ssh-agent` flag, explanation that keys cannot leave the VM, and `ssh-add -l` verification inside the VM.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Create a Smolfile for a Python web app that has network enabled, allows api.stripe.com, mounts ./app to /app, and uses the python:3.12-alpine image.",
+      "expected_output": "A complete Smolfile with image, net, [network] allow_hosts, [dev] volumes, and relevant sections.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "On a Linux host with KVM, how would you verify that virtualization is available before running smolvm?",
+      "expected_output": "Checking /dev/kvm exists with `ls -l /dev/kvm` and potentially checking /proc/cpuinfo for vmx/svm flags.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "How do you copy a file from the host into a running VM at /workspace/script.py, execute it, and then copy the results back?",
+      "expected_output": "Commands using `smolvm machine cp ./script.py vm:/workspace/script.py`, `smolvm machine exec --name vm -- python3 /workspace/script.py`, and `smolvm machine cp vm:/workspace/output.json ./output.json`.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Show how to create a persistent machine from an existing .smolmachine file for fast boot without image pull.",
+      "expected_output": "Commands using `smolvm machine create myvm --from ./artifact.smolmachine` followed by `smolvm machine start --name myvm`.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Start an HTTP API server on port 8080 and list the key endpoints available for machine management.",
+      "expected_output": "Command using `smolvm serve start --listen 127.0.0.1:8080` and explanation of endpoints like POST /api/v1/machines, POST /api/v1/machines/:name/exec, etc.",
+      "files": []
+    }
+  ]
+}

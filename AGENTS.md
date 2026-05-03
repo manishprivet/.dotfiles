@@ -1,42 +1,27 @@
-# Dotfiles Repository Agent Guidelines
+# AGENTS
 
-## Development Commands
-- Setup: `./scripts/setup.sh`
-- Install dependencies: `brew bundle --file .Brewfile`
-- Symlink configs: `stow .`
-- Fish plugin management: `./scripts/fish.sh`
+## Repo shape
+- This is a macOS-focused dotfiles repo, not an app repo. There is no root `package.json`, test runner, linter, or CI workflow to use as a default verification path.
+- Most managed files live under `.config/`, plus `.pi/` for Pi prompt/config state.
 
-## Code Style & Conventions
-### Shell Scripts
-- Use `#!/bin/bash` for bash, `#!/usr/bin/env fish` for fish
-- Linting: Always run `shellcheck` before committing
-- Bash conventions:
-  - Use `[[ ]]` for conditionals
-  - Quote all variables: `"$variable"`
-  - Use `set -euo pipefail` for robust error handling
-- Fish conventions:
-  - Use `set` for variable declaration
-  - Prefer functions over aliases
-  - Use type annotations where possible
+## Deploying changes
+- Apply dotfile changes with `stow .` from the repo root.
+- `.stow-local-ignore` excludes `.git`, `README.md`, `scripts`, `wallpapers`, `tokyonight-wallpapers`, and `submodules`, so edits there do not get deployed by Stow.
+- Use `stow -n -v .` for a safe dry run before changing symlinked layout.
 
-## Error Handling
-- Always include error logging
-- Use exit codes (0 for success, non-zero for errors)
-- Validate inputs and dependencies
-- Provide clear error messages
+## Source-of-truth locations
+- OpenCode command prompts in `.config/opencode/command/` are symlinks to `.pi/prompts/`. Edit `.pi/prompts/*.md`, not the mirrored paths.
+- `.pi/agent/prompts/` is also symlinked back to `.pi/prompts/`. Keep prompt changes in one place: `.pi/prompts/`.
+- OpenCode skills are stored in `.config/opencode/skills/` in this repo. Do not edit `~/.config/opencode/skills` directly if you are trying to persist changes; deploy via `stow .`.
 
-## Testing & Verification
-- Manual testing recommended
-- Verify configuration changes manually
-- Use `stow --adopt` for careful config management
+## Setup and verification
+- Main bootstrap is `./scripts/setup.sh`. It installs Homebrew, runs `brew bundle --file .Brewfile`, changes the login shell to Fish, installs Fisher plugins, clones tmux plugins, installs Rust, downloads the Sketchybar font, then runs `stow .`.
+- `scripts/fish.sh` assumes Fish is installed at `/opt/homebrew/bin/fish`.
+- There is no general test suite. `test.sh` is an ad hoc AeroSpace/Sketchybar helper, not a repo-wide verification command.
 
-## Best Practices
-- Keep configurations declarative
-- Minimize complex scripting
-- Prioritize readability and maintainability
-- Personal configs may require customization
+## Path quirks
+- Several configs hardcode `/Users/manishprivet` or depend on files under the real home directory. Preserve that pattern unless the task is explicitly to remove hardcoded paths.
+- Representative examples: `.config/fish/config.fish`, `.wezterm.lua`, `.config/sketchybar/plugins/cron.js`, and `.config/nvim/lua/config/options.lua`.
 
-## Recommended Tools
-- ShellCheck for script linting
-- Stow for config management
-- Homebrew for package installation
+## README caveat
+- Trust the current tree over `README.md` for OpenCode skills. The README still describes skill links coming from `submodules/anthropic-skills`, but the checked-in source of truth today is `.config/opencode/skills/` in this repo.

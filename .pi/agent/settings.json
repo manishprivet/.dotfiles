@@ -13,5 +13,6 @@
   },
   "enableInstallTelemetry": false,
   "doubleEscapeAction": "tree",
-  "theme": "everforest"
+  "theme": "everforest",
+  "packages": []
 }
