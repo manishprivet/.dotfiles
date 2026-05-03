@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@ishaksebsib/opencode-tree",
+  "version": "0.3.1",
+  "description": "Pi-style /tree plugin for OpenCode TUI.",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "exports": {
+    "./tui": {
+      "config": {
+        "storageScope": "global"
+      },
+      "types": "./dist/tui.d.ts",
+      "import": "./dist/tui.js"
+    }
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "1.4.3",
+    "@opentui/solid": "0.1.97",
+    "opentui-spinner": "0.0.6",
+    "solid-js": "^1.9.9",
+    "zod": "^3.25.76"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.1.97",
+    "@opentui/solid": ">=0.1.97"
+  },
+  "peerDependenciesMeta": {
+    "@opentui/core": {
+      "optional": true
+    },
+    "@opentui/solid": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "opencode": "^1.4.0"
+  }
+}

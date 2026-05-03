@@ -12,3 +12,5 @@
 .brewfile-exclude
 .pi/agent/auth.json
 .pi/agent/sessions/
+.config/opencode/node_modules/
+.config/opencode/bun.lock

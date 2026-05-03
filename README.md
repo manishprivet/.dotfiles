@@ -53,3 +53,11 @@ Then apply symlinks:
 ```bash
 stow .
 ```
+
+# OpenCode plugins
+
+This repo vendors selected OpenCode plugins under `.config/opencode/plugin/` instead of installing them from npm at runtime.
+
+- `opencode-tree` is based on `ishaksebsib/opencode-tree`
+- Upstream repository: `https://github.com/ishaksebsib/opencode-tree`
+- Original author: Ishak Sebsib

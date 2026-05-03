@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@opencode-ai/plugin": "1.4.3",
+    "@opencode-ai/sdk": "1.4.3",
+    "@opentui/core": "0.1.97",
+    "@opentui/solid": "0.1.97",
+    "opentui-spinner": "0.0.6",
+    "solid-js": "^1.9.9",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "node-notifier": "10.0.1",
+    "detect-terminal": "2.0.0"
+  }
+}

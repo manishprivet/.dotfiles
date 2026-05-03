@@ -1,0 +1,10 @@
+{
+  "plugin": [
+    [
+      "./plugin/opencode-tree",
+      {
+        "storageScope": "global"
+      }
+    ]
+  ]
+}
