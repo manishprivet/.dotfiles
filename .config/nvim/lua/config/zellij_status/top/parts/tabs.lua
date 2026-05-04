@@ -15,7 +15,7 @@ return {
     local message = fmt.hl(" | ", { bg = palette.bg, fg = palette.top.active })
     for idx, buf in ipairs(buffers) do
       local tab_color = buf.bufnr == current_buf and palette.top.active or palette.top.inactive
-      local buf_name = buf.name:match("^%s*(.-)%s*$")
+      local buf_name = (buf.display_name or buf.name):match("^%s*(.-)%s*$")
       buf_name = #buf_name > config.max_label_width and buf_name:sub(1, config.max_label_width - 3) .. "..." or buf_name
       message = message
         .. fmt.hl("█", { bg = palette.bg, fg = tab_color })

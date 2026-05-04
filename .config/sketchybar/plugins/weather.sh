@@ -116,7 +116,7 @@ feelslike=$(echo $data | jq -r '.current.feelslike_c')
 humidity=$(echo $data | jq -r '.current.humidity')
 is_day=$(echo $data | jq -r '.current.is_day')
 
-[ "$is_day" = "1" ] && icon=$weather_icons_day[$condition] || icon=$weather_icons_night[$condition]
+[ "$is_day" = "1" ] && icon=${weather_icons_day[$condition]} || icon=${weather_icons_night[$condition]}
 
 sketchybar -m \
   --set weather \
