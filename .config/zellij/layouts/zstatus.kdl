@@ -1,0 +1,48 @@
+layout {
+    pane size=1 borderless=true {
+        plugin location="zjstatus" {
+            format_left  "#[fg=#272e33,bg=#a7c080,bold] {session} "
+            format_right "{mode}"
+            format_space "#[bg=#272e33]"
+
+            mode_locked  "#[fg=#272e33,bg=#272e33,bold] "
+            mode_normal  "#[fg=#272e33,bg=#a7c080,bold] ; #[fg=#a7c080,bg=#272e33,bold] Rename  #[fg=#272e33,bg=#a7c080,bold] c #[fg=#a7c080,bg=#272e33,bold] NewTab  #[fg=#272e33,bg=#a7c080,bold] |/- #[fg=#a7c080,bg=#272e33,bold] Split  #[fg=#272e33,bg=#a7c080,bold] m #[fg=#a7c080,bg=#272e33,bold] Full  #[fg=#272e33,bg=#7fbbb3,bold] P #[fg=#7fbbb3,bg=#272e33,bold] Pane  #[fg=#272e33,bg=#83c092,bold] t #[fg=#83c092,bg=#272e33,bold] Tab  #[fg=#272e33,bg=#dbbc7f,bold] r #[fg=#dbbc7f,bg=#272e33,bold] Resize  #[fg=#272e33,bg=#9da9a0,bold] M #[fg=#9da9a0,bg=#272e33,bold] Move  #[fg=#272e33,bg=#d699b6,bold] s #[fg=#d699b6,bg=#272e33,bold] Scroll  #[fg=#272e33,bg=#e69875,bold] o #[fg=#e69875,bg=#272e33,bold] Session"
+            mode_resize  "#[fg=#272e33,bg=#dbbc7f,bold] h/j/k/l #[fg=#dbbc7f,bg=#272e33,bold] Increase  #[fg=#272e33,bg=#dbbc7f,bold] H/J/K/L #[fg=#dbbc7f,bg=#272e33,bold] Decrease  #[fg=#272e33,bg=#dbbc7f,bold] +/- #[fg=#dbbc7f,bg=#272e33,bold] Size  #[fg=#272e33,bg=#dbbc7f,bold] r #[fg=#dbbc7f,bg=#272e33,bold] Return"
+            mode_pane    "#[fg=#272e33,bg=#7fbbb3,bold] n #[fg=#7fbbb3,bg=#272e33,bold] New  #[fg=#272e33,bg=#7fbbb3,bold] h/j/k/l #[fg=#7fbbb3,bg=#272e33,bold] Focus  #[fg=#272e33,bg=#7fbbb3,bold] r/d/s #[fg=#7fbbb3,bg=#272e33,bold] Split  #[fg=#272e33,bg=#7fbbb3,bold] x #[fg=#7fbbb3,bg=#272e33,bold] Close  #[fg=#272e33,bg=#7fbbb3,bold] c #[fg=#7fbbb3,bg=#272e33,bold] Rename  #[fg=#272e33,bg=#7fbbb3,bold] f/w/e #[fg=#7fbbb3,bg=#272e33,bold] Full/Float/Embed  #[fg=#272e33,bg=#7fbbb3,bold] i/z #[fg=#7fbbb3,bg=#272e33,bold] Pin/Frames  #[fg=#272e33,bg=#7fbbb3,bold] TAB #[fg=#7fbbb3,bg=#272e33,bold] Next  #[fg=#272e33,bg=#7fbbb3,bold] p #[fg=#7fbbb3,bg=#272e33,bold] Return"
+            mode_tab     "#[fg=#272e33,bg=#83c092,bold] n #[fg=#83c092,bg=#272e33,bold] New  #[fg=#272e33,bg=#83c092,bold] h/j/k/l #[fg=#83c092,bg=#272e33,bold] Prev/Next  #[fg=#272e33,bg=#83c092,bold] 1-9 #[fg=#83c092,bg=#272e33,bold] Jump  #[fg=#272e33,bg=#83c092,bold] [/]/b #[fg=#83c092,bg=#272e33,bold] Break  #[fg=#272e33,bg=#83c092,bold] r #[fg=#83c092,bg=#272e33,bold] Rename  #[fg=#272e33,bg=#83c092,bold] s #[fg=#83c092,bg=#272e33,bold] Sync  #[fg=#272e33,bg=#83c092,bold] x #[fg=#83c092,bg=#272e33,bold] Close  #[fg=#272e33,bg=#83c092,bold] TAB #[fg=#83c092,bg=#272e33,bold] Toggle  #[fg=#272e33,bg=#83c092,bold] t #[fg=#83c092,bg=#272e33,bold] Return"
+            mode_scroll  "#[fg=#272e33,bg=#d699b6,bold] f #[fg=#d699b6,bg=#272e33,bold] Search  #[fg=#272e33,bg=#d699b6,bold] h/j/k/l #[fg=#d699b6,bg=#272e33,bold] Page/Scroll  #[fg=#272e33,bg=#d699b6,bold] d/u #[fg=#d699b6,bg=#272e33,bold] Half  #[fg=#272e33,bg=#d699b6,bold] e #[fg=#d699b6,bg=#272e33,bold] Edit  #[fg=#272e33,bg=#d699b6,bold] s #[fg=#d699b6,bg=#272e33,bold] Return"
+            mode_session "#[fg=#272e33,bg=#e69875,bold] d #[fg=#e69875,bg=#272e33,bold] Detach  #[fg=#272e33,bg=#e69875,bold] w #[fg=#e69875,bg=#272e33,bold] Manager  #[fg=#272e33,bg=#e69875,bold] s #[fg=#e69875,bg=#272e33,bold] Share  #[fg=#272e33,bg=#e69875,bold] c #[fg=#e69875,bg=#272e33,bold] Config  #[fg=#272e33,bg=#e69875,bold] l #[fg=#e69875,bg=#272e33,bold] Layout  #[fg=#272e33,bg=#e69875,bold] p #[fg=#e69875,bg=#272e33,bold] Plugins  #[fg=#272e33,bg=#e69875,bold] a #[fg=#e69875,bg=#272e33,bold] About  #[fg=#272e33,bg=#e69875,bold] o #[fg=#e69875,bg=#272e33,bold] Return"
+            mode_move    "#[fg=#272e33,bg=#9da9a0,bold] h/j/k/l #[fg=#9da9a0,bg=#272e33,bold] Move  #[fg=#272e33,bg=#9da9a0,bold] n/p/TAB #[fg=#9da9a0,bg=#272e33,bold] Cycle  #[fg=#272e33,bg=#9da9a0,bold] m #[fg=#9da9a0,bg=#272e33,bold] Return"
+        }
+    }
+    pane
+    pane size=1 borderless=true {
+        plugin location="zjstatus" {
+            format_left   "{tabs}"
+            format_right  "#[fg=#4f5b58,bg=#272e33]#[fg=#272e33,bg=#4f5b58,bold] {datetime}{mode}"
+            format_space "#[bg=#272e33]"
+
+            hide_frame_for_single_pane "true"
+
+            mode_locked  "#[fg=#e67e80,bold]  "
+            mode_normal  "#[fg=#a7c080,bold]  "
+            mode_resize  "#[fg=#a7c080,bold]  "
+            mode_pane    "#[fg=#a7c080,bold]  "
+            mode_tab     "#[fg=#a7c080,bold]  "
+            mode_scroll  "#[fg=#a7c080,bold]  "
+            mode_session "#[fg=#a7c080,bold]  "
+            mode_move    "#[fg=#a7c080,bold]  "
+
+            tab_normal "#[fg=#859289,bg=#272e33] {name}{sync_indicator}{fullscreen_indicator}{floating_indicator} "
+            tab_active "#[fg=#272e33,bg=#83c092,bold] {name}{sync_indicator}{fullscreen_indicator}{floating_indicator} "
+
+            tab_sync_indicator       " 󰓦"
+            tab_fullscreen_indicator " 󰊓"
+            tab_floating_indicator   " 󰹙"
+
+            datetime        "{format} "
+            datetime_format "%Y-%m-%d %H:%M"
+            datetime_timezone "Asia/Tokyo"
+        }
+    }
+}
