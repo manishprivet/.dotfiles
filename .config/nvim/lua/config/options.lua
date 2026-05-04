@@ -3,6 +3,7 @@
 -- Add any additional options here
 
 vim.opt.winbar = "%=%m %f"
+vim.opt.laststatus = 0
 -- vim.opt.colorcolumn = "80"
 vim.opt.scrolloff = 10
 vim.opt.incsearch = true
