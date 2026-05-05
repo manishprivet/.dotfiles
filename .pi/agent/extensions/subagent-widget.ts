@@ -7,7 +7,7 @@
  *   /subrm <id>                 Remove a subagent widget; kills it if running
  *   /subclear                   Clear all subagent widgets; kills running agents
  *   /sublist                    List active and completed subagents
- *   /subview <id>               Open a Markdown transcript in bat inside a tmux popup
+ *   /subview <id>               Open a compact Markdown transcript in nvim -R inside a tmux popup
  *   /subattach <id>             Attach to the actual subagent session in a tmux popup with read-only tools
  *
  * Tools exposed to the main agent:
@@ -489,7 +489,7 @@ export default function subagentWidget(pi: ExtensionAPI) {
 	});
 
 	pi.registerCommand("subview", {
-		description: "Open a Markdown transcript in bat inside a tmux floating pane: /subview <id>",
+		description: "Open a compact Markdown transcript in nvim -R inside a tmux floating pane: /subview <id>",
 		handler: async (args, ctx) => {
 			const id = Number.parseInt(args.trim(), 10);
 			if (!Number.isFinite(id)) {

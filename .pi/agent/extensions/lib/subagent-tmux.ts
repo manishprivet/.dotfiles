@@ -6,6 +6,9 @@ import type { NotifyLevel, SubagentState, ToolContext } from "./subagent-types";
 
 export type SubagentPopupMode = "fork" | "attach";
 
+const TOOL_ARGUMENT_LIMIT = 1_200;
+const TOOL_OUTPUT_LIMIT = 2_000;
+
 type MessagePart = {
 	type?: string;
 	text?: string;
@@ -36,6 +39,11 @@ function codeFence(text: string, language = ""): string {
 	return `${fence}${language}\n${text}\n${fence}`;
 }
 
+function truncateText(text: string, limit: number): string {
+	if (text.length <= limit) return text;
+	return `${text.slice(0, limit)}\n\n… [truncated ${text.length - limit} chars]`;
+}
+
 function stringifyArguments(args: unknown): string {
 	if (args === undefined) return "";
 	if (typeof args === "string") return args;
@@ -44,6 +52,17 @@ function stringifyArguments(args: unknown): string {
 	} catch {
 		return String(args);
 	}
+}
+
+function summarizeToolCall(part: MessagePart): string {
+	const args = part.arguments as { command?: unknown; path?: unknown } | undefined;
+	if (part.name === "bash" && typeof args?.command === "string") {
+		return truncateText(args.command, TOOL_ARGUMENT_LIMIT);
+	}
+	if ((part.name === "read" || part.name === "write" || part.name === "edit") && typeof args?.path === "string") {
+		return args.path;
+	}
+	return truncateText(stringifyArguments(part.arguments), TOOL_ARGUMENT_LIMIT);
 }
 
 function textFromParts(parts: MessagePart[] | undefined): string {
@@ -68,20 +87,21 @@ function renderMessage(message: SessionMessage): string[] {
 	lines.push(heading, "");
 
 	if (role === "toolResult") {
-		const output = textFromParts(message.content);
-		lines.push(output ? codeFence(output.trimEnd(), "text") : "_(no output)_", "");
+		const output = textFromParts(message.content).trimEnd();
+		lines.push(output ? codeFence(truncateText(output, TOOL_OUTPUT_LIMIT), "text") : "_(no output)_", "");
 		return lines;
 	}
 
 	for (const part of message.content ?? []) {
 		if (part.type === "text" && typeof part.text === "string") {
 			lines.push(part.text, "");
-		} else if (part.type === "thinking" && typeof part.thinking === "string" && part.thinking.trim()) {
-			lines.push("<details>", "<summary>Thinking</summary>", "", part.thinking, "", "</details>", "");
+		} else if (part.type === "thinking") {
+			// Match Pi's default compact transcript view: omit reasoning content.
+			continue;
 		} else if (part.type === "toolCall") {
 			lines.push(`### Tool Call: ${part.name ?? "tool"}`, "");
-			const args = stringifyArguments(part.arguments);
-			lines.push(args ? codeFence(args, "json") : "_(no arguments)_", "");
+			const summary = summarizeToolCall(part);
+			lines.push(summary ? codeFence(summary, part.name === "bash" ? "bash" : "text") : "_(no arguments)_", "");
 		}
 	}
 
@@ -171,9 +191,17 @@ export function openSubagentTranscriptPopup(state: SubagentState, ctx: ToolConte
 	}
 
 	const quotedPath = shellQuote(transcriptPath);
-	const command = `bat --paging=always --style=plain --language=markdown ${quotedPath}`;
+	const command = [
+		"nvim",
+		"-R",
+		"--cmd", "set nomodifiable readonly",
+		"-c", "setlocal filetype=markdown nonumber norelativenumber signcolumn=no foldlevel=99",
+		quotedPath,
+	]
+		.map(shellQuote)
+		.join(" ");
 	openTmuxPopup(command, `Subagent #${state.id} transcript`, ctx);
-	notify(ctx, `Opened subagent #${state.id} transcript in bat.`, "info");
+	notify(ctx, `Opened subagent #${state.id} transcript in nvim -R.`, "info");
 }
 
 export function openReadonlySubagentPopup(state: SubagentState, ctx: ToolContext, mode: SubagentPopupMode): void {
