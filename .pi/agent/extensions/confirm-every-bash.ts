@@ -1,66 +1,22 @@
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
 import {
-	CONFIRM_EVERY_BASH_CONFIG_PATH,
 	CONFIRM_EVERY_BASH_SESSION_STATE_TYPE,
 	normalizeCommand,
-	normalizeStringList,
-	loadConfirmEveryBashConfig,
 	restoreConfirmEveryBashSessionAllowedCommands,
-	shouldAllowWithoutPrompt,
-	updateConfirmEveryBashConfig,
 } from "./lib/confirm-every-bash-shared";
+import { confirmBashPermission, shouldAllowBashWithoutPrompt } from "./lib/bash-permission-policy";
 import { NotificationSound } from "./lib/terminal-notify-shared";
 import { sendPiNotificationWhenUnfocused } from "./lib/pi-notification-shared";
 import { getBashCommand } from "./lib/tool-call-shared";
-import { showPermissionDialog, type PermissionDialogOption } from "./lib/permission-dialog-ui";
 
 type SessionState = {
 	allowedCommands: string[];
 };
 
-type PermissionDecision = "allow-once" | "allow-session" | "allow-always" | "deny";
-
-const PERMISSION_OPTIONS: PermissionDialogOption<PermissionDecision>[] = [
-	{
-		value: "allow-once",
-		label: "Allow once",
-	},
-	{
-		value: "allow-session",
-		label: "Allow this session",
-	},
-	{
-		value: "allow-always",
-		label: "Always allow exact command",
-		color: "warning",
-	},
-	{
-		value: "deny",
-		label: "Deny",
-		color: "error",
-	},
-];
-
 function persistSessionAllowedCommands(pi: ExtensionAPI, sessionAllowedCommands: Set<string>) {
 	pi.appendEntry<SessionState>(CONFIRM_EVERY_BASH_SESSION_STATE_TYPE, {
 		allowedCommands: Array.from(sessionAllowedCommands).sort(),
 	});
-}
-
-async function promptForPermission(ctx: ExtensionContext, _source: string, command: string): Promise<PermissionDecision> {
-	if (!ctx.hasUI) {
-		return "deny";
-	}
-
-	const result = await showPermissionDialog(ctx, {
-		title: "⚠ Bash permission required",
-		contextLines: [],
-		bodyLabel: "command:",
-		body: command,
-		options: PERMISSION_OPTIONS,
-	});
-
-	return result ?? "deny";
 }
 
 function getBlockReason(ctx: ExtensionContext): string {
@@ -83,33 +39,16 @@ export default function (pi: ExtensionAPI) {
 		if (!bashCommand) return;
 
 		const command = normalizeCommand(bashCommand);
-		const config = await loadConfirmEveryBashConfig();
-		if (shouldAllowWithoutPrompt(command, config, sessionAllowedCommands)) {
-			return;
-		}
+		if (await shouldAllowBashWithoutPrompt(command, sessionAllowedCommands)) return;
 
 		await sendPiNotificationWhenUnfocused(pi, ctx, {
 			message: "Waiting for bash approval",
 			sound: NotificationSound.Submarine,
 		});
-		const decision = await promptForPermission(ctx, "Pi wants to run this bash command:", command);
-		if (decision === "allow-once") {
-			return;
-		}
-
-		if (decision === "allow-session") {
-			sessionAllowedCommands.add(command);
-			persistSessionAllowedCommands(pi, sessionAllowedCommands);
-			ctx.ui.notify(`Allowed for this session: ${command}`, "info");
-			return;
-		}
-
-		if (decision === "allow-always") {
-			await updateConfirmEveryBashConfig((current) => ({
-				...current,
-				allowCommands: Array.from(new Set([...normalizeStringList(current.allowCommands), command])).sort(),
-			}));
-			ctx.ui.notify(`Always allowed and saved to ${CONFIRM_EVERY_BASH_CONFIG_PATH}`, "success");
+		const beforeSize = sessionAllowedCommands.size;
+		const approved = await confirmBashPermission(ctx, command, sessionAllowedCommands);
+		if (approved) {
+			if (sessionAllowedCommands.size !== beforeSize) persistSessionAllowedCommands(pi, sessionAllowedCommands);
 			return;
 		}
 
