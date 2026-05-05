@@ -1,5 +1,4 @@
 import { TimeoutError, withTimeout } from "../kdco-primitives/with-timeout"
-import { canUseCmuxWorkflow } from "../worktree/terminal"
 
 interface CmuxNotificationPayload {
 	title: string
@@ -30,6 +29,14 @@ const spawnCmuxWithBun: SpawnCmuxProcess = (command) =>
 		stdout: "ignore",
 		stderr: "ignore",
 	})
+
+function canUseCmuxWorkflow(
+	env: EnvironmentVariables,
+	resolveExecutable: ResolveExecutable,
+	cmuxCommand: string,
+): boolean {
+	return Boolean(env.TMUX && resolveExecutable(cmuxCommand))
+}
 
 export const CMUX_NOTIFY_TIMEOUT_MS = 1500
 export const CMUX_STATUS_TIMEOUT_MS = CMUX_NOTIFY_TIMEOUT_MS

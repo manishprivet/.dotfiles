@@ -12,7 +12,7 @@
 ## Source-of-truth locations
 - OpenCode command prompts in `.config/opencode/command/` are symlinks to `.pi/prompts/`. Edit `.pi/prompts/*.md`, not the mirrored paths.
 - `.pi/agent/prompts/` is also symlinked back to `.pi/prompts/`. Keep prompt changes in one place: `.pi/prompts/`.
-- OpenCode skills are stored in `.config/opencode/skills/` in this repo. Do not edit `~/.config/opencode/skills` directly if you are trying to persist changes; deploy via `stow .`.
+- OpenCode skills are stored in `.agents/skills/` in this repo. Do not edit `~/.agents/skills` directly if you are trying to persist changes; deploy via `stow .`.
 
 ## Setup and verification
 - Main bootstrap is `./scripts/setup.sh`. It installs Homebrew, runs `brew bundle --file .Brewfile`, changes the login shell to Fish, installs Fisher plugins, clones tmux plugins, installs Rust, downloads the Sketchybar font, then runs `stow .`.
@@ -35,4 +35,4 @@
 - **All files in this repo are symlinked TO ~** - files in `.dotfiles/.config/`, `.dotfiles/.pi/`, etc. are the sources; stow creates symlinks at `~/.config/`, `~/.pi/`, `~/.tmux.conf`, `~/.wezterm.lua`, etc. pointing back to the dotfiles repo
 
 ## README caveat
-- Trust the current tree over `README.md` for OpenCode skills. The README still describes skill links coming from `submodules/anthropic-skills`, but the checked-in source of truth today is `.config/opencode/skills/` in this repo.
+- Trust the current tree over `README.md` for OpenCode skills. The checked-in source of truth today is `.agents/skills/` in this repo.
