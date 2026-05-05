@@ -161,7 +161,7 @@ if [ ! -s "$file" ]; then
 fi
 exec nvim -R -n "$file" \
   -c 'setlocal filetype=markdown nonumber norelativenumber signcolumn=no nofoldenable conceallevel=0 readonly nomodifiable' \
-  -c 'normal! gg'
+  -c 'normal! G'
 `, { mode: 0o700 });
 	return scriptPath;
 }

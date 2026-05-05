@@ -5,11 +5,54 @@ import { getBashCommand, getWriteToolInput } from "./tool-call-shared";
 
 const REQUEST_TIMEOUT_MS = 10 * 60 * 1000;
 
+function getBridgeEnv(): { socketPath?: string; token?: string; subagentId?: string; task?: string } {
+	return {
+		socketPath: process.env.PI_SUBAGENT_PERMISSION_SOCKET,
+		token: process.env.PI_SUBAGENT_PERMISSION_TOKEN,
+		subagentId: process.env.PI_SUBAGENT_ID,
+		task: process.env.PI_SUBAGENT_TASK,
+	};
+}
+
+function startParentHeartbeat(): void {
+	const { socketPath, token, subagentId, task } = getBridgeEnv();
+	if (!socketPath || !token) return;
+
+	const socket = net.createConnection(socketPath);
+	let connected = false;
+	let exiting = false;
+
+	function exitBecauseParentGone(reason: string): void {
+		if (exiting) return;
+		exiting = true;
+		console.error(`Subagent exiting: ${reason}`);
+		process.exit(1);
+	}
+
+	socket.on("connect", () => {
+		connected = true;
+		socket.write(JSON.stringify({
+			kind: "heartbeat",
+			token,
+			subagentId,
+			task,
+			pid: process.pid,
+		}) + "\n");
+	});
+
+	socket.on("close", () => exitBecauseParentGone("main Pi permission bridge closed"));
+	socket.on("end", () => exitBecauseParentGone("main Pi permission bridge ended"));
+	socket.on("error", (error) => {
+		exitBecauseParentGone(
+			connected
+				? `main Pi permission bridge error: ${error.message}`
+				: `could not connect to main Pi permission bridge: ${error.message}`,
+		);
+	});
+}
+
 function requestPermission(request: PermissionRequest): Promise<PermissionResponse> {
-	const socketPath = process.env.PI_SUBAGENT_PERMISSION_SOCKET;
-	const token = process.env.PI_SUBAGENT_PERMISSION_TOKEN;
-	const subagentId = process.env.PI_SUBAGENT_ID;
-	const task = process.env.PI_SUBAGENT_TASK;
+	const { socketPath, token, subagentId, task } = getBridgeEnv();
 
 	if (!socketPath || !token) {
 		return Promise.resolve({
@@ -73,6 +116,8 @@ function requestPermission(request: PermissionRequest): Promise<PermissionRespon
 }
 
 export default function subagentPermissionClient(pi: ExtensionAPI) {
+	startParentHeartbeat();
+
 	pi.on("tool_call", async (event, ctx) => {
 		const command = getBashCommand(event);
 		if (command) {

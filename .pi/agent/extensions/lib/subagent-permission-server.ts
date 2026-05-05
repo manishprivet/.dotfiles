@@ -29,8 +29,11 @@ export function createSubagentPermissionServer(options: Options): SubagentPermis
 	let server: net.Server | undefined;
 	let socketPath: string | undefined;
 	let queue: Promise<void> = Promise.resolve();
+	const heartbeatSockets = new Set<net.Socket>();
 
 	function close(): void {
+		for (const socket of heartbeatSockets) socket.destroy();
+		heartbeatSockets.clear();
 		server?.close();
 		server = undefined;
 		if (socketPath) {
@@ -117,6 +120,20 @@ export function createSubagentPermissionServer(options: Options): SubagentPermis
 		return { allow: false, reason: "Blocked: unknown subagent permission request kind" };
 	}
 
+	function handleHeartbeatRequest(request: PermissionRequest, socket: net.Socket): boolean {
+		if (request.kind !== "heartbeat") return false;
+		if (request.token !== token) {
+			socket.end(JSON.stringify({ allow: false, reason: "Invalid heartbeat token" }) + "\n");
+			return true;
+		}
+
+		heartbeatSockets.add(socket);
+		socket.write(JSON.stringify({ ok: true }) + "\n");
+		socket.on("close", () => heartbeatSockets.delete(socket));
+		socket.on("error", () => heartbeatSockets.delete(socket));
+		return true;
+	}
+
 	function enqueuePermissionRequest(request: PermissionRequest): Promise<PermissionResponse> {
 		const responsePromise = queue.then(() => handlePermissionRequest(request));
 		queue = responsePromise.then(() => undefined, () => undefined);
@@ -139,11 +156,14 @@ export function createSubagentPermissionServer(options: Options): SubagentPermis
 
 		server = net.createServer((socket) => {
 			let buffer = "";
+			let handledFirstRequest = false;
 			socket.setEncoding("utf-8");
 			socket.on("data", (chunk: string) => {
+				if (handledFirstRequest) return;
 				buffer += chunk;
 				const newline = buffer.indexOf("\n");
 				if (newline === -1) return;
+				handledFirstRequest = true;
 
 				const line = buffer.slice(0, newline).trim();
 				let request: PermissionRequest;
@@ -153,6 +173,8 @@ export function createSubagentPermissionServer(options: Options): SubagentPermis
 					socket.end(JSON.stringify({ allow: false, reason: "Blocked: invalid subagent permission request JSON" }) + "\n");
 					return;
 				}
+
+				if (handleHeartbeatRequest(request, socket)) return;
 
 				void enqueuePermissionRequest(request).then((response) => {
 					socket.end(JSON.stringify(response) + "\n");

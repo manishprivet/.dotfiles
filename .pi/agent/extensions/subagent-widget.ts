@@ -27,8 +27,21 @@ import { openReadonlySubagentPopup, openSubagentTranscriptPopup } from "./lib/su
 import type { NotifyLevel, SubagentState, SubagentStatus, ToolContext, ToolUpdate } from "./lib/subagent-types";
 
 const SUBAGENT_TOOLS = "read,bash,edit,write,grep,find,ls";
+const SUBAGENT_STATE_TYPE = "subagent-widget-state";
 const RESULT_PREVIEW_LIMIT = 8_000;
 const WIDGET_RESULT_LIMIT = 4_000;
+
+type PersistedSubagentState = {
+	id: number;
+	status: "running" | "done" | "error" | "removed";
+	task: string;
+	toolCount: number;
+	elapsedMs: number;
+	sessionFile: string;
+	turnCount: number;
+	lastOutput?: string;
+	error?: string;
+};
 
 function getPiInvocation(args: string[]): { command: string; args: string[] } {
 	const currentScript = process.argv[1];
@@ -80,6 +93,35 @@ function buildList(agents: Map<number, SubagentState>): string {
 		.join("\n");
 }
 
+function toPersistedState(state: SubagentState, status: PersistedSubagentState["status"] = state.status): PersistedSubagentState {
+	const output = state.textChunks.join("");
+	return {
+		id: state.id,
+		status,
+		task: state.task,
+		toolCount: state.toolCount,
+		elapsedMs: state.elapsedMs,
+		sessionFile: state.sessionFile,
+		turnCount: state.turnCount,
+		lastOutput: output ? output.slice(-2_000) : undefined,
+		error: state.error,
+	};
+}
+
+function fromPersistedState(snapshot: PersistedSubagentState): SubagentState {
+	return {
+		id: snapshot.id,
+		status: snapshot.status === "running" ? "error" : snapshot.status,
+		task: snapshot.task,
+		textChunks: snapshot.lastOutput ? [snapshot.lastOutput] : [],
+		toolCount: snapshot.toolCount,
+		elapsedMs: snapshot.elapsedMs,
+		sessionFile: snapshot.sessionFile,
+		turnCount: snapshot.turnCount,
+		error: snapshot.status === "running" ? "interrupted by reload" : snapshot.error,
+	};
+}
+
 function notify(ctx: ToolContext, message: string, level: NotifyLevel): void {
 	if (ctx.hasUI === false) return;
 	ctx.ui.notify(message, level);
@@ -90,6 +132,29 @@ export default function subagentWidget(pi: ExtensionAPI) {
 	const permissionServer = createSubagentPermissionServer({ getSubagent: (id) => agents.get(id) });
 	let nextId = 1;
 	let widgetCtx: ToolContext | undefined;
+
+	function persistState(state: SubagentState, status?: PersistedSubagentState["status"]): void {
+		pi.appendEntry<PersistedSubagentState>(SUBAGENT_STATE_TYPE, toPersistedState(state, status));
+	}
+
+	function restoreSubagents(ctx: ToolContext): void {
+		agents.clear();
+		let maxId = 0;
+		const snapshots = new Map<number, PersistedSubagentState>();
+		for (const entry of ctx.sessionManager.getBranch() as Array<{ type?: string; customType?: string; data?: unknown }>) {
+			if (entry.type !== "custom" || entry.customType !== SUBAGENT_STATE_TYPE) continue;
+			const snapshot = entry.data as PersistedSubagentState | undefined;
+			if (!snapshot || typeof snapshot.id !== "number") continue;
+			snapshots.set(snapshot.id, snapshot);
+		}
+
+		for (const snapshot of snapshots.values()) {
+			maxId = Math.max(maxId, snapshot.id);
+			if (snapshot.status === "removed") continue;
+			agents.set(snapshot.id, fromPersistedState(snapshot));
+		}
+		nextId = Math.max(nextId, maxId + 1);
+	}
 
 	function clearWidget(id: number, ctx = widgetCtx): void {
 		if (ctx?.hasUI === false) return;
@@ -247,6 +312,7 @@ export default function subagentWidget(pi: ExtensionAPI) {
 			state.status = code === 0 ? "done" : "error";
 			if (signal) state.error = `terminated by ${signal}`;
 			if (code !== 0 && !state.error) state.error = `pi exited with code ${code ?? "unknown"}`;
+			persistState(state);
 			updateWidgets();
 
 			const result = state.textChunks.join("").trim();
@@ -283,6 +349,7 @@ export default function subagentWidget(pi: ExtensionAPI) {
 			state.status = "error";
 			state.error = error.message;
 			state.textChunks.push(`\nError: ${error.message}`);
+			persistState(state);
 			updateWidgets();
 			notify(ctx, `Subagent #${state.id} failed: ${error.message}`, "error");
 		});
@@ -302,6 +369,7 @@ export default function subagentWidget(pi: ExtensionAPI) {
 			turnCount: 1,
 		};
 		agents.set(id, state);
+		persistState(state);
 		updateWidgets();
 		await spawnAgent(state, task, ctx);
 		return state;
@@ -321,6 +389,7 @@ export default function subagentWidget(pi: ExtensionAPI) {
 		state.error = undefined;
 		state.removed = false;
 		state.turnCount += 1;
+		persistState(state);
 		updateWidgets();
 		await spawnAgent(state, prompt, ctx);
 		return state;
@@ -337,6 +406,7 @@ export default function subagentWidget(pi: ExtensionAPI) {
 			state.proc.kill("SIGTERM");
 			suffix = "killed and removed";
 		}
+		persistState(state, "removed");
 		agents.delete(id);
 		clearWidget(id, ctx);
 		return `Subagent #${id} ${suffix}.`;
@@ -352,12 +422,26 @@ export default function subagentWidget(pi: ExtensionAPI) {
 				state.proc.kill("SIGTERM");
 				killed += 1;
 			}
+			persistState(state, "removed");
 			clearWidget(id, ctx);
 		}
 		agents.clear();
 		nextId = 1;
 		if (total === 0) return "No subagents to clear.";
 		return `Cleared ${total} subagent${total === 1 ? "" : "s"}${killed > 0 ? ` (${killed} killed)` : ""}.`;
+	}
+
+	function interruptSubagentsForShutdown(ctx: ToolContext): void {
+		for (const [id, state] of agents.entries()) {
+			if (state.proc && state.status === "running") {
+				state.status = "error";
+				state.error = "interrupted by reload";
+				state.proc.kill("SIGTERM");
+			}
+			persistState(state);
+			clearWidget(id, ctx);
+		}
+		agents.clear();
 	}
 
 	pi.registerMessageRenderer("subagent-result", (message, _options, theme) => {
@@ -532,11 +616,12 @@ export default function subagentWidget(pi: ExtensionAPI) {
 		widgetCtx = ctx as ToolContext;
 		permissionServer.setContext(widgetCtx);
 		permissionServer.clearSessionAllowedCommands();
+		restoreSubagents(widgetCtx);
 		updateWidgets();
 	});
 
 	pi.on("session_shutdown", async (_event, ctx) => {
-		clearSubagents(ctx as ToolContext);
+		interruptSubagentsForShutdown(ctx as ToolContext);
 		permissionServer.close();
 		permissionServer.setContext(undefined);
 		widgetCtx = undefined;

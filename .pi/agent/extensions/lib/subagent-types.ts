@@ -8,7 +8,7 @@ export type ToolContext = ExtensionContext & { hasUI?: boolean };
 
 export type PermissionRequest = {
 	token?: string;
-	kind?: "bash" | "write";
+	kind?: "bash" | "write" | "heartbeat";
 	command?: string;
 	toolName?: "write" | "edit";
 	path?: string;
