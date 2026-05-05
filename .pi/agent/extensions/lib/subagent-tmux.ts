@@ -138,11 +138,32 @@ function renderSessionMarkdown(state: SubagentState): string {
 	return lines.join("\n");
 }
 
-function writeTranscriptMarkdown(state: SubagentState): string {
+function writeTranscriptMarkdown(state: SubagentState): { dir: string; filePath: string } {
 	const dir = fs.mkdtempSync(path.join(os.tmpdir(), `pi-subagent-${state.id}-`));
 	const filePath = path.join(dir, `subagent-${state.id}.md`);
 	fs.writeFileSync(filePath, renderSessionMarkdown(state), "utf-8");
-	return filePath;
+	return { dir, filePath };
+}
+
+function writeNvimTranscriptLauncher(dir: string, transcriptPath: string): string {
+	const scriptPath = path.join(dir, "open-transcript.sh");
+	fs.writeFileSync(scriptPath, `#!/bin/sh
+set -eu
+file=${shellQuote(transcriptPath)}
+if [ ! -s "$file" ]; then
+  clear
+  echo "Subagent transcript is empty or missing: $file"
+  ls -l "$file" 2>/dev/null || true
+  echo
+  echo "Press enter to close."
+  read _
+  exit 1
+fi
+exec nvim -R -n "$file" \
+  -c 'setlocal filetype=markdown nonumber norelativenumber signcolumn=no nofoldenable conceallevel=0 readonly nomodifiable' \
+  -c 'normal! gg'
+`, { mode: 0o700 });
+	return scriptPath;
 }
 
 function openTmuxPopup(command: string, title: string, ctx: ToolContext): void {
@@ -183,26 +204,18 @@ function buildReadonlySubagentCommand(sessionFile: string, mode: SubagentPopupMo
 
 export function openSubagentTranscriptPopup(state: SubagentState, ctx: ToolContext): void {
 	let transcriptPath: string;
+	let launcherPath: string;
 	try {
-		transcriptPath = writeTranscriptMarkdown(state);
+		const transcript = writeTranscriptMarkdown(state);
+		transcriptPath = transcript.filePath;
+		launcherPath = writeNvimTranscriptLauncher(transcript.dir, transcriptPath);
 	} catch (error) {
 		notify(ctx, `Failed to render subagent transcript: ${error instanceof Error ? error.message : String(error)}`, "error");
 		return;
 	}
 
-	const quotedPath = shellQuote(transcriptPath);
-	const command = [
-		"nvim",
-		"--clean",
-		"-R",
-		"-n",
-		"-c", "setlocal filetype=markdown nonumber norelativenumber signcolumn=no foldlevel=99 readonly nomodifiable",
-		quotedPath,
-	]
-		.map(shellQuote)
-		.join(" ");
-	openTmuxPopup(command, `Subagent #${state.id} transcript`, ctx);
-	notify(ctx, `Opened subagent #${state.id} transcript in nvim -R.`, "info");
+	openTmuxPopup(shellQuote(launcherPath), `Subagent #${state.id} transcript`, ctx);
+	notify(ctx, `Opened subagent #${state.id} transcript in nvim -R: ${transcriptPath}`, "info");
 }
 
 export function openReadonlySubagentPopup(state: SubagentState, ctx: ToolContext, mode: SubagentPopupMode): void {
