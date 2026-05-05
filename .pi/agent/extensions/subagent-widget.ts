@@ -7,67 +7,24 @@
  *   /subrm <id>                 Remove a subagent widget; kills it if running
  *   /subclear                   Clear all subagent widgets; kills running agents
  *   /sublist                    List active and completed subagents
+ *   /subview <id>               Open a Markdown transcript in bat inside a tmux popup
+ *   /subattach <id>             Attach to the actual subagent session in a tmux popup with read-only tools
  *
  * Tools exposed to the main agent:
  *   subagent_create, subagent_continue, subagent_remove, subagent_list
  */
 
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
-import { randomBytes } from "node:crypto";
+import { spawn } from "node:child_process";
 import * as fs from "node:fs";
-import * as net from "node:net";
 import * as os from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { DynamicBorder, type ExtensionAPI, type ExtensionContext } from "@mariozechner/pi-coding-agent";
+import { DynamicBorder, type ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Box, Container, Text, truncateToWidth } from "@mariozechner/pi-tui";
 import { Type } from "typebox";
-import {
-	confirmBashPermission,
-	shouldAllowBashWithoutPrompt,
-} from "./lib/bash-permission-policy";
-import {
-	confirmOutsideCwdWrite,
-	getOutsideCwdWriteAttempt,
-} from "./lib/outside-cwd-write-policy";
-
-type SubagentStatus = "running" | "done" | "error";
-type NotifyLevel = "info" | "success" | "warning" | "error";
-type ToolUpdate = (update: { content: Array<{ type: "text"; text: string }> }) => void;
-
-type PermissionRequest = {
-	token?: string;
-	kind?: "bash" | "write";
-	command?: string;
-	toolName?: "write" | "edit";
-	path?: string;
-	cwd?: string;
-	toolCallId?: string;
-	subagentId?: string;
-	task?: string;
-	pid?: number;
-};
-
-type PermissionResponse = {
-	allow: boolean;
-	reason?: string;
-};
-
-type ToolContext = ExtensionContext & { hasUI?: boolean };
-
-interface SubagentState {
-	id: number;
-	status: SubagentStatus;
-	task: string;
-	textChunks: string[];
-	toolCount: number;
-	elapsedMs: number;
-	sessionFile: string;
-	turnCount: number;
-	proc?: ChildProcessWithoutNullStreams;
-	error?: string;
-	removed?: boolean;
-}
+import { createSubagentPermissionServer } from "./lib/subagent-permission-server";
+import { openReadonlySubagentPopup, openSubagentTranscriptPopup } from "./lib/subagent-tmux";
+import type { NotifyLevel, SubagentState, SubagentStatus, ToolContext, ToolUpdate } from "./lib/subagent-types";
 
 const SUBAGENT_TOOLS = "read,bash,edit,write,grep,find,ls";
 const RESULT_PREVIEW_LIMIT = 8_000;
@@ -130,152 +87,9 @@ function notify(ctx: ToolContext, message: string, level: NotifyLevel): void {
 
 export default function subagentWidget(pi: ExtensionAPI) {
 	const agents = new Map<number, SubagentState>();
-	const subagentSessionAllowedCommands = new Set<string>();
-	const permissionToken = randomBytes(16).toString("hex");
+	const permissionServer = createSubagentPermissionServer({ getSubagent: (id) => agents.get(id) });
 	let nextId = 1;
 	let widgetCtx: ToolContext | undefined;
-	let permissionServer: net.Server | undefined;
-	let permissionSocketPath: string | undefined;
-	let permissionQueue: Promise<void> = Promise.resolve();
-
-	function closePermissionServer(): void {
-		permissionServer?.close();
-		permissionServer = undefined;
-		if (permissionSocketPath) {
-			try {
-				fs.unlinkSync(permissionSocketPath);
-			} catch {}
-		}
-		permissionSocketPath = undefined;
-	}
-
-	function getRequestContextLines(request: PermissionRequest, ctx: ToolContext): { state?: SubagentState; lines: string[] } {
-		const id = Number.parseInt(request.subagentId ?? "", 10);
-		const state = Number.isFinite(id) ? agents.get(id) : undefined;
-		return {
-			state,
-			lines: [
-				`cwd: ${request.cwd ?? ctx.cwd}`,
-				...(state?.task || request.task ? [`task: ${state?.task ?? request.task}`] : []),
-				...(request.pid ? [`pid: ${request.pid}`] : []),
-			],
-		};
-	}
-
-	async function handleBashPermissionRequest(request: PermissionRequest, ctx: ToolContext): Promise<PermissionResponse> {
-		if (typeof request.command !== "string" || request.command.trim() === "") {
-			return { allow: false, reason: "Blocked: invalid bash permission request" };
-		}
-
-		if (await shouldAllowBashWithoutPrompt(request.command, subagentSessionAllowedCommands)) {
-			return { allow: true };
-		}
-
-		const { state, lines } = getRequestContextLines(request, ctx);
-		const approved = await confirmBashPermission(ctx, request.command, subagentSessionAllowedCommands, {
-			title: "⚠ Subagent bash permission required",
-			subtitle: state ? `Subagent #${state.id}` : request.subagentId ? `Subagent #${request.subagentId}` : undefined,
-			contextLines: lines,
-			sessionAllowNotification: (command) => `Allowed for subagents this session: ${command}`,
-		});
-
-		return approved ? { allow: true } : { allow: false, reason: "Blocked by user in main Pi UI" };
-	}
-
-	async function handleWritePermissionRequest(request: PermissionRequest, ctx: ToolContext): Promise<PermissionResponse> {
-		if ((request.toolName !== "write" && request.toolName !== "edit") || typeof request.path !== "string") {
-			return { allow: false, reason: "Blocked: invalid write permission request" };
-		}
-
-		const attempt = await getOutsideCwdWriteAttempt(request.cwd ?? ctx.cwd, request.toolName, request.path);
-		if (!attempt) return { allow: true };
-
-		const { state, lines } = getRequestContextLines(request, ctx);
-		const approved = await confirmOutsideCwdWrite(ctx, attempt, {
-			title: "⚠ Subagent external write permission required",
-			subtitle: state ? `Subagent #${state.id}` : request.subagentId ? `Subagent #${request.subagentId}` : undefined,
-			contextLines: [
-				...lines,
-				`project root: ${attempt.cwdPath}`,
-				`requested: ${attempt.requestedPath}`,
-			],
-		});
-
-		return approved ? { allow: true } : { allow: false, reason: "Blocked by user in main Pi UI" };
-	}
-
-	async function handlePermissionRequest(request: PermissionRequest): Promise<PermissionResponse> {
-		if (request.token !== permissionToken) {
-			return { allow: false, reason: "Blocked: invalid subagent permission token" };
-		}
-
-		const ctx = widgetCtx;
-		if (!ctx || ctx.hasUI === false) {
-			return { allow: false, reason: "Blocked: no main Pi UI available for subagent permission confirmation" };
-		}
-
-		if (request.kind === "bash") return handleBashPermissionRequest(request, ctx);
-		if (request.kind === "write") return handleWritePermissionRequest(request, ctx);
-		return { allow: false, reason: "Blocked: unknown subagent permission request kind" };
-	}
-
-	function enqueuePermissionRequest(request: PermissionRequest): Promise<PermissionResponse> {
-		const responsePromise = permissionQueue.then(() => handlePermissionRequest(request));
-		permissionQueue = responsePromise.then(() => undefined, () => undefined);
-		return responsePromise.catch((error) => ({
-			allow: false,
-			reason: `Blocked: subagent permission bridge failed: ${error instanceof Error ? error.message : String(error)}`,
-		}));
-	}
-
-	async function ensurePermissionServer(ctx: ToolContext): Promise<{ socketPath: string; token: string }> {
-		widgetCtx = ctx;
-		if (permissionServer && permissionSocketPath) {
-			return { socketPath: permissionSocketPath, token: permissionToken };
-		}
-
-		permissionSocketPath = path.join("/tmp", `pi-subperm-${process.pid}-${randomBytes(6).toString("hex")}.sock`);
-		try {
-			fs.unlinkSync(permissionSocketPath);
-		} catch {}
-
-		permissionServer = net.createServer((socket) => {
-			let buffer = "";
-			socket.setEncoding("utf-8");
-			socket.on("data", (chunk: string) => {
-				buffer += chunk;
-				const newline = buffer.indexOf("\n");
-				if (newline === -1) return;
-
-				const line = buffer.slice(0, newline).trim();
-				let request: PermissionRequest;
-				try {
-					request = JSON.parse(line) as PermissionRequest;
-				} catch {
-					socket.end(JSON.stringify({ allow: false, reason: "Blocked: invalid subagent permission request JSON" }) + "\n");
-					return;
-				}
-
-				void enqueuePermissionRequest(request).then((response) => {
-					socket.end(JSON.stringify(response) + "\n");
-				});
-			});
-		});
-
-		permissionServer.on("error", (error) => {
-			widgetCtx?.ui.notify(`Subagent permission bridge error: ${error.message}`, "error");
-		});
-
-		await new Promise<void>((resolve, reject) => {
-			permissionServer!.once("error", reject);
-			permissionServer!.listen(permissionSocketPath, () => {
-				permissionServer!.off("error", reject);
-				resolve();
-			});
-		});
-
-		return { socketPath: permissionSocketPath, token: permissionToken };
-	}
 
 	function clearWidget(id: number, ctx = widgetCtx): void {
 		if (ctx?.hasUI === false) return;
@@ -368,7 +182,7 @@ export default function subagentWidget(pi: ExtensionAPI) {
 	}
 
 	async function spawnAgent(state: SubagentState, prompt: string, ctx: ToolContext): Promise<void> {
-		const permissionBridge = await ensurePermissionServer(ctx);
+		const permissionBridge = await permissionServer.ensure(ctx);
 		const args = [
 			"--mode", "json",
 			"--print",
@@ -674,15 +488,57 @@ export default function subagentWidget(pi: ExtensionAPI) {
 		},
 	});
 
+	pi.registerCommand("subview", {
+		description: "Open a Markdown transcript in bat inside a tmux floating pane: /subview <id>",
+		handler: async (args, ctx) => {
+			const id = Number.parseInt(args.trim(), 10);
+			if (!Number.isFinite(id)) {
+				ctx.ui.notify("Usage: /subview <id>", "warning");
+				return;
+			}
+
+			const state = agents.get(id);
+			if (!state) {
+				ctx.ui.notify(`No subagent #${id} found.`, "error");
+				return;
+			}
+			openSubagentTranscriptPopup(state, ctx as ToolContext);
+		},
+	});
+
+	pi.registerCommand("subattach", {
+		description: "Attach to a subagent session in a tmux floating pane with read-only tools: /subattach <id>",
+		handler: async (args, ctx) => {
+			const id = Number.parseInt(args.trim(), 10);
+			if (!Number.isFinite(id)) {
+				ctx.ui.notify("Usage: /subattach <id>", "warning");
+				return;
+			}
+
+			const state = agents.get(id);
+			if (!state) {
+				ctx.ui.notify(`No subagent #${id} found.`, "error");
+				return;
+			}
+			if (state.status === "running") {
+				ctx.ui.notify(`Subagent #${id} is still running; wait for it to finish before attaching.`, "warning");
+				return;
+			}
+			openReadonlySubagentPopup(state, ctx as ToolContext, "attach");
+		},
+	});
+
 	pi.on("session_start", async (_event, ctx) => {
 		widgetCtx = ctx as ToolContext;
-		subagentSessionAllowedCommands.clear();
+		permissionServer.setContext(widgetCtx);
+		permissionServer.clearSessionAllowedCommands();
 		updateWidgets();
 	});
 
 	pi.on("session_shutdown", async (_event, ctx) => {
 		clearSubagents(ctx as ToolContext);
-		closePermissionServer();
+		permissionServer.close();
+		permissionServer.setContext(undefined);
 		widgetCtx = undefined;
 	});
 }

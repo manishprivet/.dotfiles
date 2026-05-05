@@ -1,20 +1,7 @@
 import * as net from "node:net";
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { PermissionRequest, PermissionResponse } from "./subagent-types";
 import { getBashCommand, getWriteToolInput } from "./tool-call-shared";
-
-type PermissionRequest = {
-	kind: "bash" | "write";
-	command?: string;
-	toolName?: "write" | "edit";
-	path?: string;
-	cwd: string;
-	toolCallId: string;
-};
-
-type PermissionResponse = {
-	allow: boolean;
-	reason?: string;
-};
 
 const REQUEST_TIMEOUT_MS = 10 * 60 * 1000;
 
