@@ -1,12 +1,13 @@
 {
-  "lastChangelogVersion": "0.72.1",
-  "defaultProvider": "github-copilot",
-  "defaultModel": "gpt-5.4",
+  "lastChangelogVersion": "0.73.0",
+  "defaultProvider": "openai",
+  "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "medium",
   "compaction": {
     "enabled": false
   },
   "showHardwareCursor": false,
+  "quietStartup": true,
   "editorPaddingX": 0,
   "terminal": {
     "showTerminalProgress": false

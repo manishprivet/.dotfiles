@@ -1,0 +1,9 @@
+{
+  "disableDefaultReadOnlyAllowlist": false,
+  "allowCommands": [],
+  "allowPrefixes": [],
+  "alwaysConfirmCommands": [],
+  "alwaysConfirmPrefixes": [],
+  "readOnlyCommands": [],
+  "readOnlyGitSubcommands": []
+}
