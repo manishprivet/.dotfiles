@@ -4,6 +4,7 @@ import * as net from "node:net";
 import * as path from "node:path";
 import { confirmBashPermission, shouldAllowBashWithoutPrompt } from "./bash-permission-policy";
 import { confirmOutsideCwdWrite, getOutsideCwdWriteAttempt } from "./outside-cwd-write-policy";
+import { confirmWebFetchPermission, createWebFetchPermissionState } from "./web-fetch-permission-policy";
 import type { PermissionRequest, PermissionResponse, SubagentState, ToolContext } from "./subagent-types";
 
 export type SubagentPermissionServer = {
@@ -24,6 +25,7 @@ function requestSubagentId(request: PermissionRequest): number | undefined {
 
 export function createSubagentPermissionServer(options: Options): SubagentPermissionServer {
 	const sessionAllowedCommands = new Set<string>();
+	const webFetchPermissionState = createWebFetchPermissionState();
 	const token = randomBytes(16).toString("hex");
 	let ctx: ToolContext | undefined;
 	let server: net.Server | undefined;
@@ -105,6 +107,24 @@ export function createSubagentPermissionServer(options: Options): SubagentPermis
 		return approved ? { allow: true } : { allow: false, reason: "Blocked by user in main Pi UI" };
 	}
 
+	async function handleWebFetchPermissionRequest(
+		request: PermissionRequest,
+		currentCtx: ToolContext,
+	): Promise<PermissionResponse> {
+		if (typeof request.url !== "string" || request.url.trim() === "") {
+			return { allow: false, reason: "Blocked: invalid web_fetch permission request" };
+		}
+
+		const { state, lines } = getRequestContextLines(request, currentCtx);
+		const approved = await confirmWebFetchPermission(currentCtx, request.url, webFetchPermissionState, {
+			title: "⚠ Subagent web fetch permission required",
+			subtitle: state ? `Subagent #${state.id}` : request.subagentId ? `Subagent #${request.subagentId}` : undefined,
+			contextLines: lines,
+		});
+
+		return approved ? { allow: true } : { allow: false, reason: "Blocked by user in main Pi UI" };
+	}
+
 	async function handlePermissionRequest(request: PermissionRequest): Promise<PermissionResponse> {
 		if (request.token !== token) {
 			return { allow: false, reason: "Blocked: invalid subagent permission token" };
@@ -117,6 +137,7 @@ export function createSubagentPermissionServer(options: Options): SubagentPermis
 
 		if (request.kind === "bash") return handleBashPermissionRequest(request, currentCtx);
 		if (request.kind === "write") return handleWritePermissionRequest(request, currentCtx);
+		if (request.kind === "web_fetch") return handleWebFetchPermissionRequest(request, currentCtx);
 		return { allow: false, reason: "Blocked: unknown subagent permission request kind" };
 	}
 
@@ -204,6 +225,7 @@ export function createSubagentPermissionServer(options: Options): SubagentPermis
 		},
 		clearSessionAllowedCommands() {
 			sessionAllowedCommands.clear();
+			webFetchPermissionState.allowedOrigins.clear();
 		},
 		close,
 	};

@@ -1,7 +1,8 @@
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { Type } from "typebox";
 import { searchDuckDuckGo } from "./lib/duckduckgo-search";
 import { fetchWebPage } from "./lib/web-fetch";
+import { confirmWebFetchPermission, createWebFetchPermissionState } from "./lib/web-fetch-permission-policy";
 
 type ToolUpdate = (update: { content: Array<{ type: string; text: string }> }) => void;
 
@@ -97,8 +98,31 @@ const webFetchTool = {
 };
 
 export default function webSearchExtension(pi: ExtensionAPI) {
+	const webFetchPermissionState = createWebFetchPermissionState();
+	const guardedWebFetchTool = {
+		...webFetchTool,
+		async execute(
+			toolCallId: string,
+			params: { url: string; max_length?: number },
+			signal: AbortSignal | undefined,
+			onUpdate: ToolUpdate | undefined,
+			ctx: ExtensionContext,
+		) {
+			const isSubagentWithPermissionBridge = Boolean(
+				process.env.PI_SUBAGENT_PERMISSION_SOCKET && process.env.PI_SUBAGENT_PERMISSION_TOKEN,
+			);
+			const approved = isSubagentWithPermissionBridge
+				? true
+				: await confirmWebFetchPermission(ctx, params.url, webFetchPermissionState);
+			if (!approved) {
+				throw new Error(ctx.hasUI ? "Web fetch blocked by user" : "Web fetch blocked: no UI available for confirmation");
+			}
+			return webFetchTool.execute(toolCallId, params, signal, onUpdate, ctx);
+		},
+	};
+
 	pi.registerTool(webSearchTool);
-	pi.registerTool(webFetchTool);
+	pi.registerTool(guardedWebFetchTool);
 
 	pi.registerCommand("search", {
 		description: "Perform a web search and display results",

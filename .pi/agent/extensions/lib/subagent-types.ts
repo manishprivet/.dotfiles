@@ -8,8 +8,9 @@ export type ToolContext = ExtensionContext & { hasUI?: boolean };
 
 export type PermissionRequest = {
 	token?: string;
-	kind?: "bash" | "write" | "heartbeat";
+	kind?: "bash" | "write" | "web_fetch" | "heartbeat";
 	command?: string;
+	url?: string;
 	toolName?: "write" | "edit";
 	path?: string;
 	cwd?: string;

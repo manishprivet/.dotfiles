@@ -3,6 +3,12 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import type { PermissionRequest, PermissionResponse } from "./subagent-types";
 import { getBashCommand, getWriteToolInput } from "./tool-call-shared";
 
+type ToolCallLike = {
+	toolName?: string;
+	toolCallId: string;
+	input?: unknown;
+};
+
 const REQUEST_TIMEOUT_MS = 10 * 60 * 1000;
 
 function getBridgeEnv(): { socketPath?: string; token?: string; subagentId?: string; task?: string } {
@@ -53,6 +59,12 @@ function startParentHeartbeat(): void {
 				: `could not connect to main Pi permission bridge: ${error.message}`,
 		);
 	});
+}
+
+function getWebFetchUrl(event: unknown): string | null {
+	const toolCall = event as ToolCallLike;
+	const url = (toolCall.input as { url?: unknown } | undefined)?.url;
+	return toolCall.toolName === "web_fetch" && typeof url === "string" ? url : null;
 }
 
 function requestPermission(request: PermissionRequest): Promise<PermissionResponse> {
@@ -123,6 +135,21 @@ export default function subagentPermissionClient(pi: ExtensionAPI) {
 	startParentHeartbeat();
 
 	pi.on("tool_call", async (event, ctx) => {
+		const webFetchUrl = getWebFetchUrl(event);
+		if (webFetchUrl) {
+			const response = await requestPermission({
+				kind: "web_fetch",
+				url: webFetchUrl,
+				cwd: ctx.cwd,
+				toolCallId: event.toolCallId,
+			});
+			if (response.allow) return;
+			return {
+				block: true,
+				reason: response.reason ?? "Blocked by main Pi web_fetch permission bridge",
+			};
+		}
+
 		const command = getBashCommand(event);
 		if (command) {
 			const response = await requestPermission({

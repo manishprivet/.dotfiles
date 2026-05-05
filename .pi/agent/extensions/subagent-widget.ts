@@ -26,7 +26,7 @@ import { createSubagentPermissionServer } from "./lib/subagent-permission-server
 import { openReadonlySubagentPopup, openSubagentTranscriptPopup } from "./lib/subagent-tmux";
 import type { NotifyLevel, SubagentState, SubagentStatus, ToolContext, ToolUpdate } from "./lib/subagent-types";
 
-const SUBAGENT_TOOLS = "read,bash,edit,write,grep,find,ls";
+const SUBAGENT_TOOLS = "read,bash,edit,write,grep,find,ls,web_search,web_fetch";
 const SUBAGENT_STATE_TYPE = "subagent-widget-state";
 const RESULT_PREVIEW_LIMIT = 8_000;
 const WIDGET_RESULT_LIMIT = 4_000;
@@ -59,8 +59,20 @@ function getPiInvocation(args: string[]): { command: string; args: string[] } {
 	return { command: "pi", args };
 }
 
+function getExtensionPath(relativePath: string): string {
+	return path.join(path.dirname(fileURLToPath(import.meta.url)), relativePath);
+}
+
 function getPermissionClientExtensionPath(): string {
-	return path.join(path.dirname(fileURLToPath(import.meta.url)), "lib", "subagent-permission-client.ts");
+	return getExtensionPath(path.join("lib", "subagent-permission-client.ts"));
+}
+
+function getBashTempfileGuidanceExtensionPath(): string {
+	return getExtensionPath("bash-tempfile-guidance.ts");
+}
+
+function getWebSearchExtensionPath(): string {
+	return getExtensionPath("web-search.ts");
 }
 
 function makeSessionFile(id: number): string {
@@ -301,6 +313,8 @@ export default function subagentWidget(pi: ExtensionAPI) {
 			"--session", state.sessionFile,
 			"--no-extensions",
 			"--extension", getPermissionClientExtensionPath(),
+			"--extension", getBashTempfileGuidanceExtensionPath(),
+			"--extension", getWebSearchExtensionPath(),
 			"--tools", SUBAGENT_TOOLS,
 		];
 
