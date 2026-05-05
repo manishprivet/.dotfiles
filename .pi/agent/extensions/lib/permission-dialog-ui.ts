@@ -35,7 +35,8 @@ export async function showPermissionDialog<T extends string>(
 ): Promise<T | undefined> {
 	if (config.options.length === 0) return undefined;
 
-	return ctx.ui.custom<T | undefined>((tui, theme, _keybindings, done) => {
+	return ctx.ui.custom<T | undefined>(
+		(tui, theme, _keybindings, done) => {
 			let selectedIndex = 0;
 			let cachedWidth: number | undefined;
 			let cachedLines: string[] | undefined;
@@ -55,13 +56,28 @@ export async function showPermissionDialog<T extends string>(
 			}
 
 			function handleInput(data: string) {
-				if (matchesKey(data, Key.up) || data === "k" || data === "h") {
+				const previous =
+					matchesKey(data, Key.up) ||
+					matchesKey(data, Key.left) ||
+					data === "\x1b[A" ||
+					data === "\x1b[D" ||
+					data === "k" ||
+					data === "h";
+				const next =
+					matchesKey(data, Key.down) ||
+					matchesKey(data, Key.right) ||
+					data === "\x1b[B" ||
+					data === "\x1b[C" ||
+					data === "j" ||
+					data === "l";
+
+				if (previous) {
 					selectedIndex = Math.max(0, selectedIndex - 1);
 					refresh();
 					return;
 				}
 
-				if (matchesKey(data, Key.down) || data === "j" || data === "l") {
+				if (next) {
 					selectedIndex = Math.min(config.options.length - 1, selectedIndex + 1);
 					refresh();
 					return;
@@ -126,7 +142,7 @@ export async function showPermissionDialog<T extends string>(
 				}
 
 				// lines.push(frame());
-				// lines.push(frame(theme.fg("dim", "↑↓/h/j/k/l navigate • Enter select • Esc cancel")));
+				// lines.push(frame(theme.fg("dim", "←→/↑↓/h/j/k/l navigate • Enter select • Esc cancel")));
 				lines.push(theme.fg("borderAccent", `╰${"─".repeat(borderWidth)}╯`));
 
 				cachedWidth = width;
@@ -139,5 +155,14 @@ export async function showPermissionDialog<T extends string>(
 				render,
 				invalidate: clearCache,
 			};
-		});
+		},
+		{
+			overlay: true,
+			overlayOptions: {
+				anchor: "bottom-center",
+				width: "100%",
+				margin: 1,
+			},
+		},
+	);
 }

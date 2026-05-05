@@ -161,11 +161,51 @@ export default function subagentWidget(pi: ExtensionAPI) {
 		ctx?.ui.setWidget(`subagent-${id}`, undefined);
 	}
 
-	function updateWidgets(): void {
-		const ctx = widgetCtx;
-		if (!ctx || ctx.hasUI === false) return;
+	function updateSummaryWidget(ctx: ToolContext): void {
+		if (agents.size === 0) {
+			ctx.ui.setWidget("subagent-summary", undefined);
+			return;
+		}
+
+		ctx.ui.setWidget("subagent-summary", (_tui, theme) => ({
+			render(width: number): string[] {
+				const states = Array.from(agents.values());
+				const running = states.filter((state) => state.status === "running");
+				const done = states.filter((state) => state.status === "done");
+				const errors = states.filter((state) => state.status === "error");
+				const parts = [
+					running.length ? theme.fg("accent", `${running.length} running`) : "",
+					done.length ? theme.fg("success", `${done.length} done`) : "",
+					errors.length ? theme.fg("error", `${errors.length} error`) : "",
+				].filter(Boolean);
+				const latest = states.at(-1);
+				const latestText = latest
+					? theme.fg("dim", ` · latest #${latest.id}: ${truncateToWidth(latest.task, Math.max(10, Math.floor(width * 0.35)), "…")}`)
+					: "";
+				return [
+					truncateToWidth(
+						theme.fg("toolTitle", "Subagents: ") +
+						(parts.join(theme.fg("dim", " · ")) || theme.fg("muted", "none")) +
+						latestText +
+						theme.fg("dim", "  (/sublist, /subview <id>)"),
+						width,
+						"…",
+					),
+				];
+			},
+			invalidate() {},
+		}));
+	}
+
+	function updateRunningWidgets(ctx: ToolContext): void {
+		const activeIds = new Set(agents.keys());
+		for (let id = 1; id < nextId; id++) {
+			const state = agents.get(id);
+			if (!activeIds.has(id) || state?.status !== "running") clearWidget(id, ctx);
+		}
 
 		for (const state of agents.values()) {
+			if (state.status !== "running") continue;
 			ctx.ui.setWidget(`subagent-${state.id}`, (_tui, theme) => {
 				const container = new Container();
 				const border = (s: string) => theme.fg("borderMuted", s);
@@ -205,6 +245,13 @@ export default function subagentWidget(pi: ExtensionAPI) {
 				};
 			});
 		}
+	}
+
+	function updateWidgets(): void {
+		const ctx = widgetCtx;
+		if (!ctx || ctx.hasUI === false) return;
+		updateSummaryWidget(ctx);
+		updateRunningWidgets(ctx);
 	}
 
 	function processJsonLine(state: SubagentState, line: string): void {
@@ -441,6 +488,7 @@ export default function subagentWidget(pi: ExtensionAPI) {
 			persistState(state);
 			clearWidget(id, ctx);
 		}
+		ctx.ui.setWidget("subagent-summary", undefined);
 		agents.clear();
 	}
 
