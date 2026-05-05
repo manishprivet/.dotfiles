@@ -521,10 +521,12 @@ export default function subagentWidget(pi: ExtensionAPI) {
 	pi.registerTool({
 		name: "subagent_create",
 		label: "Create Subagent",
-		description: "Spawn a background Pi subagent for an independent task. Returns immediately; bash permission and external writes are routed through the main Pi UI.",
-		promptSnippet: "Spawn a background subagent for an independent investigation, summarization, or narrowly scoped implementation task",
+		description: "Spawn a background Pi subagent for an independent task. Returns immediately and later sends an automatic subagent-result follow-up; bash permission and external writes are routed through the main Pi UI.",
+		promptSnippet: "Spawn a background subagent for an independent investigation, summarization, or narrowly scoped implementation task, then wait for its subagent-result follow-up before answering when the user asked to use a subagent",
 		promptGuidelines: [
 			"Use subagent_create for independent research, code reading, summarization, or narrowly scoped implementation tasks that can run in parallel.",
+			"If the user specifically asks you to use a subagent, do not duplicate the same investigation yourself while it runs; wait for the automatic subagent-result follow-up before giving the final answer.",
+			"After creating a requested subagent, do not poll for status or continue the same work yourself; the subagent will exit and deliver a passed or failed follow-up result.",
 			"When using subagent_create for file changes, keep the task narrow and avoid overlapping edits with the main agent or other subagents.",
 		],
 		parameters: Type.Object({
@@ -534,8 +536,15 @@ export default function subagentWidget(pi: ExtensionAPI) {
 			onUpdate?.({ content: [{ type: "text", text: `Spawning subagent: ${args.task}` }] });
 			const state = await createSubagent(args.task, ctx);
 			return {
-				content: [{ type: "text", text: `Subagent #${state.id} spawned and running in the background.` }],
-				details: { id: state.id, sessionFile: state.sessionFile },
+				content: [{
+					type: "text",
+					text: [
+						`Subagent #${state.id} spawned and running in the background.`,
+						"Wait for its automatic `subagent-result` follow-up before answering if the user asked you to use a subagent.",
+						"Do not poll for status or duplicate the same investigation yourself; the subagent will exit with a passed or failed result.",
+					].join("\n"),
+				}],
+				details: { id: state.id, sessionFile: state.sessionFile, waitForFollowUp: true },
 			};
 		},
 	});
