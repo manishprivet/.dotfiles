@@ -15,5 +15,6 @@
   "enableInstallTelemetry": false,
   "doubleEscapeAction": "tree",
   "theme": "everforest",
-  "packages": []
+  "packages": [],
+  "hideThinkingBlock": false
 }
