@@ -21,3 +21,6 @@ node_modules
 .DS_Store
 
 **/.claude/settings.local.json
+
+.opencode/package-lock.json
+.opencode/package.json

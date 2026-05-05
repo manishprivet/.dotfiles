@@ -2,8 +2,8 @@ add_newline = true
 command_timeout = 150
 
 [character]
-success_symbol = "[✔ ](fg:#7dcfff)"
-error_symbol = "[𝕏 ](gray)"
+success_symbol = "[✔ ](fg:#a7c080)"
+error_symbol = "[𝕏 ](fg:#e67e80)"
 
 [git_state]
 disabled=false
