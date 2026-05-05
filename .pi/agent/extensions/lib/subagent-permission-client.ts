@@ -19,6 +19,10 @@ function startParentHeartbeat(): void {
 	if (!socketPath || !token) return;
 
 	const socket = net.createConnection(socketPath);
+	// Keep the heartbeat active while the subagent is doing model/tool work,
+	// but do not let this long-lived socket keep `pi --print` alive after the
+	// agent has produced its final answer.
+	socket.unref();
 	let connected = false;
 	let exiting = false;
 
