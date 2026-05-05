@@ -12,6 +12,7 @@ import {
 import { NotificationSound } from "./lib/terminal-notify-shared";
 import { sendPiNotificationWhenUnfocused } from "./lib/pi-notification-shared";
 import { getBashCommand } from "./lib/tool-call-shared";
+import { showPermissionDialog, type PermissionDialogOption } from "./lib/permission-dialog-ui";
 
 type SessionState = {
 	allowedCommands: string[];
@@ -19,34 +20,47 @@ type SessionState = {
 
 type PermissionDecision = "allow-once" | "allow-session" | "allow-always" | "deny";
 
+const PERMISSION_OPTIONS: PermissionDialogOption<PermissionDecision>[] = [
+	{
+		value: "allow-once",
+		label: "Allow once",
+	},
+	{
+		value: "allow-session",
+		label: "Allow this session",
+	},
+	{
+		value: "allow-always",
+		label: "Always allow exact command",
+		color: "warning",
+	},
+	{
+		value: "deny",
+		label: "Deny",
+		color: "error",
+	},
+];
+
 function persistSessionAllowedCommands(pi: ExtensionAPI, sessionAllowedCommands: Set<string>) {
 	pi.appendEntry<SessionState>(CONFIRM_EVERY_BASH_SESSION_STATE_TYPE, {
 		allowedCommands: Array.from(sessionAllowedCommands).sort(),
 	});
 }
 
-async function promptForPermission(ctx: ExtensionContext, source: string, command: string): Promise<PermissionDecision> {
+async function promptForPermission(ctx: ExtensionContext, _source: string, command: string): Promise<PermissionDecision> {
 	if (!ctx.hasUI) {
 		return "deny";
 	}
 
-	const choice = await ctx.ui.select(`${source}\n\n${command}`, [
-		"Allow once",
-		"Allow this session",
-		"Always allow this exact command",
-		"Deny",
-	]);
+	const result = await showPermissionDialog(ctx, {
+		title: "⚠ Bash permission required",
+		contextLines: [],
+		bodyLabel: "command:",
+		body: command,
+		options: PERMISSION_OPTIONS,
+	});
 
-	switch (choice) {
-		case "Allow once":
-			return "allow-once";
-		case "Allow this session":
-			return "allow-session";
-		case "Always allow this exact command":
-			return "allow-always";
-		default:
-			return "deny";
-	}
+	return result ?? "deny";
 }
 
 function getBlockReason(ctx: ExtensionContext): string {

@@ -5,6 +5,21 @@ import { NotificationSound } from "./lib/terminal-notify-shared";
 import { sendPiNotificationWhenUnfocused } from "./lib/pi-notification-shared";
 import { canonicalizeAllowMissing, isPathInside, stripToolPathPrefix } from "./lib/path-shared";
 import { getWriteToolInput } from "./lib/tool-call-shared";
+import { showPermissionDialog, type PermissionDialogOption } from "./lib/permission-dialog-ui";
+
+type WritePermissionDecision = "allow" | "deny";
+
+const WRITE_PERMISSION_OPTIONS: PermissionDialogOption<WritePermissionDecision>[] = [
+	{
+		value: "allow",
+		label: "Allow write",
+	},
+	{
+		value: "deny",
+		label: "Deny",
+		color: "error",
+	},
+];
 
 type WriteAttempt = {
 	toolName: "write" | "edit";
@@ -43,10 +58,15 @@ async function confirmWriteAttempt(ctx: ExtensionContext, attempt: WriteAttempt)
 		return false;
 	}
 
-	return ctx.ui.confirm(
-		"Allow external write?",
-		`${attempt.toolName} wants to write outside the current directory.\n\nRequested path: ${attempt.requestedPath}\nResolved path: ${attempt.resolvedPath}\nCurrent directory: ${attempt.cwdPath}`,
-	);
+	const decision = await showPermissionDialog(ctx, {
+		title: "⚠ External write permission required",
+		contextLines: [],
+		bodyLabel: `${attempt.toolName} target:`,
+		body: attempt.resolvedPath,
+		options: WRITE_PERMISSION_OPTIONS,
+	});
+
+	return decision === "allow";
 }
 
 function getBlockReason(ctx: ExtensionContext): string {
