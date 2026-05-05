@@ -194,9 +194,9 @@ export function openSubagentTranscriptPopup(state: SubagentState, ctx: ToolConte
 	const command = [
 		"nvim",
 		"-R",
-		"--cmd", "set nomodifiable readonly",
-		"-c", "setlocal filetype=markdown nonumber norelativenumber signcolumn=no foldlevel=99",
+		"-n",
 		quotedPath,
+		"-c", "setlocal filetype=markdown nonumber norelativenumber signcolumn=no foldlevel=99 readonly nomodifiable",
 	]
 		.map(shellQuote)
 		.join(" ");
