@@ -9,8 +9,31 @@ import {
 } from "./bash-command-parser";
 import type { ResolvedBashPermissionsConfig } from "./bash-permissions-config";
 
+function escapeRegExpLiteral(value: string): string {
+	return value.replace(/[|\\{}()[\]^$+?.]/g, "\\$&");
+}
+
+function globPatternToRegExp(pattern: string): RegExp {
+	const source = pattern
+		.split("*")
+		.map(escapeRegExpLiteral)
+		.join(".*");
+	return new RegExp(`^${source}$`);
+}
+
+function matchesCommandPattern(command: string, pattern: string): boolean {
+	if (!pattern.includes("*")) {
+		return command === pattern;
+	}
+
+	return globPatternToRegExp(pattern).test(command);
+}
+
 function matchesExactOrPrefix(command: string, exact: string[], prefixes: string[]): boolean {
-	return exact.includes(command) || prefixes.some((prefix) => command === prefix || command.startsWith(`${prefix} `));
+	return (
+		exact.some((pattern) => matchesCommandPattern(command, pattern)) ||
+		prefixes.some((prefix) => command === prefix || command.startsWith(`${prefix} `))
+	);
 }
 
 function isSafeMktempAssignment(segment: string): string | null {

@@ -91,8 +91,13 @@ function statusMeta(status: SubagentStatus): { icon: string; color: "accent" | "
 	return { icon: "✗", color: "error" };
 }
 
-function latestNonEmptyLine(text: string): string {
-	return text.split("\n").map((line) => line.trim()).filter(Boolean).pop() ?? "";
+function latestNonEmptyLineFromChunks(chunks: string[], maxTail = WIDGET_RESULT_LIMIT): string {
+	let tail = "";
+	for (let i = chunks.length - 1; i >= 0 && tail.length < maxTail; i--) {
+		tail = chunks[i] + tail;
+	}
+
+	return tail.split("\n").map((line) => line.trim()).filter(Boolean).pop() ?? "";
 }
 
 function buildList(agents: Map<number, SubagentState>): string {
@@ -240,7 +245,7 @@ export default function subagentWidget(pi: ExtensionAPI) {
 						].join("");
 
 						const lines = [title];
-						const lastLine = latestNonEmptyLine(state.textChunks.join(""));
+						const lastLine = latestNonEmptyLineFromChunks(state.textChunks);
 						if (lastLine) {
 							lines.push(theme.fg("muted", `  ${truncateToWidth(lastLine, Math.max(1, width - 4), "…")}`));
 						}

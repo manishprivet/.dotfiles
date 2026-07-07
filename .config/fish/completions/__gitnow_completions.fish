@@ -1,4 +1,4 @@
-source $__fish_data_dir/completions/git.fish
+# source $__fish_data_dir/completions/git.fish
 
 # Merge command
 

@@ -1,8 +1,22 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "share": "disabled",
+  "shell": "/opt/homebrew/bin/fish",
   "provider": {
-    "openai": {}
+    "openai": {},
+    "localllm": {
+      "name": "Local LLM",
+      "npm": "@ai-sdk/openai-compatible",
+      "models": {
+        "Qwen3.6-35B-A3B-MLX-4bit": {
+          "name": "Qwen3.6-35B-A3B-MLX-4bit"
+        }
+      },
+      "options": {
+        "baseURL": "http://127.0.0.1:8000/v1",
+        "apiKey": "1234"
+      }
+    }
   },
   "permission": {
     "read": {

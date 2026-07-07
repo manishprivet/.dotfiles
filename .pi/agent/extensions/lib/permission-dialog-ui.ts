@@ -39,10 +39,12 @@ export async function showPermissionDialog<T extends string>(
 		(tui, theme, _keybindings, done) => {
 			let selectedIndex = 0;
 			let cachedWidth: number | undefined;
+			let cachedHeight: number | undefined;
 			let cachedLines: string[] | undefined;
 
 			function clearCache() {
 				cachedWidth = undefined;
+				cachedHeight = undefined;
 				cachedLines = undefined;
 			}
 
@@ -94,38 +96,53 @@ export async function showPermissionDialog<T extends string>(
 			}
 
 			function render(width: number): string[] {
-				if (cachedLines && cachedWidth === width) return cachedLines;
+				const terminalRows = Math.max(1, tui.terminal.rows || 24);
+				// The overlay is rendered with a margin of 1, so keep the dialog within the visible viewport.
+				const maxModalHeight = Math.max(1, terminalRows - 2);
+				if (cachedLines && cachedWidth === width && cachedHeight === maxModalHeight) return cachedLines;
 
 				const modalWidth = config.maxWidth ? Math.min(Math.max(width, 1), config.maxWidth) : Math.max(width, 1);
 				const contentWidth = Math.max(1, modalWidth - 4);
 				const borderWidth = Math.max(0, modalWidth - 2);
-				const lines: string[] = [];
 
 				const pad = (text: string) => {
 					const clipped = truncateToWidth(text, contentWidth);
 					return clipped + " ".repeat(Math.max(0, contentWidth - visibleWidth(clipped)));
 				};
 				const frame = (text = "") => `│ ${pad(text)} │`;
-				const addWrapped = (text: string, color: ThemeColor = "text", indent = "") => {
+				const wrapFramed = (text: string, color: ThemeColor = "text", indent = "") => {
+					const wrappedLines: string[] = [];
 					for (const rawLine of text.split("\n")) {
 						const wrapped = wrapTextWithAnsi(
 							theme.fg(color, rawLine || " "),
 							Math.max(1, contentWidth - visibleWidth(indent)),
 						);
-						for (const wrappedLine of wrapped) lines.push(frame(indent + wrappedLine));
+						for (const wrappedLine of wrapped) wrappedLines.push(frame(indent + wrappedLine));
 					}
+					return wrappedLines;
+				};
+				const fitFramedLines = (source: string[], maxLines: number) => {
+					if (maxLines <= 0) return [];
+					if (source.length <= maxLines) return source;
+					const kept = Math.max(0, maxLines - 1);
+					const omitted = source.length - kept;
+					return [
+						...source.slice(0, kept),
+						frame(theme.fg("dim", `… ${omitted} more line${omitted === 1 ? "" : "s"} omitted`)),
+					];
 				};
 
-				lines.push(theme.fg("borderAccent", `╭${"─".repeat(borderWidth)}╮`));
-				lines.push(frame(theme.fg("warning", config.title)));
-				if (config.subtitle) lines.push(frame(theme.fg("dim", config.subtitle.replace(/:$/, ""))));
-				lines.push(frame());
+				const headerLines: string[] = [];
+				headerLines.push(theme.fg("borderAccent", `╭${"─".repeat(borderWidth)}╮`));
+				headerLines.push(frame(theme.fg("warning", config.title)));
+				if (config.subtitle) headerLines.push(frame(theme.fg("dim", config.subtitle.replace(/:$/, ""))));
+				headerLines.push(frame());
 				for (const contextLine of config.contextLines ?? [`cwd: ${ctx.cwd}`]) {
-					lines.push(frame(theme.fg("muted", contextLine)));
+					headerLines.push(frame(theme.fg("muted", contextLine)));
 				}
-				lines.push(frame(theme.fg("toolTitle", config.bodyLabel)));
-				addWrapped(config.body, "toolOutput", "  ");
-				lines.push(frame());
+				headerLines.push(frame(theme.fg("toolTitle", config.bodyLabel)));
+
+				const bodyLines = wrapFramed(config.body, "toolOutput", "  ");
 
 				const optionParts = config.options.map((option, i) => {
 					const selected = i === selectedIndex;
@@ -135,17 +152,37 @@ export async function showPermissionDialog<T extends string>(
 						? `${fgAnsiToBgAnsi(theme.getFgAnsi(color))}${blackText(paddedLabel)}\x1b[49m`
 						: theme.fg(color, paddedLabel);
 				});
-				lines.push(frame(optionParts.join("  ")));
+				const actionLines = [frame(), frame(optionParts.join("  "))];
 
+				const descriptionLines: string[] = [];
 				for (const option of config.options) {
-					if (option.description) lines.push(frame(`     ${theme.fg("muted", option.description)}`));
+					if (option.description) descriptionLines.push(frame(`     ${theme.fg("muted", option.description)}`));
 				}
 
 				// lines.push(frame());
 				// lines.push(frame(theme.fg("dim", "←→/↑↓/h/j/k/l navigate • Enter select • Esc cancel")));
-				lines.push(theme.fg("borderAccent", `╰${"─".repeat(borderWidth)}╯`));
+				const footerLines = [theme.fg("borderAccent", `╰${"─".repeat(borderWidth)}╯`)];
+
+				const fixedHeight = headerLines.length + actionLines.length + footerLines.length;
+				let remaining = Math.max(0, maxModalHeight - fixedHeight);
+				const reservedDescriptionLines = Math.min(
+					descriptionLines.length,
+					Math.max(0, Math.min(3, remaining - (bodyLines.length > 0 ? 1 : 0))),
+				);
+				const fittedBodyLines = fitFramedLines(bodyLines, Math.max(0, remaining - reservedDescriptionLines));
+				remaining -= fittedBodyLines.length;
+				const fittedDescriptionLines = fitFramedLines(descriptionLines, remaining);
+
+				let lines = [...headerLines, ...fittedBodyLines, ...actionLines, ...fittedDescriptionLines, ...footerLines];
+				if (lines.length > maxModalHeight) {
+					lines =
+						maxModalHeight === 1
+							? [footerLines[0] ?? ""]
+							: [...lines.slice(0, maxModalHeight - 1), footerLines[0] ?? ""];
+				}
 
 				cachedWidth = width;
+				cachedHeight = maxModalHeight;
 				cachedLines = lines.map((line) => truncateToWidth(line, width));
 				return cachedLines;
 			}
