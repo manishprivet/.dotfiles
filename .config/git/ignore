@@ -24,3 +24,5 @@ node_modules
 
 .opencode/package-lock.json
 .opencode/package.json
+
+**/.claude/.cc-writes/
