@@ -1,0 +1,22 @@
+{
+  "theme": {
+    "name": "nord"
+  },
+  "plugins": [
+    {
+      "package": "./plugin/opencode-tree",
+      "options": {
+        "storageScope": "global"
+      }
+    }
+  ],
+  "diffs": {
+    "wrap": "word"
+  },
+  "session": {
+    "sidebar": "auto",
+    "scrollbar": false,
+    "thinking": "hide"
+  },
+  "animations": true
+}

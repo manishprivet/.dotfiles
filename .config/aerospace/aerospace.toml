@@ -7,6 +7,7 @@
 # You can use it to add commands that run after login to macOS user session.
 # 'start-at-login' needs to be 'true' for 'after-login-command' to work
 # Available commands: https://nikitabobko.github.io/AeroSpace/commands
+config-version = 2
 after-login-command = []
 
 # You can use it to add commands that run after AeroSpace startup.
@@ -208,3 +209,8 @@ run = "move-node-to-workspace 5"
 [[on-window-detected]]
 if.app-id = 'notion.id'
 run = "move-node-to-workspace 5"
+
+# Notion
+[[on-window-detected]]
+if.app-id = 'com.electron.aqua-voice'
+run = "layout floating"

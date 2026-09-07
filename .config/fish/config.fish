@@ -67,9 +67,6 @@ if [ -f '/Users/manishprivet/.config/fish/secrets.fish' ]; source /Users/manishp
 
 # opencode
 fish_add_path /Users/manishprivet/.opencode/bin
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/manishprivet/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/google-cloud-sdk/path.fish.inc'; end
 export PATH="$HOME/.local/bin:$PATH"
 
 # bun
@@ -80,3 +77,8 @@ set --export LG_CONFIG_FILE "$HOME/.config/lazygit/config.yml,$HOME/.config/lazy
 
 # Added by `rbenv init` on Mon Jan 12 09:03:47 JST 2026
 status --is-interactive; and rbenv init - --no-rehash fish | source
+
+set -gx GPG_TTY (tty)
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/manishprivet/Development/zp-manish/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/Development/zp-manish/google-cloud-sdk/path.fish.inc'; end

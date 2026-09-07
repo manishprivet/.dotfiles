@@ -1,6 +1,6 @@
 #!/opt/homebrew/bin/node
 
-import { createReadStream, rmSync, existsSync } from "fs";
+import { createReadStream, rmSync, existsSync, mkdirSync } from "fs";
 import { createInterface } from "readline";
 import { execSync } from "child_process";
 
@@ -73,6 +73,12 @@ if (!hasDfIndexedDb) {
 }
 
 const binPath = hasDfIndexedDb ? dfIndexedDbPath : `dfindexeddb`;
+
+// dfindexeddb requires the sibling .blob folder to exist, but Chromium only
+// creates it once a blob is stored for the origin
+mkdirSync(`${INDEXDB_LOCATION}/https_calendar.notion.so_0.indexeddb.blob`, {
+  recursive: true,
+});
 
 execute(`
   ${binPath} db \
