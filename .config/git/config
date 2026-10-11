@@ -1,8 +1,8 @@
 # Override in /opt/homebrew/etc/gitconfig for local system settings
 
 [user]
-  name = Manish Kumar ⛄
-  email = manishprivet@protonmail.com
+	name = Manish Kumar
+	email = manishprivet@protonmail.com
   signingkey = /Users/manishprivet/.ssh/id_ed25519.pub
 
 [core]

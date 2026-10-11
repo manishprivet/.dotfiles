@@ -1,5 +1,6 @@
 // src/index.ts
 import * as path5 from "node:path";
+import { Plugin } from "@opencode/plugin";
 
 // src/logger.ts
 import * as fs from "node:fs";
@@ -616,9 +617,11 @@ function trackFileChange(file, info) {
     isWrite: existing.isWrite || (info.isWrite ?? false)
   });
 }
-var plugin = async (ctx) => {
-  const { project, worktree } = ctx;
-  const projectName = path5.basename(worktree || project.worktree);
+var plugin = Plugin.define({
+  id: "wakatime",
+  async setup(ctx) {
+  const projectFolder = ctx.location.directory;
+  const projectName = path5.basename(projectFolder);
   const cliInstalled = await ensureCliInstalled();
   if (!cliInstalled) {
     logger.warn(
@@ -629,19 +632,27 @@ var plugin = async (ctx) => {
       `OpenCode WakaTime plugin initialized for project: ${projectName}`
     );
   }
-  const projectFolder = worktree || process.cwd();
-  const hooks = {
-    // Track tool executions that modify files
-    "tool.execute.after": async (input, output) => {
-      const { tool } = input;
-      const { metadata, title } = output;
+  await ctx.tool.hook("execute.after", async (event) => {
+      if (event.status !== "completed") return;
+      const { tool } = event;
+      const { metadata } = event.result;
+      const title = typeof metadata?.title === "string" ? metadata.title : undefined;
       logger.debug(`Tool executed: ${tool} - ${title}`);
       const changes = extractFileChanges(
         tool,
         metadata,
-        output.output,
+        event.result.content.map((part) => part.type === "text" ? part.text : "").join("\n"),
         title
       );
+      // V2 tool results need not carry V1 file-diff metadata. Fall back to
+      // the tool input so edit/write/read activity still produces heartbeats.
+      if (changes.length === 0 && ["edit", "write", "read"].includes(tool)) {
+        const input = event.input && typeof event.input === "object" ? event.input : {};
+        const file = input.filePath ?? input.path;
+        if (typeof file === "string" && file) {
+          changes.push({ file, info: { additions: 0, deletions: 0, isWrite: tool === "write" } });
+        }
+      }
       for (const change of changes) {
         trackFileChange(change.file, change.info);
         logger.debug(
@@ -651,27 +662,27 @@ var plugin = async (ctx) => {
       if (changes.length > 0) {
         processHeartbeat(projectFolder);
       }
-    },
-    // Track chat activity
-    "chat.message": async (_input, _output) => {
+    });
+  await ctx.session.hook("prompt", () => {
       logger.debug("Chat message received");
       if (fileChanges.size > 0) {
         processHeartbeat(projectFolder);
       }
-    },
-    // Listen to all events for session lifecycle
-    event: async ({ event }) => {
-      if (event.type === "session.deleted" || event.type === "session.idle") {
+    });
+  const controller = new AbortController();
+  void (async () => {
+    try {
+      for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
+      if (event.type === "session.deleted" || event.type === "session.execution.succeeded" || event.type === "session.execution.failed" || event.type === "session.execution.interrupted") {
         logger.debug(`Session event: ${event.type} - sending final heartbeat`);
         processHeartbeat(projectFolder, true);
       }
+      }
+    } catch (error) {
+      if (!controller.signal.aborted) logger.errorException(error);
     }
-  };
-  return hooks;
-};
-var index_default = plugin;
-export {
-  index_default as default,
-  extractFileChanges,
-  plugin
-};
+  })();
+  return () => controller.abort();
+  }
+});
+export default plugin;

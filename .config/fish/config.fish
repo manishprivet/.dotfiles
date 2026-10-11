@@ -1,3 +1,7 @@
+# The following lines were added by Docker Desktop to add commands to your PATH.
+export PATH="$PATH:/Users/manishprivet/.docker/bin"
+# End of Docker Desktop section.
+
 if status is-interactive
     # Commands to run in interactive sessions can go here
 end
@@ -81,4 +85,4 @@ status --is-interactive; and rbenv init - --no-rehash fish | source
 set -gx GPG_TTY (tty)
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/manishprivet/Development/zp-manish/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/Development/zp-manish/google-cloud-sdk/path.fish.inc'; end
+if [ -f '/Users/manishprivet/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/google-cloud-sdk/path.fish.inc'; end

@@ -1,22 +1,22 @@
 {
+  "$schema": "https://opencode.ai/v2/cli.json",
   "theme": {
-    "name": "nord"
+    "name": "everforest-dark-hard-v2"
   },
-  "plugins": [
-    {
-      "package": "./plugin/opencode-tree",
-      "options": {
-        "storageScope": "global"
-      }
-    }
-  ],
+  "plugins": [],
+  "tabs": {
+    "mode": "off"
+  },
   "diffs": {
     "wrap": "word"
   },
   "session": {
     "sidebar": "auto",
     "scrollbar": false,
-    "thinking": "hide"
+    "thinking": "show"
   },
-  "animations": true
+  "animations": true,
+  "attention": {
+    "notifications": true
+  }
 }

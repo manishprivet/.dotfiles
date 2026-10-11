@@ -14,3 +14,8 @@
 .pi/agent/sessions/
 .config/opencode/node_modules/
 .config/opencode/bun.lock
+.config/opencode/service.json
+.config/argocd/config
+.config/cagent/
+.agents/skills/synced/
+/repro.sh
