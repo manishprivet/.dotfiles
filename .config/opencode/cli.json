@@ -1,22 +1,30 @@
 {
   "$schema": "https://opencode.ai/v2/cli.json",
   "theme": {
-    "name": "everforest-dark-hard-v2"
+    "name": "everforest-dark-hard-v2",
+    "mode": "system"
   },
   "plugins": [],
   "tabs": {
     "mode": "off"
   },
   "diffs": {
-    "wrap": "word"
+    "wrap": "word",
+    "single": false
   },
   "session": {
     "sidebar": "auto",
     "scrollbar": false,
-    "thinking": "show"
+    "thinking": "show",
+    "image_preview": true
   },
   "animations": true,
   "attention": {
-    "notifications": true
+    "notifications": true,
+    "sound": true,
+    "volume": 1
+  },
+  "scroll": {
+    "acceleration": false
   }
 }
