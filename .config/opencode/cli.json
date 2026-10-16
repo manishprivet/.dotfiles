@@ -1,10 +1,10 @@
 {
   "$schema": "https://opencode.ai/v2/cli.json",
   "theme": {
-    "name": "everforest-dark-hard-v2",
+    "name": "cursor",
     "mode": "system"
   },
-  "plugins": [],
+  "plugins": ["./herdr-opencode"],
   "tabs": {
     "mode": "off"
   },
@@ -13,15 +13,15 @@
     "single": false
   },
   "session": {
-    "sidebar": "auto",
+    "sidebar": "hide",
     "scrollbar": false,
     "thinking": "show",
     "image_preview": true
   },
   "animations": true,
   "attention": {
-    "notifications": true,
-    "sound": true,
+    "notifications": false,
+    "sound": false,
     "volume": 1
   },
   "scroll": {

@@ -1,0 +1,56 @@
+onboarding = false
+
+[ui.toast]
+delivery = "system"
+
+[ui.sound]
+enabled = true
+
+[ui]
+status_indicators = "dots"
+sidebar_collapsed_mode = "hidden"
+sidebar_start_collapsed = true
+tab_bar_position = "bottom"
+tab_bar_right = [
+  { type = "datetime", format = "%Y-%m-%d %H:%M" },
+]
+
+[theme]
+name = "catppuccin"
+auto_switch = false
+
+[keys]
+prefix = "ctrl+s"
+reload_config = "prefix+r"
+
+# tmux windows correspond to Herdr tabs; c, n, p, and 1..9 already match.
+rename_tab = "prefix+comma"
+detach = "prefix+d"
+
+# tmux split-window -h creates side-by-side panes; -v stacks them.
+split_vertical = "prefix+|"
+split_horizontal = "prefix+minus"
+
+# Direct pane navigation, matching tmux's prefix-free Ctrl+h/j/k/l.
+# Unlike tmux's is_vim.sh bindings, these do not pass through to Vim.
+focus_pane_left = "ctrl+h"
+focus_pane_down = "ctrl+j"
+focus_pane_up = "ctrl+k"
+focus_pane_right = "ctrl+l"
+
+resize_pane_left = "prefix+h"
+resize_pane_down = "prefix+j"
+resize_pane_up = "prefix+k"
+resize_pane_right = "prefix+l"
+zoom = "prefix+m"
+
+# Keep resize mode available without conflicting with reload on prefix+r.
+resize_mode = "prefix+shift+r"
+
+[[keys.command]]
+key = "prefix+ctrl+f"
+type = "popup"
+command = 'exec "${SHELL:-sh}"'
+description = "open floating shell"
+width = "80%"
+height = "80%"

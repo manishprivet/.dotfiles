@@ -1,0 +1,37 @@
+id = "local.tab-numbers"
+name = "Tab Numbers"
+version = "0.1.0"
+min_herdr_version = "0.9.5"
+description = "Keep tab titles prefixed with their shortcut number within each Space"
+platforms = ["macos", "linux"]
+
+[[startup]]
+command = ["python3", "tab_numbers.py", "sync"]
+
+[[events]]
+on = "tab.created"
+command = ["python3", "tab_numbers.py", "sync"]
+
+[[events]]
+on = "tab.closed"
+command = ["python3", "tab_numbers.py", "sync"]
+
+[[events]]
+on = "tab.moved"
+command = ["python3", "tab_numbers.py", "sync"]
+
+[[events]]
+on = "tab.renamed"
+command = ["python3", "tab_numbers.py", "sync"]
+
+[[actions]]
+id = "refresh"
+title = "Enable and refresh tab numbers"
+contexts = ["workspace"]
+command = ["python3", "tab_numbers.py", "refresh"]
+
+[[actions]]
+id = "remove"
+title = "Remove tab numbers and pause automatic numbering"
+contexts = ["workspace"]
+command = ["python3", "tab_numbers.py", "remove"]
