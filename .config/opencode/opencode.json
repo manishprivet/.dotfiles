@@ -8,17 +8,20 @@
       "notion": {
         "type": "remote",
         "url": "https://mcp.notion.com/mcp",
+        "codemode": true,
         "disabled": true
       },
       "linear": {
         "type": "remote",
         "url": "https://mcp.linear.app/mcp",
+        "codemode": true,
         "disabled": true
       },
       "aembit": {
         "type": "remote",
         "url": "{env:AEMBIT_MCP_URL}",
-        "disabled": true,
+        "codemode": true,
+        "disabled": false,
         "oauth": {
           "redirect_uri": "http://127.0.0.1:19876/callback"
         }
@@ -39,6 +42,9 @@
         },
         "claude-opus-4-8-lb": {
           "name": "claude-opus-4-8-lb"
+        },
+        "anthropic/claude-opus-5-5": {
+          "name": "anthropic/claude-opus-5-5"
         },
         "gpt-6-sol": {
           "name": "gpt-6-sol"

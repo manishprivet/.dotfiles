@@ -22,10 +22,10 @@ tap "mongodb/brew", trusted: true
 tap "nikitabobko/tap", trusted: true
 tap "octopusdeploy/taps"
 tap "pear-devs/pear", trusted: true
+tap "pyroscope-io/brew", "https://github.com/grafana/homebrew-pyroscope.git"
 tap "saiyam1814/tap"
 tap "sourcegraph/src-cli", trusted: true
 tap "teamookla/speedtest", trusted: true
-tap "th-ch/youtube-music", trusted: true
 tap "us/tap"
 tap "waydabber/betterdisplay", trusted: true
 tap "xwmx/taps", trusted: true
@@ -77,6 +77,8 @@ brew "conftest"
 brew "cowsay"
 # Cryptographic recipes and primitives for Python
 brew "cryptography"
+# Image format providing lossless and lossy compression for web images
+brew "webp"
 # TIFF library and utilities
 brew "libtiff"
 # Color management engine supporting ICC profiles
@@ -103,8 +105,6 @@ brew "edencommon"
 brew "fribidi"
 # OpenType text shaping engine
 brew "harfbuzz"
-# Image format providing lossless and lossy compression for web images
-brew "webp"
 # Image processing and image analysis library
 brew "leptonica"
 # Multi-format archive and compression library
@@ -119,8 +119,6 @@ brew "ghostscript"
 brew "eza"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
-# New file format for still image compression
-brew "jpeg-xl"
 # Play, record, convert, and stream select audio and video codecs
 brew "ffmpeg"
 # Create thumbnails for your video files
@@ -163,6 +161,8 @@ brew "go"
 brew "gobject-introspection"
 # Go version management
 brew "goenv"
+# New file format for still image compression
+brew "jpeg-xl"
 # ISO/IEC 23008-12:2017 HEIF file format decoder and encoder
 brew "libheif"
 # Image processing tools collection
@@ -199,6 +199,8 @@ brew "kubectx"
 brew "kustomize"
 # Simple terminal UI for git commands
 brew "lazygit"
+# Cross-platform TUI database management tool
+brew "lazysql"
 # Library for reading RAW files from digital photo cameras
 brew "libraw"
 # XML security library
@@ -223,8 +225,6 @@ brew "protobuf"
 brew "mysql", restart_service: :changed
 # Open source relational database management system
 brew "mysql@8.4"
-# Fast, highly customisable system info script
-brew "neofetch"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # Port scanning utility for large networks
@@ -243,6 +243,8 @@ brew "suite-sparse"
 brew "sundials"
 # High-level interpreted language for numerical computing
 brew "octave"
+# Command-line Git information tool
+brew "onefetch"
 # Open source, general-purpose policy engine
 brew "opa"
 # Development kit for the Java programming language
@@ -255,6 +257,8 @@ brew "pass-otp"
 brew "php"
 # General-purpose scripting language
 brew "php@8.3"
+# Pinentry for GPG on Mac
+brew "pinentry-mac"
 # PDF rendering library (based on the xpdf-3.0 code base)
 brew "poppler"
 # Quick and easy command-line file transfer utility from any computer to another
@@ -305,8 +309,6 @@ brew "sshs"
 brew "starship"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
 brew "stow"
-# Command-line Kanban board/task manager with support for Trello
-brew "taskell"
 # Rich and complete approach to parallelism in C++
 brew "tbb"
 # Plugin-driven server agent for collecting & reporting metrics
@@ -338,7 +340,7 @@ brew "worktrunk"
 # Access X11 clipboards from the command-line
 brew "xclip"
 # JavaScript package manager
-brew "yarn"
+brew "yarn", link: false
 # Blazing fast terminal file manager written in Rust, based on async I/O
 brew "yazi"
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
@@ -350,50 +352,50 @@ brew "zellij"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
 # A powerful terminal-based AI assistant for developers, providing intelligent coding assistance directly in your terminal.
-brew "charmbracelet/tap/crush"
+brew "charmbracelet/tap/crush", trusted: true
 # CodeCrafters CLI
-brew "codecrafters-io/tap/codecrafters"
+brew "codecrafters-io/tap/codecrafters", trusted: true
 # Kubernetes CLI To Manage Your Clusters In Style!
-brew "derailed/k9s/k9s"
+brew "derailed/k9s/k9s", trusted: true
 # MQTT 5.0 and MQTT X CLI client
-brew "emqx/mqttx/mqttx-cli"
+brew "emqx/mqttx/mqttx-cli", trusted: true
 # A window border system for macOS
-brew "felixkratz/formulae/borders"
+brew "felixkratz/formulae/borders", trusted: true
 # Custom macOS statusbar with shell plugin, interaction and graph support
-brew "felixkratz/formulae/sketchybar"
+brew "felixkratz/formulae/sketchybar", trusted: true
 # Terraform
-brew "hashicorp/tap/terraform"
+brew "hashicorp/tap/terraform", trusted: true
 # δyƒƒ /ˈdʏf/ - A diff tool for YAML files, and sometimes JSON
-brew "homeport/tap/dyff"
+brew "homeport/tap/dyff", trusted: true
 # A simple terminal UI for docker, written in Go
-brew "jesseduffield/lazydocker/lazydocker"
+brew "jesseduffield/lazydocker/lazydocker", trusted: true
 # A simple API client (postman like) in your terminal
-brew "julien-cpsn/atac/atac"
+brew "julien-cpsn/atac/atac", trusted: true
 # Terminal UI for GitHub pull requests
 brew "kitlangton/tap/ghui", trusted: true
 # Evans: more expressive universal gRPC client
-brew "ktr0731/evans/evans"
+brew "ktr0731/evans/evans", trusted: true
 # Connect your local process and your cloud environment
-brew "metalbear-co/mirrord/mirrord"
+brew "metalbear-co/mirrord/mirrord", trusted: true
 # Super fast CLI tool to decode and encode JWTs built in Rust
-brew "mike-engel/jwt-cli/jwt-cli"
+brew "mike-engel/jwt-cli/jwt-cli", trusted: true
 # Desktop-inspired terminal diff viewer for agent-authored changesets
-brew "modem-dev/tap/hunk"
+brew "modem-dev/tap/hunk", trusted: true
 # High-performance, schema-free, document-oriented database
-brew "mongodb/brew/mongodb-community"
+brew "mongodb/brew/mongodb-community", trusted: true
 # Sourcegraph CLI
-brew "sourcegraph/src-cli/src-cli"
+brew "sourcegraph/src-cli/src-cli", trusted: true
 # Ookla Speedtest
-brew "teamookla/speedtest/speedtest"
+brew "teamookla/speedtest/speedtest", trusted: true
 # Docker-compatible container CLI built on Apple's Containerization framework
 brew "us/tap/mocker", trusted: true
 # BetterDisplay CLI proxy
-brew "waydabber/betterdisplay/betterdisplaycli"
-brew "xwmx/taps/nb"
+brew "waydabber/betterdisplay/betterdisplaycli", trusted: true
+brew "xwmx/taps/nb", trusted: true
 # Command-line interface for 1Password
 cask "1password-cli"
 # AeroSpace is an i3-like tiling window manager for macOS
-cask "nikitabobko/tap/aerospace"
+cask "nikitabobko/tap/aerospace", trusted: true
 cask "font-hack-nerd-font"
 cask "font-sf-pro"
 cask "font-symbols-only-nerd-font"
@@ -402,7 +404,7 @@ cask "ghostty"
 # Tool to control external monitor brightness & volume
 cask "monitorcontrol"
 # Pear Desktop App
-cask "pear-devs/pear/pear-desktop"
+cask "pear-devs/pear/pear-desktop", trusted: true
 # Tool that provides consistent, highly configurable symbols for apps
 cask "sf-symbols"
 # Menu bar indicator showing the currently selected space
@@ -414,13 +416,14 @@ cask "wezterm"
 # OpenJDK distribution from Azul
 cask "zulu@11"
 mas "CopyClip", id: 595191960
+mas "Okta Verify", id: 490179405
+mas "uBlock Origin Lite", id: 6745342698
 mas "Xcode", id: 497799835
 go "cuelang.org/go/cmd/cue"
 go "github.com/planetscale/ghcommit"
-go "cmd/go"
-go "cmd/gofmt"
 npm "@anthropic-ai/claude-code"
 npm "@googleworkspace/cli"
 npm "@mariozechner/pi-coding-agent"
 npm "@openai/codex"
 npm "corepack"
+npm "opencode-with-claude"

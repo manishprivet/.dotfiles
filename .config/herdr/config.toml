@@ -7,6 +7,7 @@ delivery = "system"
 enabled = true
 
 [ui]
+# pane_borders = "off"
 status_indicators = "dots"
 sidebar_collapsed_mode = "hidden"
 sidebar_start_collapsed = true
@@ -31,13 +32,6 @@ detach = "prefix+d"
 split_vertical = "prefix+|"
 split_horizontal = "prefix+minus"
 
-# Direct pane navigation, matching tmux's prefix-free Ctrl+h/j/k/l.
-# Unlike tmux's is_vim.sh bindings, these do not pass through to Vim.
-focus_pane_left = "ctrl+h"
-focus_pane_down = "ctrl+j"
-focus_pane_up = "ctrl+k"
-focus_pane_right = "ctrl+l"
-
 resize_pane_left = "prefix+h"
 resize_pane_down = "prefix+j"
 resize_pane_up = "prefix+k"
@@ -46,6 +40,31 @@ zoom = "prefix+m"
 
 # Keep resize mode available without conflicting with reload on prefix+r.
 resize_mode = "prefix+shift+r"
+
+# Navigate Vim splits first, then cross into neighbouring Herdr panes at an edge.
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "vim-herdr-navigation.left"
+description = "navigate left (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "vim-herdr-navigation.down"
+description = "navigate down (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "vim-herdr-navigation.up"
+description = "navigate up (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "vim-herdr-navigation.right"
+description = "navigate right (vim/herdr)"
 
 [[keys.command]]
 key = "prefix+ctrl+f"
