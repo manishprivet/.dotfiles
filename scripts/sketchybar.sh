@@ -1,6 +1,5 @@
 #!/bin/bash
 
-CPPFLAGS="-I/opt/homebrew/include -L/opt/homebrew/lib" python3 -m pip install --user dfindexeddb --break-system-packages
-CPPFLAGS="-I/opt/homebrew/include -L/opt/homebrew/lib" python3 -m pip install --user 'dfindexeddb[plugins]' --break-system-packages
+bash "$(dirname "$0")/setup-calendar.sh" || exit 1
 
 ./sketchybar-fish.sh

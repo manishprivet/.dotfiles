@@ -92,8 +92,7 @@
         "apiKey": "12345"
       },
       "models": {
-        "Jundot/Qwen3.6-35B-A3B-oQ4e-mtp": {},
-        "Qwen3.8-27B-MLX-4bit": {}
+        "Qwen3.6-35B-A3B-MLX-4bit": {}
       }
     }
   },

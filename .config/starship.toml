@@ -185,6 +185,9 @@ symbol = " "
 [python]
 symbol = " "
 
+[gcloud]
+disabled = true
+
 [rlang]
 symbol = "󰟔 "
 
