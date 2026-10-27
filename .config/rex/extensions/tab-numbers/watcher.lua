@@ -1,4 +1,4 @@
--- Run: rex do ~/.config/rex/tab-numbers.lua --all
+-- Run: rex do ~/.config/rex/extensions/tab-numbers/watcher.lua --all
 -- Restore owned titles and exit: same command with mode=remove
 -- Requires macOS's /usr/bin/shlock. No polling or init.lua changes needed.
 -- A new invocation replaces the watcher for the same server and local user.

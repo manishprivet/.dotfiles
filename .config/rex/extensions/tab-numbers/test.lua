@@ -1,6 +1,6 @@
--- Run from the repository root: lua .config/rex/test-tab-numbers.lua
+-- Run from the repository root: lua .config/rex/extensions/tab-numbers/test.lua
 -- In-memory Rex/filesystem mocks: does not connect to or modify live sessions.
-local script = ".config/rex/tab-numbers.lua"
+local script = ".config/rex/extensions/tab-numbers/watcher.lua"
 local real_io, real_rename, real_remove = io, os.rename, os.remove
 local files, views, handlers, writes, locked, fail_rename, unreadable
 local current_pid, identities, signals, stuck, guard_busy
