@@ -1,1 +1,0 @@
-../../prompts/knowledge.md

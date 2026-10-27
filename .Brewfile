@@ -341,14 +341,10 @@ brew "worktrunk"
 brew "xclip"
 # JavaScript package manager
 brew "yarn", link: false
-# Blazing fast terminal file manager written in Rust, based on async I/O
-brew "yazi"
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
 brew "yq"
 # Feature-rich command-line audio/video downloader
 brew "yt-dlp"
-# Pluggable terminal workspace, with terminal multiplexer as the base feature
-brew "zellij"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
 # A powerful terminal-based AI assistant for developers, providing intelligent coding assistance directly in your terminal.
@@ -411,8 +407,6 @@ cask "sf-symbols"
 cask "spaceid"
 # Run commands and display their output on the desktop
 cask "ubersicht"
-# GPU-accelerated cross-platform terminal emulator and multiplexer
-cask "wezterm"
 # OpenJDK distribution from Azul
 cask "zulu@11"
 mas "CopyClip", id: 595191960
@@ -423,7 +417,6 @@ go "cuelang.org/go/cmd/cue"
 go "github.com/planetscale/ghcommit"
 npm "@anthropic-ai/claude-code"
 npm "@googleworkspace/cli"
-npm "@mariozechner/pi-coding-agent"
 npm "@openai/codex"
 npm "corepack"
 npm "opencode-with-claude"

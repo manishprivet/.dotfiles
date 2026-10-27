@@ -57,26 +57,20 @@ Use these groups unless the user says otherwise.
 ### Editor group
 - Neovim
 - Neovim terminal colors
-- Neovim-driven zellij status palette
 
 ### Terminal group
 - Ghostty
-- WezTerm
 - Fish prompt and syntax colors
 - tmux
 - Borders
 
 ### TUI group
 - Lazygit
-- Yazi
 - btop
 - htop
-- Zellij built-in theme
-- Zellij custom status layout
 
 ### Agent UI group
 - OpenCode custom theme files
-- Pi agent theme and selector
 
 ### Desktop bar group
 - SketchyBar
@@ -91,11 +85,6 @@ These are the important theme-bearing files in this repo.
 - Available configured themes: `material`, `gruvbox`, `nightfox`, `everforest`, `catppuccin`, `rose-pine`, `tokyonight`
 - Extra theme logic: Everforest terminal colors are hardcoded here via `vim.g.terminal_color_*`
 - Fallback install list: `.config/nvim/lua/config/lazy.lua`
-
-### WezTerm
-- File: `.wezterm.lua`
-- Theme model: built-in named theme via `color_scheme = "..."`
-- Current file also contains a wallpaper layer and a color overlay in `background`
 
 ### Ghostty
 - File: `.config/ghostty/config`
@@ -124,20 +113,6 @@ These are the important theme-bearing files in this repo.
 - Theme model: one active exported block plus many commented alternate scheme blocks
 - Safe pattern: switch the active export block instead of editing every item script
 
-### Zellij
-- Built-in theme selector: `.config/zellij/config.kdl`
-- Custom status layout colors: `.config/zellij/layouts/zstatus.kdl`
-- Theme model: often split across built-in theme selection and custom status-bar color strings
-
-### Neovim Zellij status palette
-- File: `.config/nvim/lua/config/zellij_status/palette.lua`
-- Theme model: custom Lua palette used by the Neovim-generated Zellij status content
-
-### Yazi
-- File: `.config/yazi/theme.toml`
-- Flavor package pins: `.config/yazi/package.toml`
-- Theme model: named `flavor` selectors for dark and light plus pinned flavor sources
-
 ### btop
 - File: `.config/btop/btop.conf`
 - Theme model: named theme via `color_theme = "..."`
@@ -156,19 +131,9 @@ These are the important theme-bearing files in this repo.
 - Theme model: custom semantic theme JSON
 - If the user asks to make OpenCode use a different custom theme, update the theme file and search for how that theme is selected before assuming it is auto-loaded
 
-### Pi agent
-- Selector: `.pi/agent/settings.json`
-- Theme file: `.pi/agent/themes/everforest.json`
-- Theme model: named theme selector plus custom theme definition
-
 ### Starship
 - File: `.config/starship.toml`
 - Theme model: inline styles and hex values, not a named theme file
-
-### Neofetch
-- File: `.config/neofetch/config.conf`
-- Theme model: custom output using terminal color indices and glyph styling
-- Usually leave this alone unless the user explicitly wants it changed
 
 ## Per-tool change playbook
 
@@ -186,12 +151,6 @@ If the user wants Everforest tweaked:
 If the user wants Catppuccin or Tokyo Night tuned:
 - Edit only that plugin's `opts` block.
 - Preserve unrelated highlight overrides unless they conflict with the new request.
-
-### WezTerm
-
-- For named theme changes, edit `color_scheme` only.
-- If the result looks wrong because of the custom overlay, check `background` and the `Color = "#..."` overlay block before changing more.
-- Do not remove wallpaper or opacity unless requested.
 
 ### Ghostty
 
@@ -226,19 +185,6 @@ If the user wants Catppuccin or Tokyo Night tuned:
 - If creating a new scheme, add a new clearly labeled block and activate only that block.
 - Do not hand-edit every plugin or item file unless they contain tool-specific accent overrides.
 
-### Zellij
-
-- Update `.config/zellij/config.kdl` if the user wants to switch the built-in Zellij theme.
-- Update `.config/zellij/layouts/zstatus.kdl` if the user wants the custom status layout to match.
-- If Neovim-generated Zellij status content is in use, also update `.config/nvim/lua/config/zellij_status/palette.lua` when a palette sync is requested.
-- Treat these as separate layers: built-in Zellij theme, custom Zellij layout colors, and Neovim-generated status colors.
-
-### Yazi
-
-- Update `.config/yazi/theme.toml` for flavor selection.
-- Update `.config/yazi/package.toml` only if the requested flavor package changes or a new flavor must be pinned.
-- Do not change both dark and light flavors unless the user asked for both.
-
 ### btop
 
 - Update `color_theme` in `.config/btop/btop.conf`.
@@ -260,21 +206,10 @@ If the user wants Catppuccin or Tokyo Night tuned:
 - If the request is to switch OpenCode to a different theme file, search for the active selector before editing other files.
 - Preserve semantic slots like `primary`, `secondary`, `text`, `background`, `diff*`, `markdown*`, and `syntax*`.
 
-### Pi agent
-
-- Update `.pi/agent/settings.json` if the theme name should change.
-- Update `.pi/agent/themes/<name>.json` if the custom theme definition should change.
-- Keep semantic color intent consistent across `accent`, `success`, `error`, `warning`, markdown, syntax, and diff slots.
-
 ### Starship
 
 - Update inline style strings and hex values directly in `.config/starship.toml`.
 - Preserve symbols unless the user also asked for icon or typography changes.
-
-### Neofetch
-
-- Update only when explicitly requested.
-- This config mostly relies on terminal color indices rather than a named theme selector.
 
 ## Full-stack synchronization guidance
 
@@ -286,9 +221,6 @@ When the user wants one theme across many tools:
 
 2. Update selectors first
 - Ghostty
-- WezTerm
-- Zellij
-- Yazi
 - btop
 - Neovim active colorscheme
 
@@ -297,10 +229,7 @@ When the user wants one theme across many tools:
 - Fish
 - tmux
 - SketchyBar
-- Zellij status layout
-- Neovim Zellij status palette
 - OpenCode theme JSON
-- Pi agent theme JSON
 - Borders
 
 4. Re-check wiring files
