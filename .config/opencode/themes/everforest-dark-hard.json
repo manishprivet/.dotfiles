@@ -33,7 +33,7 @@
     "info": "blue",
     "text": "fg",
     "textMuted": "grey1",
-    "background": "bg0",
+    "background": "none",
     "backgroundPanel": "bg1",
     "backgroundElement": "bg2",
     "border": "bg3",

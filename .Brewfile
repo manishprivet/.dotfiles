@@ -1,5 +1,5 @@
-tap "anomalyco/tap", "https://github.com/anomalyco/homebrew-tap.git"
-tap "asmvik/formulae", "https://github.com/asmvik/homebrew-formulae.git"
+tap "anomalyco/tap", "https://github.com/anomalyco/homebrew-tap.git", trusted: true
+tap "asmvik/formulae", "https://github.com/asmvik/homebrew-formulae.git", trusted: true
 tap "charmbracelet/tap", trusted: true
 tap "chmouel/lazyworktree", "https://github.com/chmouel/lazyworktree", trusted: true
 tap "codecrafters-io/tap", trusted: true
@@ -7,7 +7,7 @@ tap "datadog-labs/pack", "https://github.com/datadog-labs/homebrew-pack.git", tr
 tap "derailed/k9s", trusted: true
 tap "emqx/mqttx", trusted: true
 tap "felixkratz/formulae", trusted: true
-tap "grafana/pyroscope", "https://github.com/grafana/homebrew-pyroscope.git"
+tap "grafana/pyroscope", "https://github.com/grafana/homebrew-pyroscope.git", trusted: true
 tap "hashicorp/tap", trusted: true
 tap "heroku/brew", trusted: true
 tap "homeport/tap", trusted: true
@@ -20,25 +20,21 @@ tap "mike-engel/jwt-cli", trusted: true
 tap "modem-dev/tap", trusted: true
 tap "mongodb/brew", trusted: true
 tap "nikitabobko/tap", trusted: true
-tap "octopusdeploy/taps"
+tap "octopusdeploy/taps", trusted: true
 tap "pear-devs/pear", trusted: true
-tap "pyroscope-io/brew", "https://github.com/grafana/homebrew-pyroscope.git"
-tap "saiyam1814/tap"
+tap "pyroscope-io/brew", "https://github.com/grafana/homebrew-pyroscope.git", trusted: true
+tap "saiyam1814/tap", trusted: true
 tap "sourcegraph/src-cli", trusted: true
 tap "teamookla/speedtest", trusted: true
 tap "us/tap"
 tap "waydabber/betterdisplay", trusted: true
 tap "xwmx/taps", trusted: true
-# Search tool like grep, but optimized for programmers
-brew "ack"
 # Run your GitHub Actions locally
 brew "act"
 # Static checker for GitHub Actions workflow files
 brew "actionlint"
 # Codec library for encoding and decoding AV1 video streams
 brew "aom"
-# Declarative CLI Version manager
-brew "aqua"
 # GitOps Continuous Delivery for Kubernetes
 brew "argocd"
 # GNU compiler collection
@@ -53,8 +49,6 @@ brew "bash"
 brew "bat"
 # GNU binary tools for native development
 brew "binutils"
-# Get/set bluetooth power and discoverable state
-brew "blueutil"
 # Collection of portable C++ source libraries
 brew "boost"
 # Resource monitor. C++ version and continuation of bashtop and bpytop
@@ -63,18 +57,12 @@ brew "btop"
 brew "freetype"
 # Core application library for C
 brew "glib"
-# GNU File, Shell, and Text utilities
-brew "coreutils"
-# Emacs dependency management
-brew "cask"
-# Console Matrix
-brew "cmatrix"
 # Defines a standard way of committing rules and communicating it
 brew "commitizen"
 # Test your configuration files using Open Policy Agent
 brew "conftest"
-# Apjanke's fork of the classic cowsay project
-brew "cowsay"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
 # Cryptographic recipes and primitives for Python
 brew "cryptography"
 # Image format providing lossless and lossy compression for web images
@@ -131,14 +119,8 @@ brew "netpbm"
 brew "findutils"
 # User-friendly command-line shell for UNIX-like operating systems
 brew "fish"
-# Infamous electronic fortune-cookie generator
-brew "fortune"
 # Command-line fuzzy finder written in Go
 brew "fzf"
-# Open-source, cross-platform JavaScript runtime environment
-brew "node"
-# Interact with Google Gemini AI models from the command-line
-brew "gemini-cli"
 # GitHub command-line tool
 brew "gh"
 # Syntax-highlighting pager for git and diff output
@@ -153,22 +135,16 @@ brew "gnu-sed"
 brew "gnu-time"
 # GNU Privacy Guard (OpenPGP)
 brew "gnupg"
-# Command-driven, interactive function plotting
-brew "gnuplot"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
 # Generate introspection data for GObject libraries
 brew "gobject-introspection"
-# Go version management
-brew "goenv"
 # New file format for still image compression
 brew "jpeg-xl"
 # ISO/IEC 23008-12:2017 HEIF file format decoder and encoder
 brew "libheif"
 # Image processing tools collection
 brew "graphicsmagick"
-# Fulltext search engine and column store
-brew "groonga"
 # Like cURL, but for gRPC
 brew "grpcurl"
 # Tool for glamorous shell scripts
@@ -177,16 +153,12 @@ brew "gum"
 brew "hdf5"
 # Kubernetes package manager
 brew "helm"
-# Instant coding answers via the command-line
-brew "howdoi"
 # Improved top (interactive process viewer)
 brew "htop"
 # Tool to report network interface bandwidth
 brew "ifstat"
 # Tools and libraries to manipulate images in select formats
 brew "imagemagick"
-# Calculate various network masks, etc. from a given IP address
-brew "ipcalc"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
 # Run local Kubernetes cluster in Docker
@@ -195,8 +167,6 @@ brew "kind"
 brew "kubecolor"
 # Tool that can switch between kubectl contexts easily and create aliases
 brew "kubectx"
-# Template-free customization of Kubernetes YAML manifests
-brew "kustomize"
 # Simple terminal UI for git commands
 brew "lazygit"
 # Cross-platform TUI database management tool
@@ -205,34 +175,24 @@ brew "lazysql"
 brew "libraw"
 # XML security library
 brew "libxmlsec1"
-# Quickly generate a temporary email address
-brew "mailsy"
 # Mac App Store command-line interface
 brew "mas"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
 # Simple tool to make locally trusted development certificates
 brew "mkcert"
+# Open-source, cross-platform JavaScript runtime environment
+brew "node"
 # MongoDB Shell to connect, configure, query, and work with your MongoDB database
 brew "mongosh"
-# Message broker implementing the MQTT protocol
-brew "mosquitto"
 # QUIC transport protocol implementation
 brew "mvfst"
-# Protocol buffers (Google's data interchange format)
-brew "protobuf"
-# Open source relational database management system
-brew "mysql", restart_service: :changed
-# Open source relational database management system
-brew "mysql@8.4"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # Port scanning utility for large networks
 brew "nmap"
 # Install NodeJS versions
 brew "node-build"
-# Node.js version manager
-brew "nodenv"
 # Tools for one-time password authentication systems
 brew "oath-toolkit"
 # Port to Qt of the Scintilla editing component
@@ -253,38 +213,14 @@ brew "openjdk"
 brew "pass"
 # Pass extension for managing one-time-password tokens
 brew "pass-otp"
-# General-purpose scripting language
-brew "php"
-# General-purpose scripting language
-brew "php@8.3"
 # Pinentry for GPG on Mac
 brew "pinentry-mac"
 # PDF rendering library (based on the xpdf-3.0 code base)
 brew "poppler"
-# Quick and easy command-line file transfer utility from any computer to another
-brew "portal"
-# Object-relational database system
-brew "postgresql@14"
+# Protocol buffers (Google's data interchange format)
+brew "protobuf"
 # CLI companion with 200+ commands across 33+ Datadog products
 brew "pup"
-# Password generator
-brew "pwgen"
-# Python bindings for v6 of Qt
-brew "pyqt"
-# Cross-platform application and UI framework
-brew "qt@5"
-# Python bindings for v5 of Qt
-brew "pyqt@5"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.10"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.12"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.9"
-# Cross-platform application and UI framework
-brew "qt"
 # Install various Ruby versions and implementations
 brew "ruby-build"
 # Ruby version manager
@@ -292,33 +228,23 @@ brew "rbenv"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
 # Powerful, clean, object-oriented scripting language
-brew "ruby", link: false
+brew "ruby"
 # 7-Zip is a file archiver with a high compression ratio
 brew "sevenzip"
-# Prints a steam locomotive if you type sl instead of ls
-brew "sl"
-# Terminal based presentation tool
-brew "slides"
 # SMART hard drive monitoring
 brew "smartmontools"
 # Microsoft SQL Server command-line interface
 brew "sqlcmd"
-# Graphical command-line client for SSH
-brew "sshs"
 # Cross-shell prompt for astronauts
 brew "starship"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
 brew "stow"
 # Rich and complete approach to parallelism in C++
 brew "tbb"
-# Plugin-driven server agent for collecting & reporting metrics
-brew "telegraf"
 # User interface to the TELNET protocol
 brew "telnet"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier"
-# Code-search similar to ack
-brew "the_silver_searcher"
 # Simplified and community-driven man pages
 brew "tldr"
 # Terminal multiplexer
@@ -341,20 +267,18 @@ brew "worktrunk"
 brew "xclip"
 # JavaScript package manager
 brew "yarn", link: false
+# Blazing fast terminal file manager written in Rust, based on async I/O
+brew "yazi"
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
 brew "yq"
 # Feature-rich command-line audio/video downloader
 brew "yt-dlp"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
-# A powerful terminal-based AI assistant for developers, providing intelligent coding assistance directly in your terminal.
-brew "charmbracelet/tap/crush", trusted: true
 # CodeCrafters CLI
 brew "codecrafters-io/tap/codecrafters", trusted: true
 # Kubernetes CLI To Manage Your Clusters In Style!
 brew "derailed/k9s/k9s", trusted: true
-# MQTT 5.0 and MQTT X CLI client
-brew "emqx/mqttx/mqttx-cli", trusted: true
 # A window border system for macOS
 brew "felixkratz/formulae/borders", trusted: true
 # Custom macOS statusbar with shell plugin, interaction and graph support
@@ -377,8 +301,8 @@ brew "metalbear-co/mirrord/mirrord", trusted: true
 brew "mike-engel/jwt-cli/jwt-cli", trusted: true
 # Desktop-inspired terminal diff viewer for agent-authored changesets
 brew "modem-dev/tap/hunk", trusted: true
-# High-performance, schema-free, document-oriented database
-brew "mongodb/brew/mongodb-community", trusted: true
+# Open source continuous profiling software
+brew "pyroscope-io/brew/profilecli"
 # Sourcegraph CLI
 brew "sourcegraph/src-cli/src-cli", trusted: true
 # Ookla Speedtest
@@ -413,8 +337,8 @@ mas "CopyClip", id: 595191960
 mas "Okta Verify", id: 490179405
 mas "uBlock Origin Lite", id: 6745342698
 mas "Xcode", id: 497799835
-go "cuelang.org/go/cmd/cue"
-go "github.com/planetscale/ghcommit"
+go "cmd/go"
+go "cmd/gofmt"
 npm "@anthropic-ai/claude-code"
 npm "@googleworkspace/cli"
 npm "@openai/codex"
