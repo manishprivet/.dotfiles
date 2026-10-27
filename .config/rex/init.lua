@@ -4,7 +4,7 @@
 -- Keep the client's default shortcuts except where overridden below.
 -- Ported from ~/.tmux.conf where Rex exposes a documented equivalent.
 -- Client appearance, status bars, mouse handling, terminal capabilities,
--- vi copy mode and TPM/resurrect/continuum are not configured
+-- TPM/resurrect/continuum are not configured
 -- here: the published config API does not document equivalent settings.
 
 -- macOS pane shortcuts.
@@ -14,6 +14,8 @@ rex.bind("cmd+shift+enter", "pane.zoom")
 
 -- Ctrl+S prefix, matching ~/.tmux.conf.
 -- Press Escape to cancel a sequence; Ctrl+S twice sends Ctrl+S through.
+require("copy_mode")
+rex.bind("ctrl+s>[", "copy_mode")
 rex.bind("ctrl+s>ctrl+s", "pane.send_key", { key = "ctrl+s" })
 rex.bind("ctrl+s>c", "client.tab.new")
 rex.bind("ctrl+s>,", "client.tab.rename")
