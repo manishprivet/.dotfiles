@@ -1,6 +1,8 @@
 """Unit tests use a fake Herdr API; no running terminals are changed."""
 
 import copy
+from pathlib import Path
+import tomllib
 import unittest
 
 from tab_numbers import reconcile
@@ -20,15 +22,20 @@ class FakeHerdr:
 
 
 def tab(tab_id="w1:t1", number=1, label="editor"):
-    return {"tab_id": tab_id, "number": number, "label": label}
+    return {
+        "tab_id": tab_id,
+        "workspace_id": tab_id.split(":", 1)[0],
+        "number": number,
+        "label": label,
+    }
 
 
 class NumberingTests(unittest.TestCase):
     def sync(self, api, state, mode="sync"):
         reconcile(api, state, mode, lambda value: None)
 
-    def test_numbers_are_per_space_and_follow_api_numbers(self):
-        api = FakeHerdr([tab(), tab("w2:t1", 1, "shell"), tab("w1:t9", 2, "tests")])
+    def test_numbers_are_per_space_and_follow_list_order_not_api_numbers(self):
+        api = FakeHerdr([tab(number=2), tab("w2:t7", 7, "shell"), tab("w1:t9", 9, "tests")])
         self.sync(api, {})
         self.assertEqual([t["label"] for t in api.items], ["1: editor", "1: shell", "2: tests"])
 
@@ -38,14 +45,44 @@ class NumberingTests(unittest.TestCase):
         self.sync(api, state)
         self.assertEqual(api.renames, [("w1:t1", "1: editor")])
 
-    def test_close_and_move_renumber_without_stacking_prefixes(self):
+    def test_close_renumbers_without_stacking_prefixes(self):
         api, state = FakeHerdr([tab(), tab("w1:t2", 2, "shell")]), {}
         self.sync(api, state)
         api.items.pop(0)
-        api.items[0]["number"] = 1
         self.sync(api, state)
         self.assertEqual(api.items[0]["label"], "1: shell")
         self.assertNotIn("w1:t1", state["tabs"])
+
+    def test_closing_middle_tab_leaves_no_gap(self):
+        api, state = FakeHerdr([tab(), tab("w1:t2", 2, "shell"), tab("w1:t3", 3, "tests")]), {}
+        self.sync(api, state)
+        api.items.pop(1)
+        self.sync(api, state)
+        self.assertEqual([t["label"] for t in api.items], ["1: editor", "2: tests"])
+        self.assertNotIn("w1:t2", state["tabs"])
+
+    def test_last_pane_close_event_triggers_renumbering(self):
+        manifest = tomllib.loads(
+            Path(__file__).with_name("herdr-plugin.toml").read_text()
+        )
+        for event in ("tab.closed", "pane.closed", "pane.exited"):
+            with self.subTest(event=event):
+                api, state = FakeHerdr([tab(), tab("w1:t2", 2, "shell")]), {}
+                self.sync(api, state)
+                api.items.pop(0)
+                # These are distinct removal paths; shell exit emits only pane.exited.
+                hooks = [hook for hook in manifest["events"] if hook["on"] == event]
+                self.assertEqual(len(hooks), 1)
+                self.assertEqual(hooks[0]["command"], ["python3", "tab_numbers.py", "sync"])
+                self.sync(api, state, hooks[0]["command"][-1])
+                self.assertEqual(api.items[0]["label"], "1: shell")
+
+    def test_move_renumbers_without_stacking_prefixes(self):
+        api, state = FakeHerdr([tab(), tab("w1:t2", 2, "shell")]), {}
+        self.sync(api, state)
+        api.items.reverse()
+        self.sync(api, state)
+        self.assertEqual([t["label"] for t in api.items], ["1: shell", "2: editor"])
 
     def test_manual_rename_is_preserved(self):
         api, state = FakeHerdr([tab()]), {}

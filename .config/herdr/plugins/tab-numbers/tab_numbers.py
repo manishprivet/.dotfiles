@@ -56,8 +56,13 @@ def reconcile(api, state, mode, save):
             del records[tab_id]
     save(state)
 
+    positions = {}
     for tab in tabs:
         tab_id, label = tab["tab_id"], tab["label"]
+        # Herdr's number is a stable identifier, not the current shortcut index.
+        # Count list order separately per Space so closes/moves leave no gaps.
+        workspace_id = tab["workspace_id"]
+        positions[workspace_id] = positions.get(workspace_id, 0) + 1
         previous = records.get(tab_id)
         # Only remove a prefix if this plugin actually applied that exact label.
         # A manual rename (even to "2: notes") becomes the new original title.
@@ -66,7 +71,7 @@ def reconcile(api, state, mode, save):
             if previous and label == previous["applied"]
             else label
         )
-        desired = original if mode == "remove" else f'{tab["number"]}: {original}'
+        desired = original if mode == "remove" else f'{positions[workspace_id]}: {original}'
         if desired != label:
             api.rename(tab_id, desired)
         if mode == "remove":

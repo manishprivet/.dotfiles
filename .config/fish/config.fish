@@ -86,3 +86,14 @@ set -gx GPG_TTY (tty)
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/manishprivet/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/google-cloud-sdk/path.fish.inc'; end
+
+# Rex CLI outside Rex; Current follows server updates without pinning a version.
+set -l rex_bin_dir "$HOME/Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS"
+if test -x "$rex_bin_dir/rex"
+    fish_add_path --path --prepend --move "$rex_bin_dir"
+end
+
+# Inside Rex, prefer the CLI supplied by the running server.
+if set -q REX_BIN_DIR; and test -n "$REX_BIN_DIR"
+    fish_add_path --path --prepend --move "$REX_BIN_DIR"
+end

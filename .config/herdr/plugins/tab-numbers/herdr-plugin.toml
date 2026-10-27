@@ -17,6 +17,14 @@ on = "tab.closed"
 command = ["python3", "tab_numbers.py", "sync"]
 
 [[events]]
+on = "pane.closed"
+command = ["python3", "tab_numbers.py", "sync"]
+
+[[events]]
+on = "pane.exited"
+command = ["python3", "tab_numbers.py", "sync"]
+
+[[events]]
 on = "tab.moved"
 command = ["python3", "tab_numbers.py", "sync"]
 

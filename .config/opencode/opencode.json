@@ -37,6 +37,9 @@
         "apiKey": "{env:LITELLM_API_KEY}"
       },
       "models": {
+        "gemini-4-argon": {
+          "name": "gemini-4-argon"
+        },
         "claude-sonnet-5-lb": {
           "name": "claude-sonnet-5-lb"
         },

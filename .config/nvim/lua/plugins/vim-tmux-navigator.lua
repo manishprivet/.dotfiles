@@ -15,8 +15,11 @@ return {
     local keys = {
       { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
     }
+    local rex_keys = require("config.rex-navigation").keys()
+    if rex_keys then
+      vim.list_extend(keys, rex_keys)
     -- Herdr's editor script owns the directional mappings inside its panes.
-    if not vim.env.HERDR_PANE_ID or vim.env.HERDR_PANE_ID == "" then
+    elseif not vim.env.HERDR_PANE_ID or vim.env.HERDR_PANE_ID == "" then
       vim.list_extend(keys, {
         { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
         { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },

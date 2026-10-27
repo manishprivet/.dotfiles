@@ -1,7 +1,9 @@
 # Tab Numbers
 
 A local Herdr 0.9.5+ plugin that turns `editor` into `1: editor`. Numbers come
-from Herdr's tab positions within each Space, matching indexed tab shortcuts.
+from Herdr's tab list order within each Space, matching indexed tab shortcuts.
+They stay consecutive after tabs close or move; the API's stable `number` field
+is not used as a position.
 Requires Python 3 on macOS or Linux; no additional packages or daemon needed.
 
 ## Install
@@ -11,9 +13,13 @@ herdr plugin link ~/.config/herdr/plugins/tab-numbers
 herdr plugin action invoke local.tab-numbers.refresh
 ```
 
-Startup and tab-created/closed/moved/renamed hooks maintain numbering. Linking
+Startup and tab-created/closed/moved/renamed hooks maintain numbering. A
+pane-closed hook also handles removing a tab by closing its last pane, and a
+pane-exited hook handles shell exits (including `exit` and Ctrl+D). Linking
 does not run the startup hook, so invoke `refresh` once after linking. Plugin
 registration is global; refresh each already-running session separately if needed.
+After changing manifest hooks, run `herdr plugin link` again to update the
+registered hooks; editing the manifest alone does not reload them.
 
 ## Remove or resume numbering
 
