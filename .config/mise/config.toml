@@ -1,7 +1,7 @@
 [tools]
 argo-rollouts = "latest"
 go = "1.23.1"
-node = "22"
+node = "24"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]

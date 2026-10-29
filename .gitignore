@@ -17,6 +17,9 @@
 .config/opencode/service.json
 .config/argocd/config
 .config/cagent/
+.config/AWSVPNClient
+.config/pip
+.config/uv
 .agents/skills/synced/
 /repro.sh
 

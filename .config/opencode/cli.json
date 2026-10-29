@@ -4,7 +4,7 @@
     "name": "system",
     "mode": "system"
   },
-  "plugins": ["./herdr-opencode", "./openui"],
+  "plugins": ["./herdr-opencode", "./openui", "./rex-session"],
   "tabs": {
     "mode": "off"
   },

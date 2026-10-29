@@ -4,8 +4,8 @@
 -- Keep the client's default shortcuts except where overridden below.
 -- Ported from ~/.tmux.conf where Rex exposes a documented equivalent.
 -- Client appearance, status bars, mouse handling, terminal capabilities,
--- TPM/resurrect/continuum are not configured
--- here: the published config API does not document equivalent settings.
+-- Session layout persistence is provided by a local extension below; live
+-- processes and scrollback cannot be resurrected through Rex's public API.
 
 -- macOS pane shortcuts.
 rex.bind("cmd+d", "pane.split", { direction = "right" })
@@ -89,3 +89,4 @@ for _, direction in ipairs({ "left", "down", "up", "right" }) do
 end
 
 require("extensions.tab-numbers")
+require("extensions.session-persistence")
