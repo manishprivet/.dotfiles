@@ -1,6 +1,6 @@
 -- Run with rex do PATH --all. A live watcher survives config reloads.
 local source = debug.getinfo(1, "S").source:gsub("^@", ""):match("^(.*)/")
-local model = dofile(assert(source) .. "/state.lua")
+local model = dofile(assert(source) .. "/agents.lua")
 local function checked(value, err)
     if value == nil then error(err or "Rex call failed", 0) end
     return value
@@ -27,7 +27,8 @@ if not claimed.ok then
     rex.log("info", "session-persistence: watcher already running (or lock unavailable)")
     return
 end
-local path = root .. "/snapshot.json"
+-- Legacy layout snapshots and recovery files are intentionally never touched.
+local path = root .. "/agents.json"
 local function read(pathname, optional)
     local file, err = io.open(pathname, "r")
     if not file then
@@ -48,40 +49,33 @@ local function write(value, destination)
     checked(file:close())
     checked(os.rename(destination .. ".tmp", destination))
 end
-local state = read(path, true)
-if state then
-    model.validate(state.snapshot)
-end
-local live = checked(rex.call("session.list", {})).sessions or {}
-if state and state.instance_id ~= server.instance_id and not state.restoring then
-    -- Keep the pre-restart layout even if a client wins the startup race or
-    -- post-restore shell startup produces transient changes. Never overwrite
-    -- this backup on a same-instance config reload.
-    write(state, root .. "/before-restart.json")
-end
-if state and state.restoring and #live > 0 then
-    error("session-persistence: interrupted restore; snapshot preserved. See extension README before retrying.", 0)
-end
-if state and state.instance_id ~= server.instance_id and #live == 0 and #state.snapshot.sessions > 0 then
-    -- Persist intent before creating anything. On failure, never replace the
-    -- good snapshot with a half-restored layout, even after a watcher restart.
-    state.restoring = true
-    write(state)
-    rex.log("info", "session-persistence: restoring " .. #state.snapshot.sessions .. " session(s)")
-    local restored, restore_error = pcall(model.restore, rex, state.snapshot)
-    if not restored then
-        error("session-persistence: restore failed; snapshot retained with restoring=true. "
-            .. "Do not blindly retry a timed-out create; inspect live sessions first. "
-            .. "For manual cold-start restore use rex --timeout 120s do PATH --all. Cause: "
-            .. tostring(restore_error), 0)
-    end
-    state.restoring = nil
-    write(state)
-    rex.log("info", "session-persistence: restored shells and layouts")
-elseif state and state.instance_id ~= server.instance_id and #live > 0 then
-    rex.log("warn", "session-persistence: restore skipped because sessions already exist; "
-        .. "pre-restart snapshot retained at " .. root .. "/before-restart.json")
-end
+local state = read(path, true) or { version = 1, agents = {} }
+assert(state.version == 1 and type(state.agents) == "table", "Invalid agent state")
+
+-- Poll only prior-instance candidates, bounded to the initial two minutes.
+-- Native Rex owns all layouts; send a private Fish binding, never a command.
+local readiness = dofile(source .. "/readiness.lua")
+local resume_ready = readiness.new(state.agents, server.instance_id, os.time(), {
+    read = function(id, kind) return read(root .. "/readiness/" .. id .. "." .. kind .. ".json", true) end,
+    request = function(id, ready) write(ready, root .. "/readiness/" .. id .. ".request.json") end,
+    idle = function(id, agent, ready)
+        checked(rex.session.attach{ session_id = agent.rex_session })
+        local process = checked(rex.block.call("com.superlogical.terminal", "process", {
+            session_id = agent.rex_session, block_id = id,
+        }))
+        local identity = checked(rex.exec({ "/bin/ps", "-p", tostring(ready.shell_pid), "-o", "lstart=" }))
+        return process.last_exit == nil and (process.foreground or {}).pid == ready.shell_pid
+            and (process.foreground or {}).name == "fish" and identity.ok
+            and identity.stdout == ready.shell_identity
+    end,
+    wake = function(id, agent)
+        checked(rex.block.call("com.superlogical.terminal", "write", {
+            session_id = agent.rex_session, block_id = id, data = "\27[24;8~",
+        }))
+    end,
+    warn = function(err) rex.log("warn", "session-persistence: readiness check skipped: " .. tostring(err)) end,
+})
+rex.every(0.5, function() resume_ready(os.time()) end)
 
 local dirty = true
 local function mark() dirty = true end
@@ -90,37 +84,52 @@ for _, event in ipairs({ "session_created", "session_destroyed", "session_view_c
     rex.on(event, mark)
 end
 local function save()
-    -- Only consult title ownership for the current server instance. Never guess
-    -- whether a numeric prefix was user-written.
-    local titles = read(base .. "/tab-numbers/" .. server.instance_id .. ".json", true)
-    local function agent_for(session_id, block_id, process)
-        assert(block_id:match("^[%w:-]+$"), "Invalid block ID")
-        local record = read(base .. "/agent-sessions/" .. block_id .. ".json", true)
-        if not record or record.rex_session ~= session_id then return nil end
-        -- An inherited REX_BLOCK alone is not proof: nested/background agents
-        -- must actually belong to the pane's foreground process chain.
-        local found = false
-        local chain = { process.foreground or {}, process.child or {} }
-        for _, ancestor in ipairs(process.ancestors or {}) do chain[#chain + 1] = ancestor end
-        for _, item in ipairs(chain) do if item.pid == record.pid then found = true end end
-        if not found then return nil end
-        local identity = checked(rex.exec({ "/bin/ps", "-p", tostring(record.pid), "-o", "lstart=" }))
-        if not identity.ok or identity.stdout ~= record.identity then return nil end
-        assert(type(record.cwd) == "string" and record.cwd:sub(1, 1) == "/", "Invalid agent cwd")
-        return { agent = record.agent, session_id = record.session_id, cwd = record.cwd }
+    for id in pairs(state.agents) do
+        assert(id:match("^[%w:-]+$"), "Invalid saved block ID")
+        local claim = read(root .. "/claims/" .. id .. ".json", true)
+        if claim and claim.instance_id == server.instance_id then state.agents[id] = nil end
     end
-    local snapshot = model.snapshot(rex, server, titles and titles.sessions, agent_for)
-    model.validate(snapshot)
-    write({ instance_id = server.instance_id, snapshot = snapshot })
+    local function record_for(block_id)
+        assert(block_id:match("^[%w:-]+$"), "Invalid block ID")
+        return read(base .. "/agent-sessions/" .. block_id .. ".json", true)
+    end
+    local agents = model.collect(rex, server, state.agents, record_for, function(pid)
+        if type(pid) ~= "number" or pid < 2 then return nil end
+        local result = checked(rex.exec({ "/bin/ps", "-p", tostring(pid), "-o", "lstart=" }))
+        return result.ok and result.stdout or nil
+    end, function(id, record, process)
+        local claim = read(root .. "/claims/" .. id .. ".json", true)
+        if not claim or claim.instance_id ~= server.instance_id
+            or type(claim.helper_pid) ~= "number" or type(claim.shell_pid) ~= "number"
+            or (process.foreground or {}).pid ~= claim.shell_pid then return false end
+        local identity = checked(rex.exec({ "/bin/ps", "-p", tostring(claim.helper_pid), "-o", "lstart=" }))
+        if not identity.ok or identity.stdout ~= claim.helper_identity then return false end
+        local result = checked(rex.exec({ "/bin/ps", "-p",
+            table.concat({ record.pid, claim.helper_pid, claim.shell_pid }, ","),
+            "-o", "pid=,ppid=,pgid=,tpgid=" }))
+        if not result.ok then return false end
+        local rows = {}
+        for pid, parent, group, foreground in result.stdout:gmatch("(%d+)%s+(%d+)%s+(%d+)%s+(%d+)") do
+            rows[tonumber(pid)] = { parent = tonumber(parent), group = group, foreground = foreground }
+        end
+        local agent, helper, shell = rows[record.pid], rows[claim.helper_pid], rows[claim.shell_pid]
+        return agent and helper and shell and agent.parent == claim.helper_pid
+            and helper.parent == claim.shell_pid and agent.group == shell.group
+            and helper.group == shell.group and shell.group == shell.foreground
+    end)
+    local next_state = { version = 1, host_id = server.host_id, agents = agents }
+    write(next_state)
+    state = next_state
     dirty = false
 end
 local function safely_save()
     local ok, err = pcall(save)
-    if not ok then rex.log("error", "session-persistence: snapshot preserved: " .. tostring(err)) end
+    if not ok then rex.log("error", "session-persistence: agent state preserved: " .. tostring(err)) end
 end
 -- Coalesce event bursts, and periodically refresh cwd when shell integration
 -- doesn't emit directory events. Never save from a shutdown/disconnect handler.
 rex.every(1, function() if dirty then safely_save() end end)
-rex.every(30, function() dirty = true end)
+-- Conversation switches need not change the foreground process.
+rex.every(2, function() dirty = true end)
 safely_save()
-rex.log("info", "session-persistence: watching; snapshot: " .. path)
+rex.log("info", "session-persistence: agent-only tracking; Rex owns layouts; state: " .. path)

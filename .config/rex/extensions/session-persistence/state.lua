@@ -107,8 +107,21 @@ function M.validate(snapshot)
     return snapshot
 end
 
+-- Startup sessions are additive, never a reason to discard the saved layout.
+-- A matching label is ambiguous (possibly already restored): fail before any
+-- creation rather than duplicate it or overwrite its recovery snapshot.
+function M.check_conflicts(snapshot, live)
+    local labels = {}
+    for _, session in ipairs(live or {}) do labels[session.label] = true end
+    for _, session in ipairs(snapshot.sessions) do
+        assert(not labels[session.label], "Session already exists: " .. session.label
+            .. "; recovery snapshot preserved; inspect before restoring")
+    end
+end
+
 function M.restore(api, snapshot)
     M.validate(snapshot)
+    M.check_conflicts(snapshot, checked(api.call("session.list", {})).sessions)
     -- Build commands only at restore time from typed metadata, never from saved
     -- command/initial_input fields. No prompt or automatic continuation is sent.
     local function launch(node)
@@ -119,8 +132,9 @@ function M.restore(api, snapshot)
         local b = node.block
         local options = { cwd = b.options.cwd }
         if b.agent then
-            local flag = b.agent.agent == "claude" and "--resume" or "--session"
-            options.command = { b.agent.agent, flag, b.agent.session_id }
+            local config = os.getenv("XDG_CONFIG_HOME") or (assert(os.getenv("HOME")) .. "/.config")
+            options.command = { "python3", config .. "/rex/extensions/session-persistence/launch-agent.py",
+                b.agent.agent, b.agent.session_id }
         end
         return { block = { flavor = b.flavor, label = b.label, options = options } }
     end

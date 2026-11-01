@@ -56,8 +56,15 @@ Otherwise the next config load starts numbering again.
   their full originals remain saved for restoration.
 - State: `$XDG_STATE_HOME/rex/tab-numbers/`, default `~/.local/state/rex/tab-numbers/`.
   Keep state files to avoid losing ownership of existing numeric prefixes.
-- Ownership and locks are scoped to a server instance and local user. Restore
-  titles before restarting a server if it preserves its windows across restarts.
+- Ownership lives in `<host-id>-<scope>.json` and survives Rex native persistence
+  restores. Locks remain per-instance. Restored tabs keep a single managed prefix;
+  tab order changes update it without modifying the underlying title.
+- Legacy per-instance JSON files are read, not changed. Existing doubled prefixes
+  are repaired only when exact session/window IDs and saved applied labels prove
+  ownership across generations. Literal numeric titles/manual renames remain
+  intact. Without ownership records, the watcher does not guess what to strip.
+- For multiple servers on one host, set a distinct `REX_TAB_NUMBERS_SCOPE` in each
+  server environment (default `local`; letters, digits, underscores, hyphens).
 - Launcher output: `~/.local/state/rex/tab-numbers.log` (respects `XDG_STATE_HOME`).
   This append-only log is not automatically rotated.
 - The module assumes installation under the standard Rex config directory,

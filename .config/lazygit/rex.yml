@@ -1,0 +1,9 @@
+# Added to LG_CONFIG_FILE when Neovim opens lazygit in a Rex pane (nvim/lua/config/rex-terminal.lua).
+# The nvim-remote preset sends "q" to quit a lazygit running in Neovim's own terminal. Here lazygit
+# is a separate Rex pane, so open the file in the parent Neovim and close the pane instead.
+os:
+  edit: 'nvim --server "$NVIM" --remote {{filename}}; rex block close -s "$REX_SESSION" "$REX_BLOCK"'
+  editAtLine: 'nvim --server "$NVIM" --remote {{filename}}; nvim --server "$NVIM" --remote-send ":{{line}}<CR>"; rex block close -s "$REX_SESSION" "$REX_BLOCK"'
+  editAtLineAndWait: 'nvim +{{line}} {{filename}}'
+  openDirInEditor: 'nvim --server "$NVIM" --remote {{dir}}; rex block close -s "$REX_SESSION" "$REX_BLOCK"'
+  editInTerminal: false

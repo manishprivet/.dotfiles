@@ -5,8 +5,7 @@
 -- Ctrl+C stops updates but leaves numbers; restarting safely resumes them.
 -- mode=remove also replaces the watcher. State lives in ~/.local/state/rex/
 -- (or $XDG_STATE_HOME/rex/). Keep it to recognize plugin-owned prefixes.
--- State is scoped to the server instance: remove numbers before restarting
--- the Rex server if it preserves its sessions/windows across a restart.
+-- Title ownership survives native restores; watcher locks remain per-instance.
 
 local function checked(value, err)
     if value == nil then error(err or "Rex call failed", 0) end
@@ -110,9 +109,10 @@ local released, release_error = os.remove(guard)
 if not acquired then error(acquire_error, 0) end
 checked(released, release_error)
 
--- Match the lock's scope so independent servers on one host cannot overwrite
--- one another's state. Script restarts retain ownership for this server run.
-local path = root .. "/" .. safe_id(server.instance_id) .. ".json"
+-- Native restore retains session/window IDs and their displayed labels. Keep
+-- ownership across instances, scoped by host and explicit local-server scope.
+local scope = safe_id(os.getenv("REX_TAB_NUMBERS_SCOPE") or "local")
+local path = root .. "/" .. safe_id(server.host_id) .. "-" .. scope .. ".json"
 local state = { sessions = {} }
 local file, open_error = io.open(path, "r")
 if file then
@@ -130,6 +130,42 @@ else
         "tab-numbers", path, root,
     }))
     if not missing.ok then error(open_error or "Cannot read tab-numbers state", 0) end
+end
+
+-- Import legacy per-instance ownership without modifying its recovery files.
+-- Exact session/window IDs AND applied labels are required; numeric syntax is
+-- never evidence of ownership. Multiple generations may contain stacked labels.
+local history = { state.sessions }
+local listing = command({ "/usr/bin/find", root, "-maxdepth", "1", "-type", "f", "-name", "*.json" })
+for legacy_path in listing:gmatch("[^\r\n]+") do
+    local name = legacy_path:match("/([^/]+)%.json$")
+    if name and (name == server.instance_id or (#name == 36 and name:match("^[%x-]+$"))) then
+        local text = assert(read_text(legacy_path), "Cannot read legacy ownership")
+        local legacy = checked(rex.json.decode(text))
+        assert(type(legacy.sessions) == "table", "Invalid legacy tab-numbers state")
+        history[#history + 1] = legacy.sessions
+    end
+end
+
+local function original_title(session_id, window_id, label)
+    local seen = {}
+    while not seen[label] do
+        seen[label] = true
+        local original
+        for _, sessions in ipairs(history) do
+            local record = (sessions[session_id] or {})[window_id]
+            if record and record.applied == label and record.original ~= label then
+                assert(type(record.original) == "string", "Invalid original title")
+                if original and original ~= record.original then
+                    error("tab-numbers: conflicting title ownership; state preserved", 0)
+                end
+                original = record.original
+            end
+        end
+        if not original then return label end
+        label = original
+    end
+    error("tab-numbers: cyclic title ownership; state preserved", 0)
 end
 
 local function save()
@@ -170,7 +206,7 @@ local function sync(session_id)
         live[id] = true
         local previous = records[id]
         -- Never strip arbitrary numeric text or an unrecognized manual rename.
-        local original = previous and label == previous.applied and previous.original or label
+        local original = original_title(session_id, id, label)
         local prefix = tostring(index) .. ": "
         local desired = mode == "remove" and original or prefix .. shorten(original, 128 - #prefix)
         -- Rex trims labels; record the exact value it will store, including

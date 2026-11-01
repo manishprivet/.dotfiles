@@ -4,6 +4,7 @@ local script = ".config/rex/extensions/tab-numbers/watcher.lua"
 local real_io, real_rename, real_remove = io, os.rename, os.remove
 local files, views, handlers, writes, locked, fail_rename, unreadable
 local current_pid, identities, signals, stuck, guard_busy
+local instance_id, root
 local function equal(actual, expected)
     assert(actual == expected, tostring(actual) .. " ~= " .. tostring(expected))
 end
@@ -28,6 +29,8 @@ end
 local function reset()
     files, views, handlers, writes, locked, fail_rename, unreadable = {}, {}, {}, 0, false, false, false
     current_pid, identities, signals, stuck, guard_busy = 100, {}, 0, false, false
+    instance_id = "test-server"
+    root = (os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")) .. "/rex/tab-numbers"
     views.s1 = { windows = {
         { window_id = "a", label = "editor" },
         { window_id = "b", label = "2: literal" },
@@ -55,13 +58,18 @@ os.remove = function(path) files[path] = nil; return true end
 rex = {
     args = {},
     call = function(method)
-        if method == "server.status" then return { instance_id = "test-server" } end
+        if method == "server.status" then return { instance_id = instance_id, host_id = "test-host" } end
         equal(method, "session.list")
         local sessions = {}
         for id in pairs(views) do sessions[#sessions + 1] = { session_id = id } end
         return { sessions = sessions }
     end,
     exec = function(argv)
+        if argv[1] == "/usr/bin/find" then
+            local paths = {}
+            for path in pairs(files) do if path:match("%.json$") then paths[#paths + 1] = path end end
+            return { ok = true, stdout = table.concat(paths, "\n") }
+        end
         if argv[1] == "/bin/ps" then
             return { ok = identities[argv[4]] ~= nil, stdout = identities[argv[4]] or "" }
         end
@@ -149,6 +157,39 @@ local ok, err = pcall(function()
     run("remove")
     equal(first.label, "3: manual")
     equal(next(handlers), nil)
+
+    -- Native restore preserves resource IDs and numbered labels, not instance ID.
+    reset()
+    run()
+    instance_id = "next-server"
+    locked = false
+    run()
+    equal(writes, 2)
+    equal(views.s1.windows[1].label, "1: editor")
+    equal(views.s1.windows[2].label, "2: 2: literal")
+    run("remove")
+    equal(views.s1.windows[2].label, "2: literal")
+
+    -- Migrate and repair a previously doubled prefix only with exact evidence.
+    reset()
+    local legacy = { sessions = { s1 = {
+        a = { original = "editor", applied = "1: editor" },
+        b = { original = "2: literal", applied = "2: 2: literal" },
+    } } }
+    files[root .. "/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.json"] = rex.json.encode(legacy)
+    legacy.sessions.s1.a = { original = "1: editor", applied = "1: 1: editor" }
+    files[root .. "/test-server.json"] = rex.json.encode(legacy)
+    views.s1.windows[1].label = "1: 1: editor"
+    views.s1.windows[2].label = "2: 2: literal"
+    run()
+    equal(views.s1.windows[1].label, "1: editor")
+    equal(views.s1.windows[2].label, "2: 2: literal")
+    equal(writes, 1)
+    run()
+    equal(writes, 1)
+    views.s1.windows[1].label = "7: manual"
+    emit("s1")
+    equal(views.s1.windows[1].label, "1: 7: manual")
 
     reset()
     views.s1.windows[1].label = string.rep("é", 128)

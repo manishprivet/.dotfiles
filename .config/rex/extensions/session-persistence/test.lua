@@ -31,7 +31,7 @@ local view = {
 local calls, creates = {}, 0
 local api = {
     call = function(method, args)
-        if method == "session.list" then return { sessions = { { session_id = "s" } } } end
+        if method == "session.list" then return { sessions = { { session_id = "s", label = "live" } } } end
         equal(method, "session.create")
         creates = creates + 1
         calls.create = args
@@ -82,6 +82,9 @@ equal(calls.create.initial_windows[2].layout.block.options.initial_input, nil)
 -- Exact conversation IDs, not latest-session guesses; arbitrary commands stay
 -- filtered even for agent panes. Metadata survives validation and resaving.
 local agents = copy(saved)
+-- Rex.app can create an unrelated startup session before the watcher connects.
+model.check_conflicts(agents, { { label = "random-startup-session" } })
+equal(pcall(model.check_conflicts, agents, { { label = "work" } }), false)
 local a = agents.sessions[1].windows[1].layers[1].layout.split.before.block
 local b = agents.sessions[1].windows[2].layers[1].layout.block
 a.agent = { agent = "claude", session_id = "550e8400-e29b-41d4-a716-446655440000" }
@@ -89,14 +92,15 @@ b.agent = { agent = "opencode", session_id = "ses_abc123" }
 b.options.command = { "unsafe" }
 model.restore(api, agents)
 local ca = calls.create.initial_windows[1].layout.split.before.block.options.command
-equal(ca[1], "claude")
-equal(ca[2], "--resume")
-equal(ca[3], a.agent.session_id)
+equal(ca[1], "python3")
+assert(ca[2]:match("/session%-persistence/launch%-agent%.py$"))
+equal(ca[3], "claude")
+equal(ca[4], a.agent.session_id)
 local cb = calls.create.initial_windows[2].layout.block.options.command
-equal(cb[1], "opencode")
-equal(cb[2], "--session")
-equal(cb[3], "ses_abc123")
-equal(cb[4], nil)
+equal(cb[1], "python3")
+equal(cb[3], "opencode")
+equal(cb[4], "ses_abc123")
+equal(cb[5], nil)
 b.agent.session_id = "ses_bad;echo unsafe"
 equal(pcall(model.restore, api, agents), false)
 b.agent = { agent = "sh", session_id = "ses_abc" }

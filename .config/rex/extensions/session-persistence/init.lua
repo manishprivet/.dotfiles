@@ -20,7 +20,7 @@ local handle, err = rex.exec.start({
             sleep 0.5
         done
         # Login shells and filesystem access can be slow immediately after boot.
-        # This timeout also covers session.create for the complete saved layout.
+        # Only agent metadata is saved; Rex itself restores layouts.
         exec "$1" --autostart=false --timeout 120s do "$2" --all
     ]], "rex-session-persistence", binary,
     config .. "/rex/extensions/session-persistence/watcher.lua", state,

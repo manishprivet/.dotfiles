@@ -31,7 +31,11 @@ def main():
     for _ in range(20):
         line = subprocess.check_output(["/bin/ps", "-p", str(pid), "-o", "ppid=,comm="], text=True).strip()
         parent, name = line.split(None, 1)
-        if Path(name).name.lower() in ("claude", "claude-code"):
+        executable = Path(name)
+        native_versions = Path.home() / ".local/share/claude/versions"
+        if executable.name.lower() in ("claude", "claude-code") or (
+            executable.parent == native_versions and re.fullmatch(r"\d+\.\d+\.\d+", executable.name)
+        ):
             break
         pid = int(parent)
         if pid <= 1:

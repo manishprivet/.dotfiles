@@ -26,6 +26,9 @@
     "volume": 1
   },
   "scroll": {
-    "acceleration": false
+    "acceleration": true
+  },
+  "prompt": {
+    "image_preview": true
   }
 }

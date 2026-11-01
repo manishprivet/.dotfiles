@@ -4,8 +4,8 @@
 -- Keep the client's default shortcuts except where overridden below.
 -- Ported from ~/.tmux.conf where Rex exposes a documented equivalent.
 -- Client appearance, status bars, mouse handling, terminal capabilities,
--- Session layout persistence is provided by a local extension below; live
--- processes and scrollback cannot be resurrected through Rex's public API.
+-- Rex natively restores layouts. The local extension tracks exact conversations;
+-- a Fish readiness handshake resumes agents as foreground jobs, retaining Fish.
 
 -- macOS pane shortcuts.
 rex.bind("cmd+d", "pane.split", { direction = "right" })
@@ -55,9 +55,7 @@ for key, direction in pairs({ h = "left", j = "down", k = "up", l = "right" }) d
     rex.bind("ctrl+s>" .. key, action)
 end
 
-for index = 1, 9 do
-    rex.bind("ctrl+s>" .. index, "client.tab.goto", { index = index })
-end
+require("extensions.tab-navigation")
 
 -- Herdr-style navigation: let Vim handle its splits, otherwise focus Rex panes.
 -- Neovim's matching edge handoff lives in plugins/vim-tmux-navigator.lua.

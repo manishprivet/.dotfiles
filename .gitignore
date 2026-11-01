@@ -20,6 +20,7 @@
 .config/AWSVPNClient
 .config/pip
 .config/uv
+.config/command-centre
 .agents/skills/synced/
 /repro.sh
 

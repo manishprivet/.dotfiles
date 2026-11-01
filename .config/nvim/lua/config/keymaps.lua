@@ -15,4 +15,7 @@ vim.keymap.set(
   { noremap = true, silent = true, desc = "Close all buffers except current one" }
 )
 
+-- Inside Rex, snacks terminals (lazygit, <c-/>, <leader>ft) open as Rex panes.
+require("config.rex-terminal").setup()
+
 vim.api.nvim_set_keymap("i", "<C-f>", 'copilot#Accept("<CR>")', { expr = true, silent = true, noremap = true })
