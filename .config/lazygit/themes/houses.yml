@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# Houses: ~/.config/houses/palette.json
+gui:
+  theme:
+    activeBorderColor:
+      - '#EA6962'
+      - bold
+    inactiveBorderColor:
+      - '#928374'
+    searchingActiveBorderColor:
+      - '#7DAEA3'
+      - bold
+    optionsTextColor:
+      - '#7DAEA3'
+    selectedLineBgColor:
+      - '#3C3836'
+    inactiveViewSelectedLineBgColor:
+      - '#32302F'
+    cherryPickedCommitFgColor:
+      - '#7DAEA3'
+    cherryPickedCommitBgColor:
+      - '#3C3836'
+    markedBaseCommitFgColor:
+      - '#1D2021'
+    markedBaseCommitBgColor:
+      - '#D8A657'
+    unstagedChangesColor:
+      - '#EA6962'
+    defaultFgColor:
+      - '#D4BE98'

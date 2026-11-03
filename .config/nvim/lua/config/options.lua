@@ -8,10 +8,19 @@ vim.opt.laststatus = 0
 vim.opt.scrolloff = 10
 vim.opt.incsearch = true
 vim.g.lazygit_config = false
-vim.env.LG_CONFIG_FILE = table.concat({
-  vim.fn.expand("~/.config/lazygit/config.yml"),
-  vim.fn.expand("~/.config/lazygit/themes/everforest-dark-hard.yml"),
-}, ",")
+local function set_houses_lazygit_theme()
+  local name = vim.g.colors_name == "houses-light" and "houses-light" or "houses"
+  vim.env.LG_CONFIG_FILE = table.concat({
+    vim.fn.expand("~/.config/lazygit/config.yml"),
+    vim.fn.expand("~/.config/lazygit/themes/" .. name .. ".yml"),
+  }, ",")
+end
+set_houses_lazygit_theme()
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = vim.api.nvim_create_augroup("houses_lazygit_theme", { clear = true }),
+  pattern = { "houses", "houses-light" },
+  callback = set_houses_lazygit_theme,
+})
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")

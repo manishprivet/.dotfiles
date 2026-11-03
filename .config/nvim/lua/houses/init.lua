@@ -1,0 +1,158 @@
+-- Shared highlight definitions for the Houses dark and light colorschemes.
+local M = {}
+
+function M.setup(mode)
+local light = mode == "light"
+vim.cmd("highlight clear")
+vim.o.background = light and "light" or "dark"
+vim.o.termguicolors = true
+vim.g.colors_name = light and "houses-light" or "houses"
+
+local c = light and {
+  bg = "#F5EBD8", surface = "#EDE0C8", raised = "#E4D5BB",
+  selection = "#D8C7AC", border = "#A89984", muted = "#756757",
+  fg = "#3C3836", red = "#B5403A", blue = "#326B60",
+  green = "#586C2D", yellow = "#886014", orange = "#A04B18",
+  purple = "#984565", aqua = "#426D45", bright = "#1D2021",
+  added = "#DFE5CB", removed = "#F0D5CC",
+} or {
+  bg = "#1D2021", surface = "#282828", raised = "#32302F",
+  selection = "#3C3836", border = "#504945", muted = "#928374",
+  fg = "#D4BE98", red = "#EA6962", blue = "#7DAEA3",
+  green = "#A9B665", yellow = "#D8A657", orange = "#E78A4E",
+  purple = "#D3869B", aqua = "#89B482", bright = "#DDC7A1",
+  added = "#30352B", removed = "#3C2B2B",
+}
+
+local groups = {
+  -- Preserve the editor's existing transparent background.
+  Normal = { fg = c.fg, bg = "NONE" },
+  NormalNC = { link = "Normal" },
+  NormalFloat = { fg = c.fg, bg = "NONE" },
+  FloatBorder = { fg = c.blue, bg = "NONE" },
+  FloatTitle = { fg = c.red, bold = true },
+  SignColumn = { bg = "NONE" },
+  EndOfBuffer = { fg = c.border },
+  NonText = { fg = c.border },
+  Whitespace = { fg = c.border },
+  LineNr = { fg = c.muted },
+  CursorLineNr = { fg = c.red, bold = true },
+  CursorLine = { bg = c.surface },
+  CursorColumn = { bg = c.surface },
+  ColorColumn = { bg = c.surface },
+  Cursor = { fg = c.bg, bg = c.red },
+  Visual = { bg = c.selection },
+  Search = { fg = c.bg, bg = c.yellow },
+  IncSearch = { fg = c.bg, bg = c.red },
+  CurSearch = { link = "IncSearch" },
+  MatchParen = { fg = c.red, bg = c.selection, bold = true },
+  Pmenu = { fg = c.fg, bg = c.surface },
+  PmenuSel = { fg = c.bg, bg = c.blue },
+  PmenuSbar = { bg = c.raised },
+  PmenuThumb = { bg = c.border },
+  StatusLine = { fg = c.fg, bg = c.surface },
+  StatusLineNC = { fg = c.muted, bg = c.surface },
+  WinSeparator = { fg = c.border },
+  TabLine = { fg = c.muted, bg = c.surface },
+  TabLineSel = { fg = c.red, bg = c.selection, bold = true },
+  TabLineFill = { bg = "NONE" },
+  WinBar = { fg = c.fg, bg = "NONE" },
+  WinBarNC = { fg = c.muted, bg = "NONE" },
+  Folded = { fg = c.muted, bg = c.surface },
+  FoldColumn = { fg = c.muted, bg = "NONE" },
+  Directory = { fg = c.blue },
+  Title = { fg = c.red, bold = true },
+  Question = { fg = c.blue },
+  MoreMsg = { fg = c.green },
+  ErrorMsg = { fg = c.red },
+  WarningMsg = { fg = c.yellow },
+  Comment = { fg = c.muted, italic = true },
+  Constant = { fg = c.purple },
+  String = { fg = c.green },
+  Character = { fg = c.aqua },
+  Number = { fg = c.purple },
+  Boolean = { fg = c.purple },
+  Float = { fg = c.purple },
+  Identifier = { fg = c.fg },
+  Function = { fg = c.blue },
+  Statement = { fg = c.red },
+  Operator = { fg = c.orange },
+  Keyword = { fg = c.red },
+  PreProc = { fg = c.aqua },
+  Type = { fg = c.yellow },
+  Special = { fg = c.orange },
+  Delimiter = { fg = c.fg },
+  Underlined = { fg = c.blue, underline = true },
+  Ignore = { fg = c.muted },
+  Error = { fg = c.red },
+  Todo = { fg = c.bg, bg = c.yellow, bold = true },
+  DiffAdd = { bg = c.added },
+  DiffDelete = { fg = c.red, bg = c.removed },
+  DiffChange = { bg = c.surface },
+  DiffText = { bg = c.selection, bold = true },
+  Added = { fg = c.green },
+  Removed = { fg = c.red },
+  Changed = { fg = c.blue },
+  GitSignsAdd = { fg = c.green },
+  GitSignsChange = { fg = c.blue },
+  GitSignsDelete = { fg = c.red },
+  DiagnosticError = { fg = c.red },
+  DiagnosticWarn = { fg = c.yellow },
+  DiagnosticInfo = { fg = c.blue },
+  DiagnosticHint = { fg = c.aqua },
+  DiagnosticOk = { fg = c.green },
+  DiagnosticUnderlineError = { sp = c.red, undercurl = true },
+  DiagnosticUnderlineWarn = { sp = c.yellow, undercurl = true },
+  DiagnosticUnderlineInfo = { sp = c.blue, undercurl = true },
+  DiagnosticUnderlineHint = { sp = c.aqua, undercurl = true },
+  SpellBad = { sp = c.red, undercurl = true },
+  SpellCap = { sp = c.yellow, undercurl = true },
+  SpellLocal = { sp = c.blue, undercurl = true },
+  SpellRare = { sp = c.purple, undercurl = true },
+  TelescopeBorder = { link = "FloatBorder" },
+  TelescopeSelection = { bg = c.selection },
+  TelescopeMatching = { fg = c.red, bold = true },
+  WhichKey = { fg = c.red },
+  WhichKeyGroup = { fg = c.blue },
+  LazyNormal = { link = "NormalFloat" },
+  MasonNormal = { link = "NormalFloat" },
+  ["@variable"] = { fg = c.fg },
+  ["@variable.builtin"] = { fg = c.purple },
+  ["@variable.parameter"] = { fg = c.fg },
+  ["@variable.member"] = { fg = c.blue },
+  ["@function"] = { link = "Function" },
+  ["@function.builtin"] = { fg = c.aqua },
+  ["@function.call"] = { link = "Function" },
+  ["@function.method"] = { link = "Function" },
+  ["@constructor"] = { link = "Type" },
+  ["@keyword"] = { link = "Keyword" },
+  ["@operator"] = { link = "Operator" },
+  ["@string"] = { link = "String" },
+  ["@string.escape"] = { fg = c.orange },
+  ["@string.special.url"] = { fg = c.blue, underline = true },
+  ["@type"] = { link = "Type" },
+  ["@tag"] = { fg = c.red },
+  ["@tag.attribute"] = { fg = c.blue },
+  ["@tag.delimiter"] = { fg = c.muted },
+  ["@markup.heading"] = { fg = c.red, bold = true },
+  ["@markup.strong"] = { fg = c.yellow, bold = true },
+  ["@markup.italic"] = { italic = true },
+  ["@markup.raw"] = { fg = c.green },
+  ["@markup.link"] = { fg = c.blue, underline = true },
+  ["@markup.list"] = { fg = c.red },
+}
+
+for name, value in pairs(groups) do
+  vim.api.nvim_set_hl(0, name, value)
+end
+
+local terminal = {
+  light and c.fg or c.surface, c.red, c.green, c.yellow, c.blue, c.purple, c.aqua, light and c.surface or c.fg,
+  c.muted, c.red, c.green, c.yellow, c.blue, c.purple, c.aqua, light and c.bg or c.bright,
+}
+for index, color in ipairs(terminal) do
+  vim.g["terminal_color_" .. (index - 1)] = color
+end
+end
+
+return M

@@ -7,17 +7,32 @@ if status is-interactive
 end
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Everforest Dark Hard Color Palette
-set -l foreground d3c6aa
-set -l selection 384b55
-set -l comment 859289
-set -l red e67e80
-set -l orange e69875
-set -l yellow dbbc7f
-set -l green a7c080
-set -l purple d699b6
-set -l cyan 83c092
-set -l pink 7fbbb3
+# Houses Color Palette (see ~/.config/houses/palette.json)
+# Set this to light to select the companion palette and Lazygit theme.
+set -g houses_theme_mode dark
+set -l foreground d4be98
+set -l selection 3c3836
+set -l comment 928374
+set -l red ea6962
+set -l orange e78a4e
+set -l yellow d8a657
+set -l green a9b665
+set -l purple d3869b
+set -l cyan 7daea3
+set -l pink ea6962
+
+if test "$houses_theme_mode" = light
+    set foreground 3c3836
+    set selection d8c7ac
+    set comment 756757
+    set red b5403a
+    set orange a04b18
+    set yellow 886014
+    set green 586c2d
+    set purple 984565
+    set cyan 326b60
+    set pink b5403a
+end
 
 # Syntax Highlighting Colors
 set -g fish_color_normal $foreground
@@ -77,7 +92,11 @@ export PATH="$HOME/.local/bin:$PATH"
 set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
 
-set --export LG_CONFIG_FILE "$HOME/.config/lazygit/config.yml,$HOME/.config/lazygit/themes/everforest-dark-hard.yml"
+set -l houses_lazygit_theme houses
+if test "$houses_theme_mode" = light
+    set houses_lazygit_theme houses-light
+end
+set --export LG_CONFIG_FILE "$HOME/.config/lazygit/config.yml,$HOME/.config/lazygit/themes/$houses_lazygit_theme.yml"
 
 # Added by `rbenv init` on Mon Jan 12 09:03:47 JST 2026
 status --is-interactive; and rbenv init - --no-rehash fish | source

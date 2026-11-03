@@ -146,6 +146,11 @@
       "action": "external_directory",
       "resource": "/tmp/_99/*",
       "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "opencode api post *",
+      "effect": "allow"
     }
   ]
 }

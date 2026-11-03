@@ -1,9 +1,32 @@
 add_newline = true
 command_timeout = 150
+palette = "houses"
+
+[palettes.houses]
+red = "#ea6962"
+green = "#a9b665"
+yellow = "#d8a657"
+blue = "#7daea3"
+purple = "#d3869b"
+cyan = "#7daea3"
+white = "#d4be98"
+black = "#1d2021"
+bright-black = "#928374"
+
+[palettes.houses-light]
+red = "#b5403a"
+green = "#586c2d"
+yellow = "#886014"
+blue = "#326b60"
+purple = "#984565"
+cyan = "#326b60"
+white = "#3c3836"
+black = "#f5ebd8"
+bright-black = "#756757"
 
 [character]
-success_symbol = "[✔ ](fg:#a7c080)"
-error_symbol = "[𝕏 ](fg:#e67e80)"
+success_symbol = "[✔ ](cyan)"
+error_symbol = "[𝕏 ](red)"
 
 [git_state]
 disabled=false
@@ -17,11 +40,12 @@ behind = "([⟪${count}])"
 stashed = "([↪ ${count}](bold red)) "
 modified = "([柳${count}](bold yellow) )"
 staged = "([ ${count}](bold green) )"
-renamed = "([⇆ ${count}](vold blue) )"
+renamed = "([⇆ ${count}](bold blue) )"
 deleted = "([ ${count}](bold red) )"
 untracked ="([ ${count}](dimmed red) )"
 
 [directory]
+style = "bold cyan"
 truncate_to_repo = true
 truncation_length = 2
 read_only = " "
@@ -35,7 +59,7 @@ truncation_symbol = "󰝰 "
 
 [git_branch]
 symbol = " "
-format = "on [$symbol$branch](bold purple) "
+format = "on [$symbol$branch](bold red) "
 
 [nodejs]
 symbol = " "

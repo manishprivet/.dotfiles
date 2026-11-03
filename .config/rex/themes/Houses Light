@@ -1,0 +1,23 @@
+# Rex-importable Ghostty format. Source: ~/.config/houses/palette-light.json
+background = #f5ebd8
+foreground = #3c3836
+cursor-color = #b5403a
+cursor-text = #f5ebd8
+selection-background = #d8c7ac
+selection-foreground = #3c3836
+palette = 0=#3c3836
+palette = 1=#b5403a
+palette = 2=#586c2d
+palette = 3=#886014
+palette = 4=#326b60
+palette = 5=#984565
+palette = 6=#426d45
+palette = 7=#ede0c8
+palette = 8=#756757
+palette = 9=#b5403a
+palette = 10=#586c2d
+palette = 11=#886014
+palette = 12=#326b60
+palette = 13=#984565
+palette = 14=#426d45
+palette = 15=#f5ebd8

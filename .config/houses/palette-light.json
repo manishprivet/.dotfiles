@@ -1,0 +1,24 @@
+{
+  "name": "Houses Light",
+  "wallpaper": "wallpapers/houses.jpg",
+  "colors": {
+    "background": "#F5EBD8",
+    "surface": "#EDE0C8",
+    "surfaceRaised": "#E4D5BB",
+    "selection": "#D8C7AC",
+    "border": "#A89984",
+    "muted": "#756757",
+    "foreground": "#3C3836",
+    "coral": "#B5403A",
+    "seafoam": "#326B60",
+    "green": "#586C2D",
+    "yellow": "#886014",
+    "orange": "#A04B18",
+    "purple": "#984565",
+    "aqua": "#426D45",
+    "brightForeground": "#1D2021",
+    "diffAddedBackground": "#DFE5CB",
+    "diffRemovedBackground": "#F0D5CC"
+  },
+  "notes": "Light companion to Houses: warm cream surfaces and deeper wallpaper-inspired accents. Tool configs mirror this palette; they do not load this JSON automatically."
+}

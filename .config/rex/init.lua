@@ -23,6 +23,8 @@ rex.bind("ctrl+s>n", "client.tab.next")
 rex.bind("ctrl+s>p", "client.tab.previous")
 rex.bind("ctrl+s>shift+\\", "pane.split", { direction = "right" }) -- |
 rex.bind("ctrl+s>-", "pane.split", { direction = "down" })
+require("extensions.floating-pane")
+require("extensions.lazygit")
 rex.bind("ctrl+s>m", "pane.zoom")
 rex.bind("ctrl+s>x", "pane.close")
 

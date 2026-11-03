@@ -1,0 +1,24 @@
+{
+  "name": "Houses",
+  "wallpaper": "wallpapers/houses.jpg",
+  "colors": {
+    "background": "#1D2021",
+    "surface": "#282828",
+    "surfaceRaised": "#32302F",
+    "selection": "#3C3836",
+    "border": "#504945",
+    "muted": "#928374",
+    "foreground": "#D4BE98",
+    "coral": "#EA6962",
+    "seafoam": "#7DAEA3",
+    "green": "#A9B665",
+    "yellow": "#D8A657",
+    "orange": "#E78A4E",
+    "purple": "#D3869B",
+    "aqua": "#89B482",
+    "brightForeground": "#DDC7A1",
+    "diffAddedBackground": "#30352B",
+    "diffRemovedBackground": "#3C2B2B"
+  },
+  "notes": "Backgrounds, coral, seafoam, and cream are extracted from the wallpaper. Supporting syntax, diagnostic, and contrast colors extend its Gruvbox Material character. Tool configs mirror this palette; they do not load this JSON automatically."
+}

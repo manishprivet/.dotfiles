@@ -1,8 +1,8 @@
 {
   "$schema": "https://opencode.ai/v2/cli.json",
   "theme": {
-    "name": "system",
-    "mode": "system"
+    "name": "houses",
+    "mode": "dark"
   },
   "plugins": ["./herdr-opencode", "./openui", "./rex-session"],
   "tabs": {

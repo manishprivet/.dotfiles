@@ -49,7 +49,9 @@ return {
         pattern = "everforest",
         callback = set_everforest_terminal_colors,
       })
-      set_everforest_terminal_colors()
+      if vim.g.colors_name == "everforest" then
+        set_everforest_terminal_colors()
+      end
     end,
   },
   {
@@ -98,11 +100,11 @@ return {
       end,
     },
   },
-  -- Configure LazyVim to load gruvbox
+  -- Configure LazyVim to load the wallpaper-derived Houses theme
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "everforest",
+      colorscheme = "houses",
     },
   },
 }

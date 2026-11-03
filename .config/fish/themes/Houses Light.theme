@@ -1,0 +1,21 @@
+# name: Houses Light
+# Warm cream terminal background; ~/.config/houses/palette-light.json
+fish_color_normal 3c3836
+fish_color_command 326b60
+fish_color_keyword b5403a
+fish_color_quote 886014
+fish_color_redirection 3c3836
+fish_color_end a04b18
+fish_color_error b5403a
+fish_color_param 984565
+fish_color_comment 756757
+fish_color_selection --background=d8c7ac
+fish_color_search_match --background=d8c7ac
+fish_color_operator 586c2d
+fish_color_escape b5403a
+fish_color_autosuggestion 756757
+fish_pager_color_progress 756757
+fish_pager_color_prefix 326b60
+fish_pager_color_completion 3c3836
+fish_pager_color_description 756757
+fish_pager_color_selected_background --background=d8c7ac

@@ -19,11 +19,18 @@ export TRANSPARENT=0x00000000
 # export BACKGROUND=0xff282828
 
 # -- Everforest Dark Hard --
+# export CORNER_RADIUS=8
+# export BAR_COLOR=0xaa272e33
+# export ITEM_BG_COLOR=0xff2e383c
+# export ACCENT_COLOR=0xffa7c080
+# export BACKGROUND=0xff1e2326
+
+# -- Houses (wallpapers/houses.jpg) --
 export CORNER_RADIUS=8
-export BAR_COLOR=0xaa272e33
-export ITEM_BG_COLOR=0xff2e383c
-export ACCENT_COLOR=0xffa7c080
-export BACKGROUND=0xff1e2326
+export BAR_COLOR=0xaa1d2021
+export ITEM_BG_COLOR=0xff282828
+export ACCENT_COLOR=0xffea6962
+export BACKGROUND=0xff1d2021
 
 # -- Teal Scheme --
 # export BAR_COLOR=0xff001f30
