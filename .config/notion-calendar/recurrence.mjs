@@ -21,8 +21,7 @@ function wallClock(zone, fallbackOffset) {
   return {
     toWall,
     fromWall(value) {
-      // Solve the zone offset at the occurrence, not at the series' original date.
-      // This preserves wall-clock meeting times when the zone changes for DST.
+      // Use the occurrence's offset so wall-clock times survive DST changes.
       let instant = value;
       for (let attempt = 0; attempt < 4; attempt++) {
         const next = value - (toWall(instant) - instant);
@@ -70,6 +69,8 @@ export function expandSeries(event, start, end, from, until) {
   });
   const rules = rrulestr(`DTSTART:${stamp(first)}\n${normalized.join('\n')}`, { forceset: true });
   const duration = end - start;
+  const civilDays = allDay ? Math.round((new Date(`${event.end.date}T12:00:00Z`) -
+    new Date(`${event.start.date}T12:00:00Z`)) / dayMs) : 0;
   const dates = rules.between(new Date(from - duration - 2 * dayMs), new Date(until + 2 * dayMs), true,
     (date, index) => { if (index >= 500) throw new Error('Too many occurrences'); return true; });
   return dates.map(date => {
@@ -77,10 +78,7 @@ export function expandSeries(event, start, end, from, until) {
     if (allDay) {
       const civil = new Date(date);
       occurrenceStart = new Date(civil.getUTCFullYear(), civil.getUTCMonth(), civil.getUTCDate()).getTime();
-      const originalStart = new Date(`${event.start.date}T12:00:00Z`);
-      const originalEnd = new Date(`${event.end.date}T12:00:00Z`);
-      const days = Math.round((originalEnd - originalStart) / dayMs);
-      occurrenceEnd = new Date(civil.getUTCFullYear(), civil.getUTCMonth(), civil.getUTCDate() + days).getTime();
+      occurrenceEnd = new Date(civil.getUTCFullYear(), civil.getUTCMonth(), civil.getUTCDate() + civilDays).getTime();
     } else {
       occurrenceStart = clock.fromWall(date.getTime());
       occurrenceEnd = occurrenceStart + duration;

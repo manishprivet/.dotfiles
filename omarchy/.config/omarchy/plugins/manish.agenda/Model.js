@@ -30,6 +30,11 @@ function nextEvent(events, now) {
     .sort(function(a, b) { return a.start - b.start })[0] || null
 }
 
+function isStale(snapshot, error, now) {
+  // Cache modification time is not a sync heartbeat: unchanged calendars need no writes.
+  return !!snapshot && (!!error || now - snapshot.fetchedAt > 300000)
+}
+
 function truncate(value, limit) {
   var text = String(value || "")
   return text.length > limit ? text.slice(0, limit - 1) + "…" : text
@@ -54,6 +59,6 @@ function meetingTooltip(event, timeRange, relativeTime, untitled) {
 
 if (typeof module !== "undefined") module.exports = {
   dateKey: dateKey, parseDate: parseDate, stepDate: stepDate, safeMeetLink: safeMeetLink,
-  nextEvent: nextEvent, truncate: truncate, sharedText: sharedText, countdown: countdown,
+  nextEvent: nextEvent, isStale: isStale, truncate: truncate, sharedText: sharedText, countdown: countdown,
   meetingTooltip: meetingTooltip
 }

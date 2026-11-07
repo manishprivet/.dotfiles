@@ -1,63 +1,60 @@
-# Repository guide for agents
+# Repository guide
 
-## Philosophy
-- This is a personal macOS + Omarchy dotfiles repository, not a configuration-management product. Prefer a small, understandable setup over a reusable framework.
-- Chezmoi owns deployment; applications own their native configuration formats. Use chezmoi's built-in templates, ignores, externals and lifecycle scripts rather than inventing parallel machinery.
-- The checkout is the source of truth for intentional customization. Link whole app roots so new files and atomic application saves stay in the repo; do not capture secrets, caches or runtime state.
-- Share settings where they are genuinely portable. Keep OS-specific differences explicit at the app-root boundary instead of scattering platform checks everywhere or duplicating entire shared configs.
-- Extend Omarchy through its supported imports, hooks and theme connections. Preserve upstream behavior unless a personal override is explicitly requested.
-- Make focused changes in the existing structure. Avoid unrelated cleanup, mass renames, new abstractions and automatic commits or pushes.
+## Principles
 
-## User requirements
-- Use chezmoi, not a custom deployer/component framework. No custom Python tooling; the shared calendar reader explicitly uses the pinned external `dfindexeddb` decoder in an isolated environment.
-- Keep the diff minimal and files readable. One symlink declaration per app root, one focused native setup hook per purpose.
-- Every customization belongs in the repo. Whole native config directories are linked so future files and atomic app saves remain in dotfiles.
-- Preserve the existing bar layout/widgets; `manish.agenda` is the requested local addition beside the clock.
-- Preserve unfamiliar/staged user work, especially the Neovim lockfile. Do not reset unrelated changes or auto-commit.
+- This is a personal macOS + Omarchy dotfiles repo. Prefer direct native configuration over a framework.
+- Chezmoi owns deployment through templates, ignores, externals and lifecycle hooks. Applications own their config formats.
+- Link whole app roots so new files and atomic saves stay in the checkout. Keep secrets, caches, generated themes and runtime state out of Git.
+- Share portable settings; select OS-specific roots at the app boundary.
+- Use small helpers for repeated behavior or a clear boundary. Do not wrap a single operation or add speculative extension points.
+- Remove dead code, obsolete compatibility paths and unused files. Do not maintain a second implementation in tests.
+- Use descriptive names, consistent formatting and blank lines between related blocks. Comments explain constraints or non-obvious decisions, not the next line of code. Avoid filler, repeated explanations and promotional language.
 
-## Source layout
-- `.chezmoiroot` points to `home/`, the standard chezmoi source state.
-- `home/dot_config/symlink_*.tmpl` declares links using `.chezmoi.workingTree`.
-- `home/.chezmoiignore` selects OS targets. `home/.chezmoi.toml.tmpl` detects installed Omarchy and keeps the local checkout as source.
-- Package data: `home/.chezmoidata/packages.yaml`. Native lifecycle hooks: `home/.chezmoiscripts/`. Tmux plugins: `.chezmoiexternal.toml`.
-- Actual settings remain in `.config/` (shared/Mac), `macos/.config/` and `omarchy/.config/`. Don't move them wholesale into a new abstraction.
-- A new file under an owned native root needs no deployment registration. A new app root needs one standard symlink template and any OS ignore entry.
-- `scripts/setup.sh` is only a thin compatibility wrapper around chezmoi; do not add argument parsing, link mechanics or a manifest there.
+## Before editing
 
-## Working on the repo
-1. Read `git status --short` and the relevant diff before editing. Identify existing user changes and any more-specific `AGENTS.md` instructions.
-2. Find the native config source and check its symlink declaration and OS selection. Edit the actual settings, not a generated theme or a copied deployment target.
-3. Keep the change scoped to the requested app or behavior. A live config root can point directly into this checkout, so edits may affect the running desktop immediately.
-4. Run the relevant checks below, and review `git diff --check` and `git diff`. Sandbox tests do not authorize package installs, live reloads or unrelated desktop changes.
-5. When deployment is needed, initialize with `chezmoi init --source "$PWD"`, inspect `chezmoi diff`, then apply only the intended scope. A full `chezmoi apply` can install packages, fetch externals and run desktop hooks; do not treat it as a read-only check.
-6. Summarize what changed and what was actually tested. Commit or push only when requested, staging explicit paths and leaving unrelated changes alone.
+1. Read `git status --short`, the relevant staged/unstaged diffs and any nested `AGENTS.md`.
+2. Preserve unrelated work, especially the Neovim lockfile. Do not reset changes or commit/push unless asked.
+3. Find the native source, its symlink template and OS selection. Edit maintained sources, not generated files or deployment copies.
+4. Remember that linked roots may affect running apps immediately. Tests do not authorize installs, live reloads or desktop changes.
 
-### Common changes
-- **Existing app settings:** edit files under the selected native root. Files added inside an already linked root need no extra deployment declaration. Review app-written changes before committing them.
-- **New app:** add its native config root and one `home/dot_config/symlink_<app>.tmpl` pointing through `{{ .chezmoi.workingTree }}`. Add an OS exclusion in `home/.chezmoiignore` if needed. Use an explicit OS-dependent target for shared apps with different roots.
-- **Packages:** edit `home/.chezmoidata/packages.yaml`. Keep installation in the existing native package hook; do not add a second package manifest or installer framework.
-- **Setup actions:** use a small, idempotent native chezmoi script for one purpose. Prefer `run_onchange_` for input-dependent setup and `run_once_` for migrations; remember that changed script contents can run again.
-- **External repositories:** use `home/.chezmoiexternal.toml`, rather than ad hoc clone commands for managed plugins.
-- **Machine-local settings:** use the existing ignored overrides (`fish/local.fish`, `fish/secrets.fish`, `git/local.config`). Add narrow ignore rules for any new local state before it can be staged.
-- **Themes:** change the maintained palette/theme sources and selector, not generated files or native runtime pointers. Keep terminal and desktop theme integration intact.
-- **Documentation:** update `README.md` when the user workflow or layout changes, and this file when maintenance rules change.
+## Layout and changes
 
-## Safety and native integration
-- Initialize with `chezmoi init --source "$PWD"`; review `chezmoi diff` before `chezmoi apply`.
-- Never apply through an old whole-`~/.config` Stow symlink. The migration hook rejects it. Do not bypass this or use `exact_`/removal patterns on the whole config directory.
-- The migration hook privately archives existing real config roots and preserves ignored Fish/OpenCode local state. Don't overwrite credentials or service registration contents.
-- Runtime state, secrets and generated themes are not source files. Keep them ignored; provider accounts, databases and browser profiles stay in the normal app data locations.
-- Never modify `/usr/share/omarchy`. Import the native bootstrap/theme/services, not copied implementations. Preset bindings are disabled; Mac Alt bindings plus the four agreed essentials are explicit.
-- Hyprland behavior stays split into `bindings.lua`, `aerospace.lua`, `workspaces.lua`, `looknfeel.lua`, `input.lua`, `monitors.lua` under `omarchy/.config/hypr/`.
-- Retain native terminal/btop theme includes and pointers. `omarchy/theme` selects the theme; sources live under `omarchy/.config/omarchy/themes/houses/`.
-- OpenCode commands remain in `.config/opencode/command/`, shared plugins in `.config/opencode/`, and managed skills in `.agents/skills/`. No automatic work endpoints or tracking plugins.
+- `.chezmoiroot` selects `home/`. `home/.chezmoi.toml.tmpl` detects Omarchy and records the checkout.
+- Native settings live in `.config/` (shared/Mac), `macos/.config/` and `omarchy/.config/`.
+- Existing app: edit its native root. New files inside it need no deployment registration.
+- New app: add one `home/dot_config/symlink_<app>.tmpl` using `.chezmoi.workingTree`, plus an OS exclusion in `home/.chezmoiignore` if needed.
+- Packages: edit `home/.chezmoidata/packages.yaml`; keep installation in the existing native package hook.
+- Setup: use one idempotent `home/.chezmoiscripts/` hook per purpose. Use `run_onchange_` for input-dependent work and `run_once_` for one-time setup. Hash production inputs, not tests or build output.
+- External repos: use `home/.chezmoiexternal.toml`, not custom clone logic.
+- Local overrides: use ignored `fish/local.fish`, `fish/secrets.fish` and `git/local.config`. Ignore new local state before staging it.
+- Update `README.md` when workflows or layout change; update this guide when maintenance rules change. Document each rule once.
+
+## Deployment and native integration
+
+- Initialize with `chezmoi init --source "$PWD"`, inspect `chezmoi diff`, then apply only the intended scope. A full apply can install packages, fetch externals and reload apps.
+- Back up existing configs and preserve local overrides before replacing app roots. Do not overwrite credentials or OpenCode service registration. Do not manage or remove the whole config directory.
+- Never edit `/usr/share/omarchy`. Use its supported imports, hooks and theme connections; preserve upstream behavior unless requested otherwise.
+- Hyprland behavior stays in `bindings.lua`, `aerospace.lua`, `workspaces.lua`, `looknfeel.lua`, `input.lua` and `monitors.lua` under `omarchy/.config/hypr/`.
+- Preserve the bar layout unless the task changes it. Keep calendar cache parsing in `.config/notion-calendar/`, separate from bar adapters. Use the pinned external `dfindexeddb` decoder, not custom Python parsing.
+- Theme selection is in `omarchy/theme`; sources are in `omarchy/.config/omarchy/themes/houses/`. Retain native terminal/btop theme pointers.
+- OpenCode commands live in `.config/opencode/command/`, shared plugins in `.config/opencode/`, and managed skills in `.agents/skills/`. Do not activate work endpoints or tracking plugins automatically. Install pinned npm dependencies with lifecycle scripts disabled.
 
 ## Verification
-- `chezmoi verify --exclude=scripts,externals` — actual link state, without installs.
-- `bash scripts/test-chezmoi.sh` — native chezmoi in isolated test homes; no real installs/desktop reloads.
-- `lua scripts/test_hyprland.lua`; `node scripts/test-theme.mjs`; `nvim --clean --headless -l scripts/test_navigation.lua`.
-- `node --test .config/opencode/rex-session/test.mjs` for the Rex integration.
-- `node --test omarchy/.config/omarchy/plugins/manish.agenda/tests/agenda.test.mjs`; `bash scripts/test-agenda-ui.sh` for the agenda helper and offscreen popup. Tests use fixtures, not live credentials or meetings.
-- `node --test .config/notion-calendar/tests/*.test.mjs` for the shared local-cache reader, recurrence expansion and AeroSpace/SketchyBar adapter. Keep IndexedDB parsing out of the individual bar adapters.
-- After live Hyprland edits run `hyprctl reload` then `hyprctl configerrors`. Avoid the installed standalone verifier: it crashed during timer cleanup earlier.
-- For OpenCode use `/reload` or `opencode reload`, not a service restart. Package hooks install its pinned dependencies with scripts disabled.
+
+Keep tests that exercise behavior, failure paths, security boundaries or real integrations. Delete tests that copy settings, search source text, derive expected results from the implementation, or only test mocks. Do not add checks merely to increase coverage.
+
+Run checks relevant to the change:
+
+- `bash scripts/test-chezmoi.sh` — isolated native apply/verify on both platforms; no hooks, installs or reloads.
+- `lua scripts/test_hyprland.lua` — window placement and shortcut dispatch.
+- `node scripts/test-theme.mjs` — native Omarchy template rendering in a temporary home.
+- `node --test .config/opencode/rex-session/test.mjs` — Rex session metadata lifecycle.
+- `node --test .config/notion-calendar/tests/*.test.mjs` — cache reading and recurrence.
+- `node --test omarchy/.config/omarchy/plugins/manish.agenda/tests/agenda.test.mjs`; `bash scripts/test-agenda-ui.sh` — agenda behavior and offscreen QML.
+- `node --test .config/youtube-music/tests/*.test.mjs`; `bash scripts/test-music-ui.sh` — music client and offscreen controls.
+- `omarchy/apps/notioncalendar/bin/test` — launcher, live theme/language updates and QML interaction.
+- `chezmoi verify --exclude=scripts,externals` — read-only check of deployed links.
+
+Use fixtures, not live credentials, meetings or playback. After authorized live Hyprland edits, run `hyprctl reload` and `hyprctl configerrors`; avoid the standalone verifier, which has crashed during cleanup. For OpenCode use `/reload` or `opencode reload`, not a service restart.
+
+Review `git diff --check` and the final diff. Report commands, results and anything not verified.

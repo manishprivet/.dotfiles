@@ -12,6 +12,7 @@ import unittest
 
 
 class LauncherTest(unittest.TestCase):
+    @unittest.skipUnless(Path("/opt/homebrew/bin/fish").is_file(), "requires Homebrew Fish")
     def test_foreground_then_shell(self):
         with tempfile.TemporaryDirectory() as root:
             root = Path(root)

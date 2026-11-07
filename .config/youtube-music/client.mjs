@@ -15,11 +15,16 @@ export function normalizeSong(data) {
   const artist = clean(data.artist);
   if (!title) return { ok: true, available: false };
   if (typeof data.isPaused !== "boolean") throw new Error("Invalid playback state");
-  return { ok: true, available: true, title, artist, album: clean(data.album), isPaused: data.isPaused,
+  return {
+    ok: true, available: true, title, artist,
+    album: clean(data.album),
+    isPaused: data.isPaused,
     trackId: clean(data.videoId),
     durationSeconds: Number.isFinite(data.songDuration) ? Math.max(0, Math.min(604800, data.songDuration)) : 0,
     elapsedSeconds: Number.isFinite(data.elapsedSeconds) ? Math.max(0, Math.min(604800, data.elapsedSeconds)) : 0,
-    label: artist ? `${title} - ${artist}` : title, imageSrc: safeArtwork(data.imageSrc) };
+    label: artist ? `${title} - ${artist}` : title,
+    imageSrc: safeArtwork(data.imageSrc),
+  };
 }
 
 export function safeArtwork(value) {
@@ -57,13 +62,11 @@ export async function readSong({ action, seconds, fetchImpl = fetch } = {}) {
     try { await request(action, "POST"); }
     catch { actionFailed = true; }
   }
-  // Refresh even if the POST failed. Never retry a non-idempotent control: a
-  // timed-out toggle/skip may already have reached the player.
+  // A timed-out control may have reached the player: refresh, but do not replay it.
   const song = normalizeSong(JSON.parse((await request("song-info")).toString("utf8")));
   return actionFailed ? { ...song, actionFailed: true } : song;
 }
 
-// The single cache slot is outside dotfiles; unchanged covers are not downloaded again.
 export async function cacheArtwork(url) {
   if (!safeArtwork(url)) return "";
   const dir = join(process.env.XDG_CACHE_HOME || join(homedir(), ".cache"), "youtube-music");

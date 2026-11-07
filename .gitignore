@@ -6,6 +6,8 @@
 .config/gcloud/
 .config/configstore/
 .DS_Store
+.config/**/*.bak*
+.config/**/*.backup
 .config/kargo
 .config/merctl
 .config/octopus
@@ -27,7 +29,6 @@
 .config/command-centre
 .agents/skills/synced/
 /repro.sh
-
 
 # Machine-local runtime files inside repo-owned Omarchy config directories.
 /omarchy/.config/opencode/service.json

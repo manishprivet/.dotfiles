@@ -238,7 +238,6 @@ brew "sqlcmd"
 # Cross-shell prompt for astronauts
 brew "starship"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
-brew "stow"
 # Rich and complete approach to parallelism in C++
 brew "tbb"
 # User interface to the TELNET protocol

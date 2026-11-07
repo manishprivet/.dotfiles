@@ -16,8 +16,7 @@ FocusScope {
   readonly property var events: snapshot ? snapshot.events : []
   readonly property var locale: Qt.locale(Commons.I18n.formatLocale)
   readonly property color foreground: Commons.Color.foreground
-  readonly property bool stale: !!snapshot && (error !== "" || now.getTime() - snapshot.fetchedAt > 300000 ||
-    (Number(snapshot.cacheModifiedAt || 0) > 0 && now.getTime() - snapshot.cacheModifiedAt > 900000))
+  readonly property bool stale: Model.isStale(snapshot, error, now.getTime())
   signal dayRequested(int delta)
   signal todayRequested()
   signal refreshRequested()

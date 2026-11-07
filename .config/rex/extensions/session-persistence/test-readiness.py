@@ -11,6 +11,7 @@ import unittest
 
 
 class ReadinessTest(unittest.TestCase):
+    @unittest.skipUnless(Path("/opt/homebrew/bin/fish").is_file(), "requires Homebrew Fish")
     def test_foreground_shell_return_and_typed_input(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

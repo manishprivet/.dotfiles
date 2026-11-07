@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import Model from '../Model.js';
 
 test('date navigation crosses month, year and leap-day boundaries', () => {
@@ -24,6 +23,20 @@ test('next-event selection excludes ended events and updates countdown locally',
   assert.equal(Model.countdown({ start: 120000 }, 0).minutes, 2);
   assert.equal(Model.countdown({ start: 100 }, 100).kind, 'now');
 });
+test('successful reads stay fresh even when the calendar cache has not changed for days', () => {
+  const now = Date.UTC(2026, 10, 7, 12);
+  const snapshot = { fetchedAt: now, cacheModifiedAt: now - 7 * 86400000, events: [] };
+  assert.equal(Model.isStale(snapshot, '', now), false);
+  assert.equal(Model.isStale(snapshot, '', now + 300000), false);
+  assert.equal(Model.isStale(snapshot, '', now + 300001), true);
+  assert.equal(Model.isStale({ ...snapshot, fetchedAt: now + 300001 }, '', now + 300001), false);
+});
+test('failed reads mark retained snapshots stale, without treating initial loading as stale', () => {
+  const now = Date.now();
+  assert.equal(Model.isStale({ fetchedAt: now }, 'decode', now), true);
+  assert.equal(Model.isStale(null, '', now), false);
+  assert.equal(Model.isStale(null, 'decode', now), false);
+});
 test('untrusted titles are neutralized before shared shell labels or tooltips', () => {
   const safe = Model.sharedText('<img src="https://example.invalid/tracker"> & <b>Meeting</b>');
   assert.ok(!/[<>&]/.test(safe));
@@ -42,12 +55,4 @@ test('hover text contains meeting details rather than usage instructions', () =>
   assert.ok(!/[<>&]/.test(safe));
   assert.ok(!safe.includes('click'));
   assert.equal(Model.meetingTooltip(null, '', '', ''), '');
-});
-test('the middle widgets are centered as one group, preserving their displayed order', () => {
-  const shell = JSON.parse(readFileSync(new URL('../../../shell.json', import.meta.url), 'utf8'));
-  assert.deepEqual(shell.bar.layout.center.map(item => item.id), [
-    'omarchy.indicators', 'omarchy.clock', 'manish.agenda', 'omarchy.elsewhen', 'omarchy.weather', 'omarchy.system-update'
-  ]);
-  assert.deepEqual(shell.bar.layout.centerBegin, []);
-  assert.deepEqual(shell.bar.layout.centerEnd, []);
 });

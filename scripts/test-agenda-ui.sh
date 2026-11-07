@@ -34,7 +34,7 @@ FloatingWindow {
   }
   function snapshot(date) {
     var start = Model.parseDate(date).getTime()
-    return {ok: true, date: date, fetchedAt: Date.now(), events: [
+    return {ok: true, date: date, fetchedAt: Date.now(), cacheModifiedAt: Date.now() - 7 * 86400000, events: [
       {id: "fixture", title: "Planning · <b>plain text, not markup</b>", location: "Example conference room",
         start: start, end: start + 3600000, allDay: false, url: "https://www.google.com/calendar/event?eid=fixture", meet: "https://meet.google.com/abc-defg-hij"},
       {id: "fixture-two", title: "Design review with a longer title to check wrapping on smaller screens", location: "",
@@ -60,6 +60,7 @@ FloatingWindow {
         state.accept(JSON.stringify(snapshot(state.today)))
         state.runningDate = ""
         check(content.events.length === 2, "Real QML did not receive fixture events")
+        check(!content.stale, "Unchanged cache must not make a successful read stale")
         find(content, "nextButton").clicked()
         check(state.selectedDate === Model.stepDate(state.today, 1), "Next day failed")
         check(content.snapshot === null, "Old events leaked into the newly selected date")
@@ -72,6 +73,7 @@ FloatingWindow {
         state.accept(JSON.stringify({ok: false, error: "decode"}))
         state.runningDate = ""
         check(content.snapshot !== null && content.error === "decode", "Failed refresh discarded cached data")
+        check(content.stale, "Failed refresh must mark retained data stale")
         check(state.todaySnapshot.events.length === 2, "Browsing changed today's bar data")
         state.showToday()
         content.activate()

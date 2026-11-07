@@ -1,4 +1,3 @@
-// Shared, read-only Notion Calendar cache reader for Quickshell and SketchyBar.
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { constants, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync,
@@ -10,27 +9,37 @@ import { expandSeries, recurrenceLines } from './recurrence.mjs';
 const execute = promisify(execFile);
 const databaseName = 'https_calendar.notion.so_0.indexeddb.leveldb';
 const maxOutput = 32 * 1024 * 1024;
+
 export class CalendarError extends Error {
   constructor(code) { super(code); this.code = code; }
 }
+
 export function dateKey(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
+
 export function parseDate(value) {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
   const [year, month, day] = value.split('-').map(Number);
   const date = new Date(year, month - 1, day, 12);
   return dateKey(date) === value ? date : null;
 }
+
 export function safeEventLink(value) {
   return typeof value === 'string' && value.length <= 8192 &&
     /^https:\/\/(?:calendar\.google\.com|www\.google\.com)\/calendar\/[^\s<>"\\\u0000-\u001f\u007f]*$/.test(value) ? value : '';
 }
+
 function safeMeetLink(value) {
   return typeof value === 'string' && value.length <= 8192 &&
     /^https:\/\/meet\.google\.com\/[^\s<>"\\\u0000-\u001f\u007f]*$/.test(value) ? value : '';
 }
-function text(value, max) { return typeof value === 'string' ? value.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').slice(0, max) : ''; }
+
+function text(value, max) {
+  return typeof value === 'string'
+    ? value.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').slice(0, max) : '';
+}
+
 function eventTime(value) {
   if (typeof value?.dateTime === 'string' && /(?:Z|[+-]\d{2}:\d{2})$/.test(value.dateTime)) return Date.parse(value.dateTime);
   const date = parseDate(value?.date);
@@ -77,8 +86,7 @@ function inventory(database) {
 }
 
 export function copySnapshot(database, directory) {
-  // This is a best-effort stable copy, not a transaction on Chrome's live database.
-  // Never acquire its lock, open it with a writable LevelDB client, or alter originals.
+  // Retry if Chrome changes files during the copy; never acquire its database lock.
   for (let attempt = 0; attempt < 3; attempt++) {
     const target = join(directory, `snapshot-${attempt}`, databaseName);
     try {
@@ -111,15 +119,7 @@ export function parseRecords(jsonl, diagnostics = '') {
   return records;
 }
 
-export function normalizeRecords(records, { date = dateKey(new Date()), now = Date.now(), cacheModifiedAt = now } = {}) {
-  const day = date === null ? null : parseDate(date);
-  if (date !== null && !day) throw new CalendarError('date');
-  // A null date is the macOS adapter's rolling view, including the next midnight.
-  const firstDay = day || new Date(now);
-  firstDay.setHours(0, 0, 0, 0);
-  const dayStart = firstDay.getTime();
-  firstDay.setDate(firstDay.getDate() + (day ? 1 : 2));
-  const dayEnd = firstDay.getTime();
+function latestEvents(records) {
   const latest = new Map();
   let eventRecords = 0;
   for (const record of records) {
@@ -127,28 +127,49 @@ export function normalizeRecords(records, { date = dateKey(new Date()), now = Da
     const event = record.value?.value;
     if (event?.kind !== 'calendar#event') continue;
     eventRecords++;
-    const id = text(event.id, 512), calendarId = text(event.calendarId, 512);
+    const id = text(event.id, 512);
+    const calendarId = text(event.calendarId, 512);
     if (!id) throw new CalendarError('decode');
     const identity = `${calendarId}:${id}:${event.originalStartTime?.dateTime || event.originalStartTime?.date || ''}`;
     const sequence = Number(record.sequence_number) || Date.parse(event.updated) || 0;
-    if (!latest.has(identity) || latest.get(identity).sequence <= sequence) latest.set(identity, { event, sequence });
+    if (!latest.has(identity) || latest.get(identity).sequence <= sequence) {
+      latest.set(identity, { event, sequence });
+    }
   }
   // A cache with no recognizable event records may be a changed schema or an unsynced app.
   if (eventRecords === 0) throw new CalendarError('emptyCache');
+  return Array.from(latest.values(), record => record.event);
+}
+
+export function normalizeRecords(records, { date = dateKey(new Date()), now = Date.now(), cacheModifiedAt = now } = {}) {
+  const day = date === null ? null : parseDate(date);
+  if (date !== null && !day) throw new CalendarError('date');
+
+  // A null date is the macOS rolling view, including the next midnight.
+  const firstDay = day || new Date(now);
+  firstDay.setHours(0, 0, 0, 0);
+  const dayStart = firstDay.getTime();
+  firstDay.setDate(firstDay.getDate() + (day ? 1 : 2));
+  const dayEnd = firstDay.getTime();
+  const cachedEvents = latestEvents(records);
+
+  // Record overrides before filtering: cancellations must suppress the master too.
   const overrides = new Set();
-  for (const { event } of latest.values()) {
+  for (const event of cachedEvents) {
     if (!event.recurringEventId) continue;
     const original = eventTime(event.originalStartTime);
     if (Number.isFinite(original)) overrides.add(`${event.calendarId || ''}:${event.recurringEventId}:${original}`);
   }
+
   const events = [];
-  for (const { event } of latest.values()) {
+  for (const event of cachedEvents) {
     if (event.status === 'cancelled') continue;
     const attendees = Array.isArray(event.attendees) ? event.attendees : event.attendees?.values || [];
     const self = Array.isArray(attendees) ? attendees.find(person => person?.self === true) : null;
     if (self?.responseStatus === 'declined') continue;
     if (!self && event.creator?.self !== true && event.organizer?.self !== true) continue;
-    const start = eventTime(event.start), end = eventTime(event.end);
+    const start = eventTime(event.start);
+    const end = eventTime(event.end);
     if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) throw new CalendarError('decode');
     let occurrences;
     try { occurrences = expandSeries(event, start, end, dayStart, dayEnd); }
@@ -157,10 +178,18 @@ export function normalizeRecords(records, { date = dateKey(new Date()), now = Da
     for (const occurrence of occurrences) {
       if (occurrence.end <= dayStart || occurrence.start >= dayEnd) continue;
       if (recurring && overrides.has(`${event.calendarId || ''}:${event.id}:${occurrence.start}`)) continue;
-      events.push({ id: text(event.id, 512) + (recurring ? `@${occurrence.start}` : ''), calendarId: text(event.calendarId, 512),
-        title: text(event.summary, 300), location: text(event.location, 300), start: occurrence.start, end: occurrence.end,
-        allDay: Boolean(event.start?.date), recurring: recurring || Boolean(event.recurringEventId),
-        url: safeEventLink(event.htmlLink), meet: safeMeetLink(event.hangoutLink) });
+      events.push({
+        id: text(event.id, 512) + (recurring ? `@${occurrence.start}` : ''),
+        calendarId: text(event.calendarId, 512),
+        title: text(event.summary, 300),
+        location: text(event.location, 300),
+        start: occurrence.start,
+        end: occurrence.end,
+        allDay: Boolean(event.start?.date),
+        recurring: recurring || Boolean(event.recurringEventId),
+        url: safeEventLink(event.htmlLink),
+        meet: safeMeetLink(event.hangoutLink),
+      });
     }
   }
   if (events.length > 20000) throw new CalendarError('size');

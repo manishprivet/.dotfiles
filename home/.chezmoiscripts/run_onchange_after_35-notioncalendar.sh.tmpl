@@ -2,7 +2,7 @@
 #!/bin/bash
 set -euo pipefail
 {{ $app := joinPath .chezmoi.workingTree "omarchy/apps/notioncalendar" -}}
-{{ range $pattern := list "notioncalendar.pro" "LICENSE" "bin/*" "src/*.*" "src/i18n/*.json" "tests/*" "pkgbuild/PKGBUILD" "pkgbuild/*.desktop" "pkgbuild/*.svg" -}}
+{{ range $pattern := list "notioncalendar.pro" "LICENSE" "bin/build" "bin/install" "src/*.*" "src/i18n/*.json" "pkgbuild/PKGBUILD" "pkgbuild/*.desktop" "pkgbuild/*.svg" -}}
 {{ range $path := glob (joinPath $app $pattern) -}}
 # {{ trimPrefix (printf "%s/" $app) $path }}: {{ include $path | sha256sum }}
 {{ end -}}

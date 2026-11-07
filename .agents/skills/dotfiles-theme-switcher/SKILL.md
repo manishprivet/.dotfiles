@@ -1,277 +1,46 @@
 ---
 name: dotfiles-theme-switcher
-description: Switch, align, or audit themes across this macOS dotfiles repo. Use this skill whenever the user asks to change the theme for one or more tools in this repo, create a new shared palette, or synchronize editor, terminal, prompt, bar, and TUI themes.
+description: Switch, align, or audit themes across this macOS + Omarchy dotfiles repo. Use for tool themes, shared palettes, or editor/terminal/bar/TUI color synchronization.
 ---
 
-# Dotfiles Theme Switcher Skill
-
-Use this skill to safely change themes in this dotfiles repo without missing linked configs or breaking cross-tool consistency.
-
-## When to use
-
-Use this skill when the user asks to:
-- Change the theme for a specific tool in this repo.
-- Switch several tools to the same theme or palette.
-- Create a new custom palette and apply it across multiple configs.
-- Align editor, terminal, prompt, tmux, bar, and TUI colors.
-- Audit which theme a tool is currently using before changing it.
-
-## Repo-specific constraints
-
-- This is a dotfiles repo, not an app repo. There is no default test suite.
-- Managed files are the source of truth. If a tool reads from a symlinked path in `~`, edit the file in this repo.
-- Apply dotfile changes with `stow .` only when the user wants deployment. Prefer `stow -n -v .` first for a dry run.
-- Keep changes minimal. Do not rewrite every theme file unless the user asked for a full-stack switch.
-- Some tools use built-in named themes. Others use custom palettes. Do not assume one approach fits every tool.
-
-## Core workflow
-
-1. Define the scope first
-- Determine whether the request is for one tool, a related group of tools, or the whole repo.
-- Ask one short question only if the scope is ambiguous and the choice materially changes many files.
-
-2. Identify the theme model
-- Named built-in theme: update the selector only.
-- Custom palette file: update the palette source and any references.
-- Inline colors: update the color literals in place.
-
-3. Find the source of truth
-- Read the actual config file that drives the tool.
-- Check for secondary wiring files that point to theme files or export theme paths.
-- Preserve unrelated settings such as fonts, layout, opacity, and keybindings.
-
-4. Make the smallest complete change
-- If a tool supports a built-in theme and the user asked for that tool only, change just the theme selector.
-- If a tool uses a custom Everforest-like palette, update the palette block and the styles that depend on it.
-- If multiple tools share one palette concept, keep the hex values consistent across them.
-
-5. Verify at the right level
-- Re-read edited files to confirm the intended values landed in the right places.
-- If the user wants deployment, run `stow -n -v .` before `stow .`.
-- If the tool has an obvious config check command and it is already used in the repo, run it. Otherwise report that no generic validation exists.
-
-## Recommended scope groups
-
-Use these groups unless the user says otherwise.
-
-### Editor group
-- Neovim
-- Neovim terminal colors
-
-### Terminal group
-- Ghostty
-- Fish prompt and syntax colors
-- tmux
-- Borders
-
-### TUI group
-- Lazygit
-- btop
-- htop
-
-### Agent UI group
-- OpenCode custom theme files
-
-### Desktop bar group
-- SketchyBar
-
-## Theme inventory
-
-These are the important theme-bearing files in this repo.
-
-### Neovim
-- File: `.config/nvim/lua/plugins/colorscheme.lua`
-- Active selector: `LazyVim` `colorscheme = "everforest"`
-- Available configured themes: `material`, `gruvbox`, `nightfox`, `everforest`, `catppuccin`, `rose-pine`, `tokyonight`
-- Extra theme logic: Everforest terminal colors are hardcoded here via `vim.g.terminal_color_*`
-- Fallback install list: `.config/nvim/lua/config/lazy.lua`
-
-### Ghostty
-- File: `.config/ghostty/config`
-- Theme model: built-in named theme via `theme = ...`
-- Background opacity and blur are separate from the theme choice
-
-### Fish
-- File: `.config/fish/config.fish`
-- Theme model: custom palette variables plus `fish_color_*` assignments
-- Also exports Lazygit theme file path through `LG_CONFIG_FILE`
-
-### Lazygit
-- Theme file: `.config/lazygit/themes/everforest-dark-hard.yml`
-- Wiring files:
-  - `.config/fish/config.fish`
-  - `.config/nvim/lua/config/options.lua`
-- Theme model: custom YAML theme file referenced externally
-
-### tmux
-- File: `.tmux.conf`
-- Theme model: custom palette variables `@everforest_*` plus status, window, pane, and message styles
-- Contains commented alternative plugins for Nord and Gruvbox; do not enable them unless requested
-
-### SketchyBar
-- File: `.config/sketchybar/colors.sh`
-- Theme model: one active exported block plus many commented alternate scheme blocks
-- Safe pattern: switch the active export block instead of editing every item script
-
-### btop
-- File: `.config/btop/btop.conf`
-- Theme model: named theme via `color_theme = "..."`
-
-### htop
-- File: `.config/htop/htoprc`
-- Theme model: numeric built-in scheme via `color_scheme=`
-- Low-priority target unless the user explicitly wants htop aligned too
-
-### Borders
-- File: `.config/borders/bordersrc`
-- Theme model: inline active and inactive border colors
-
-### OpenCode
-- Theme file: `.config/opencode/themes/everforest-dark-hard.json`
-- Theme model: custom semantic theme JSON
-- If the user asks to make OpenCode use a different custom theme, update the theme file and search for how that theme is selected before assuming it is auto-loaded
-
-### Starship
-- File: `.config/starship.toml`
-- Theme model: inline styles and hex values, not a named theme file
-
-## Per-tool change playbook
-
-### Neovim
-
-If the user wants a built-in theme switch:
-- Update the active `LazyVim` `colorscheme` selector.
-- Keep plugin definitions for alternate themes unless the user asks to clean them up.
-- Review theme-specific options for the selected plugin.
-
-If the user wants Everforest tweaked:
-- Update `background = "hard"` or related Everforest options in the Everforest setup block.
-- Update the `vim.g.terminal_color_*` values if the terminal palette should stay synchronized.
-
-If the user wants Catppuccin or Tokyo Night tuned:
-- Edit only that plugin's `opts` block.
-- Preserve unrelated highlight overrides unless they conflict with the new request.
-
-### Ghostty
-
-- Update the `theme = ...` line.
-- Keep `background-opacity` and `background-blur-radius` unless the user asks for a more opaque or transparent look.
-- Ignore `.bak` files unless the user explicitly asks to update backups too.
-
-### Fish
-
-- Update the palette variables at the top of `.config/fish/config.fish`.
-- Then verify each `fish_color_*` mapping still points at the intended palette variables.
-- Preserve shell initialization and path settings below the color section.
-
-### Lazygit
-
-- Update the custom theme YAML file if the user wants Lazygit aligned with a custom palette.
-- If the theme filename changes, update both wiring locations:
-  - `.config/fish/config.fish`
-  - `.config/nvim/lua/config/options.lua`
-- If the user only wants different border or selection colors, edit just the corresponding YAML keys.
-
-### tmux
-
-- Update the palette variables first.
-- Then inspect status, window, pane, and message styles to ensure they still reference the correct variables.
-- Prefer keeping the variable names stable and changing the values underneath them.
-- Do not enable commented theme plugins unless the user wants plugin-based theming.
-
-### SketchyBar
-
-- Prefer switching the active export block in `.config/sketchybar/colors.sh`.
-- If creating a new scheme, add a new clearly labeled block and activate only that block.
-- Do not hand-edit every plugin or item file unless they contain tool-specific accent overrides.
-
-### btop
-
-- Update `color_theme` in `.config/btop/btop.conf`.
-- Keep `theme_background` as-is unless the user asks for transparent or opaque behavior.
-
-### htop
-
-- Update `color_scheme` only if the user asked to align htop too.
-- This setting is numeric, so inspect the local htop theme numbering before claiming which named scheme it corresponds to.
-
-### Borders
-
-- Update `active_color` and `inactive_color` in `.config/borders/bordersrc`.
-- Keep border width, style, and hidpi settings unchanged unless requested.
-
-### OpenCode
-
-- Update the custom theme JSON under `.config/opencode/themes/` if the request is to modify the palette itself.
-- If the request is to switch OpenCode to a different theme file, search for the active selector before editing other files.
-- Preserve semantic slots like `primary`, `secondary`, `text`, `background`, `diff*`, `markdown*`, and `syntax*`.
-
-### Starship
-
-- Update inline style strings and hex values directly in `.config/starship.toml`.
-- Preserve symbols unless the user also asked for icon or typography changes.
-
-## Full-stack synchronization guidance
-
-When the user wants one theme across many tools:
-
-1. Pick the palette source
-- If the theme already exists as a custom palette in the repo, use that as the color source.
-- If the theme is only available as a built-in theme in one app, derive a small shared palette before changing inline-color tools.
-
-2. Update selectors first
-- Ghostty
-- btop
-- Neovim active colorscheme
-
-3. Update custom palette files second
-- Lazygit
-- Fish
-- tmux
-- SketchyBar
-- OpenCode theme JSON
-- Borders
-
-4. Re-check wiring files
-- `LG_CONFIG_FILE` in Fish and Neovim options
-- Any renamed theme filenames
-
-## Verification checklist
-
-For each completed theme change, verify:
-- The intended file was edited, not a backup or mirrored copy.
-- Named theme selectors reference valid theme names.
-- Custom palette files still have all required keys.
-- Wiring paths still point to the correct theme file.
-- Cross-tool shared colors are consistent when the request was a synchronized theme switch.
-
-If deployment is requested:
-- Run `stow -n -v .`
-- If the dry run looks correct, run `stow .`
-
-## Output format
-
-For substantial theme changes, respond with:
-
-1. `Scope`
-- Which tools were changed.
-
-2. `Theme Model`
-- Built-in theme switch, custom palette update, or inline color edits.
-
-3. `Files Changed`
-- Exact paths updated.
-
-4. `Verification`
-- What was checked and whether deployment was performed.
-
-5. `Notes`
-- Any tools intentionally left unchanged and why.
-
-## Guardrails
-
-- Do not change every themed tool by default when the user asked about only one tool.
-- Do not delete alternative theme configs unless the user asked for cleanup.
-- Do not edit backups, generated files, `node_modules`, or `.git` data.
-- Do not assume OpenCode theme selection without checking for the active selector.
-- Do not run `stow .` automatically unless the user asked to apply the updated dotfiles.
+# Dotfiles themes
+
+Follow `AGENTS.md` for repository safety and deployment. Change only the requested tools; preserve fonts, opacity, layout and keybindings unless asked.
+
+## Workflow
+
+1. Find the active native config and its OS-specific root in `home/dot_config/`.
+2. Identify the selector and maintained palette. A named theme usually needs only a selector change; a custom theme needs its source colors updated.
+3. Check consumers such as `LG_CONFIG_FILE` before renaming a theme.
+4. Use the app's config validator where available. Do not add tests that duplicate color values or config declarations.
+5. If deployment is requested, initialize with `chezmoi init --source "$PWD"`, review `chezmoi diff`, and apply only the intended scope. Linked files may already be live.
+
+## Sources
+
+`.config/houses/palette.json` and `palette-light.json` document shared colors; tools do not load them automatically. See `.config/houses/README.md` for light-theme selection.
+
+| Tool | Maintained sources and selectors |
+| --- | --- |
+| Neovim | `.config/nvim/lua/plugins/colorscheme.lua`; `.config/nvim/lua/houses/`; `.config/nvim/colors/` |
+| Ghostty | `.config/ghostty/config` and `themes/` on macOS; `omarchy/.config/ghostty/config` on Linux |
+| Fish | Platform `config.fish`; shared `.config/fish/themes/` |
+| Lazygit | `.config/lazygit/themes/`; `LG_CONFIG_FILE` in Fish and Neovim options |
+| tmux | `.tmux.conf`, `.config/tmux/themes/`, `omarchy/.config/tmux/tmux.conf` |
+| SketchyBar | `.config/sketchybar/colors.sh` and `themes/` |
+| Borders | `.config/borders/bordersrc` and `themes/` |
+| btop | Platform `btop.conf`; `.config/btop/themes/` for macOS |
+| htop | `.config/htop/htoprc`; ANSI colors come from the terminal |
+| OpenCode | `.config/opencode/themes/`; active platform `cli.json` |
+| Starship | `.config/starship.toml` palette selector and styles |
+| Rex | `.config/rex/themes/`; importing a file selects a private copy in Rex |
+| Omarchy | `omarchy/theme` selects sources under `omarchy/.config/omarchy/themes/` |
+
+## Native integration
+
+- On Omarchy, read the Omarchy skill before editing desktop or terminal themes. Preserve native includes and runtime pointers; never edit generated themes or `/usr/share/omarchy`.
+- Read the OpenCode skill before changing CLI theme selection. Do not put terminal preferences in server config.
+- Change Fish's palette and Lazygit path together. Neovim-launched Lazygit has its own theme wiring.
+- Rex imports do not follow later file edits; reimport to update its copy.
+- Preserve alternate themes unless removal is requested. Ignore backups, dependencies and runtime state.
+
+Report the tools changed, validation results and whether anything was applied live.

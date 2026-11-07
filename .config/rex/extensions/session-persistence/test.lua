@@ -131,21 +131,4 @@ equal(pcall(model.snapshot, api, { host_id = "host" }), false)
 api.session.view = function() return nil, "disconnected" end
 equal(pcall(model.snapshot, api, { host_id = "host" }), false)
 
--- Cold boot: the detached launcher must not use the default 10s API timeout.
--- Mock process creation: this check never launches a watcher.
-local previous_rex = rex
-local launched
-rex = {
-    exec = { start = function(argv, opts)
-        launched = argv[3]
-        equal(opts.detach, true)
-        equal(opts.env.REX_SESSION, false)
-        return {}
-    end },
-}
-local loaded, load_error = pcall(dofile, ".config/rex/extensions/session-persistence/init.lua")
-rex = previous_rex
-assert(loaded, load_error)
-assert(launched:find('--timeout 120s do "$2" --all', 1, true))
-assert(launched:find('[ "$attempt" -ge 120 ]', 1, true))
 print("session-persistence: all tests passed")

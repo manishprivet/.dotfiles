@@ -10,9 +10,7 @@ Ui.BarWidget {
   property var state: AgendaState
   Binding { target: root.state; property: "databasePath"; value: root.setting("databasePath", "") }
   readonly property var next: Model.nextEvent(state.todaySnapshot ? state.todaySnapshot.events.filter(function(event) { return !event.allDay }) : [], state.now.getTime())
-  readonly property bool stale: !!state.todaySnapshot && (state.todayError !== "" ||
-    state.now.getTime() - state.todaySnapshot.fetchedAt > 300000 ||
-    (Number(state.todaySnapshot.cacheModifiedAt || 0) > 0 && state.now.getTime() - state.todaySnapshot.cacheModifiedAt > 900000))
+  readonly property bool stale: Model.isStale(state.todaySnapshot, state.todayError, state.now.getTime())
   readonly property bool opened: controller.open
   readonly property bool popoutSwitchClosing: false
   readonly property real openPanelIndicatorWidth: button.labelWidth

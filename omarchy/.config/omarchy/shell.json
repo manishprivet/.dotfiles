@@ -4,9 +4,6 @@
     "layout": {
       "center": [
         {
-          "id": "omarchy.indicators"
-        },
-        {
           "id": "omarchy.clock",
           "format": "ddd d MMM HH:mm",
           "formatAlt": "d MMMM 'W'ww yyyy",
@@ -91,7 +88,8 @@
       ],
       "tray": []
     },
-    "position": "top"
+    "position": "top",
+    "id": "manishprivet.bar"
   },
   "dock": {
     "pinned": [

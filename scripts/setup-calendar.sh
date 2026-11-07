@@ -1,7 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# Both desktop bars use this pinned external decoder; no custom Python parser is maintained.
 PARSER_REVISION=b65ff9bd6dedb61e7b288e1bdadf68ef6b1f56bb
 VENV="${XDG_DATA_HOME:-$HOME/.local/share}/notion-calendar/dfindexeddb"
 STAMP="$VENV/.dotfiles-revision"

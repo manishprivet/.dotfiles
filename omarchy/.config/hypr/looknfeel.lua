@@ -6,7 +6,10 @@ hl.config({
     gaps_in = 9,
     gaps_out = { top = 18, right = 18, bottom = 10, left = 18 },
   },
+  decoration = {
+    rounding = 10,
+  },
 })
 
--- Leave border colors, border size, rounding, opacity, blur and animations to
+-- Leave border colors, border size, opacity, blur and animations to
 -- Omarchy's defaults/theme. macOS JankyBorders pixels are not a direct mapping.
