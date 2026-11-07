@@ -1,0 +1,22 @@
+{{ if ne .chezmoi.os "darwin" }}
+.config/aerospace
+.config/borders
+.config/sketchybar
+{{ end }}
+{{ if not .omarchy }}
+.config/alacritty
+.config/autostart
+.config/chrome-flags.conf
+.config/chromium-flags.conf
+.config/fcitx5
+.config/foot
+.config/hypr
+.config/hyprland-mimeapps.list
+.config/hyprland-preview-share-picker
+.config/imv
+.config/kitty
+.config/omarchy
+.config/wireplumber
+.config/xdg-desktop-portal
+.config/xdg-terminals.list
+{{ end }}

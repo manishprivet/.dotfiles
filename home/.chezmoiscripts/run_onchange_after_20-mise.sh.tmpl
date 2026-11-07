@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+# Versions: {{ include (joinPath .chezmoi.workingTree ".config/mise/config.toml") | sha256sum }}
+cd {{ .chezmoi.workingTree | quote }}
+mise trust .config/mise/config.toml
+mise install argo-rollouts go node
+{{ if .omarchy -}}
+if ! mise where opencode >/dev/null 2>&1; then mise install opencode; fi
+{{ end -}}

@@ -1,0 +1,9 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+set -euo pipefail
+font="$HOME/Library/Fonts/sketchybar-app-font.ttf"
+if [[ ! -f $font ]]; then
+  mkdir -p "$(dirname "$font")"
+  curl -fL https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v1.0.16/sketchybar-app-font.ttf -o "$font"
+fi
+{{ end -}}

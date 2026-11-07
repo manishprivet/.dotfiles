@@ -1,9 +1,9 @@
-# Override in /opt/homebrew/etc/gitconfig for local system settings
+# Machine-specific overrides belong in ~/.config/git/local.config (included last).
 
 [user]
 	name = Manish Kumar
 	email = manishprivet@protonmail.com
-  signingkey = /Users/manishprivet/.ssh/id_ed25519.pub
+  signingkey = ~/.ssh/id_ed25519.pub
 
 [core]
   autocrlf = input
@@ -11,7 +11,7 @@
   fsync = none
   whitespace = error
   preloadindex = true
-  excludesfile = /Users/manishprivet/.config/git/ignore
+  excludesfile = ~/.config/git/ignore
   pager = diff-so-fancy | less --tabs=4 -RFX
   editor = nvim
 
@@ -52,7 +52,7 @@
   old = red
 
 [commit]
-  template = /Users/manishprivet/.config/git/template
+  template = ~/.config/git/template
   gpgsign = true
 
 [gpg]
@@ -115,3 +115,6 @@
 [url "git@github.com:"]
   insteadOf = "gh:"
 	insteadOf = https://github.com/
+
+[include]
+  path = ~/.config/git/local.config

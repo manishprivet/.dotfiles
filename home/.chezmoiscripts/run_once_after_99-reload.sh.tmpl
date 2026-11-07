@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+{{ if .omarchy -}}
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then omarchy restart shell; fi
+{{ end -}}
+if [[ -f "$HOME/.config/opencode/service.json" ]]; then opencode reload; fi

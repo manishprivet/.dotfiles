@@ -1,0 +1,41 @@
+# Dynamic theme colors managed by Omarchy.
+config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
+
+# Do not inherit a stale desktop SHELL value.
+command = /usr/bin/fish
+env = SHELL=/usr/bin/fish
+
+# Font
+font-family = "JetBrainsMono Nerd Font"
+font-style = Regular
+font-size = 9
+
+# Window
+window-theme = ghostty
+window-padding-x = 14
+window-padding-y = 14
+confirm-close-surface = false
+resize-overlay = never
+gtk-toolbar-style = flat
+
+# Cursor styling
+cursor-style = "block"
+cursor-style-blink = false
+
+# Keep shell integration options together.
+shell-integration-features = no-cursor,ssh-env
+
+# Keyboard bindings
+keybind = shift+insert=paste_from_clipboard
+keybind = control+insert=copy_to_clipboard
+# CSI-u lets terminal applications distinguish these keys.
+keybind = shift+enter=csi:13;2u
+keybind = alt+shift+enter=csi:13;4u
+keybind = super+control+shift+alt+arrow_down=resize_split:down,100
+keybind = super+control+shift+alt+arrow_up=resize_split:up,100
+keybind = super+control+shift+alt+arrow_left=resize_split:left,100
+keybind = super+control+shift+alt+arrow_right=resize_split:right,100
+
+# Scrolling and Hyprland performance
+mouse-scroll-multiplier = 0.95
+async-backend = epoll

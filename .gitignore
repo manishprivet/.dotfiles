@@ -1,4 +1,7 @@
 .config/fish/fishd.tmp*
+.config/fish/secrets.fish
+.config/fish/local.fish
+.config/git/local.config
 .config/github-copilot/
 .config/gcloud/
 .config/configstore/
@@ -32,3 +35,34 @@
 /.config/herdr/plugins/config/
 /.config/herdr/session.json
 /.config/herdr/session-snapshots/
+
+# Machine-local runtime files inside repo-owned Omarchy config directories.
+/omarchy/.config/opencode/service.json
+/omarchy/.config/opencode/node_modules/
+/omarchy/.config/opencode/bun.lock*
+/omarchy/.config/fish/fish_variables
+/omarchy/.config/fish/secrets.fish
+/omarchy/.config/fish/local.fish
+/omarchy/.config/btop/themes/current.theme
+/omarchy/.config/fcitx5/conf/cached_layouts
+/omarchy/.config/**/.env*
+/omarchy/.config/**/auth.json
+/omarchy/.config/**/credentials*
+/omarchy/.config/**/*.bak*
+/omarchy/.config/**/*.backup
+/omarchy/.config/**/*.lock
+!/omarchy/.config/omarchy/defaults/*.lock
+/omarchy/.config/**/*.sock*
+/omarchy/.config/**/*.log
+/omarchy/.config/**/*.sample
+
+# The macOS variants also keep mutable machine state outside version control.
+/macos/.config/opencode/service.json
+/macos/.config/opencode/node_modules/
+/macos/.config/opencode/bun.lock*
+/macos/.config/fish/fish_variables
+/macos/.config/fish/secrets.fish
+/macos/.config/fish/local.fish
+/macos/.config/**/*.lock
+/macos/.config/**/*.log
+/macos/.config/**/*.bak*

@@ -1,11 +1,12 @@
-# The following lines were added by Docker Desktop to add commands to your PATH.
-export PATH="$PATH:/Users/manishprivet/.docker/bin"
-# End of Docker Desktop section.
-
-if status is-interactive
-    # Commands to run in interactive sessions can go here
+# Platform-specific paths; keep Homebrew and Docker Desktop off Linux's PATH.
+if test (uname -s) = Darwin
+    fish_add_path --append "$HOME/.docker/bin"
+    if test -x /opt/homebrew/bin/brew
+        /opt/homebrew/bin/brew shellenv | source
+    else if test -x /usr/local/bin/brew
+        /usr/local/bin/brew shellenv | source
+    end
 end
-eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Houses Color Palette (see ~/.config/houses/palette.json)
 # Set this to light to select the companion palette and Lazygit theme.
@@ -59,33 +60,50 @@ set -g fish_pager_color_selected_background --background=$selection
 
 set -gx EDITOR nvim
 
-starship init fish | source
-enable_transience
-
-zoxide init fish | source
+if status is-interactive
+    if type -q starship
+        starship init fish | source
+        if functions -q enable_transience
+            enable_transience
+        end
+    end
+    if type -q zoxide
+        zoxide init fish | source
+    end
+end
 
 # bun
 # set --export BUN_INSTALL "$HOME/.bun"
 # set --export PATH $BUN_INSTALL/bin $PATH
 
 # FZF bindings
-fzf_configure_bindings --directory=\c] --git_log= --git_status=\co --processes=\cp
+if status is-interactive; and functions -q fzf_configure_bindings
+    fzf_configure_bindings --directory=\c] --git_log= --git_status=\co --processes=\cp
+end
 
-eval "$(direnv hook fish)"
+if status is-interactive; and type -q direnv
+    direnv hook fish | source
+end
 
 abbr --add gitp git push -u origin HEAD
 
 # pnpm
-set -gx PNPM_HOME "/Users/manishprivet/Library/pnpm"
+if test (uname -s) = Darwin
+    set -gx PNPM_HOME "$HOME/Library/pnpm"
+else
+    set -gx PNPM_HOME "$HOME/.local/share/pnpm"
+end
 if not string match -q -- $PNPM_HOME $PATH
   set -gx PATH "$PNPM_HOME" $PATH
 end
 # pnpm end
 
-if [ -f '/Users/manishprivet/.config/fish/secrets.fish' ]; source /Users/manishprivet/.config/fish/secrets.fish; end
+if test -f "$__fish_config_dir/secrets.fish"
+    source "$__fish_config_dir/secrets.fish"
+end
 
 # opencode
-fish_add_path /Users/manishprivet/.opencode/bin
+fish_add_path "$HOME/.opencode/bin"
 export PATH="$HOME/.local/bin:$PATH"
 
 # bun
@@ -99,12 +117,18 @@ end
 set --export LG_CONFIG_FILE "$HOME/.config/lazygit/config.yml,$HOME/.config/lazygit/themes/$houses_lazygit_theme.yml"
 
 # Added by `rbenv init` on Mon Jan 12 09:03:47 JST 2026
-status --is-interactive; and rbenv init - --no-rehash fish | source
+if status is-interactive; and type -q rbenv
+    rbenv init - --no-rehash fish | source
+end
 
-set -gx GPG_TTY (tty)
+if status is-interactive; and isatty stdin
+    set -gx GPG_TTY (tty)
+end
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/manishprivet/google-cloud-sdk/path.fish.inc' ]; . '/Users/manishprivet/google-cloud-sdk/path.fish.inc'; end
+if test -f "$HOME/google-cloud-sdk/path.fish.inc"
+    source "$HOME/google-cloud-sdk/path.fish.inc"
+end
 
 # Rex CLI outside Rex; Current follows server updates without pinning a version.
 set -l rex_bin_dir "$HOME/Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS"
@@ -115,4 +139,14 @@ end
 # Inside Rex, prefer the CLI supplied by the running server.
 if set -q REX_BIN_DIR; and test -n "$REX_BIN_DIR"
     fish_add_path --path --prepend --move "$REX_BIN_DIR"
+end
+
+# Resolve mise-managed tool versions for this directory and refresh on cd.
+if status is-interactive; and type -q mise
+    mise activate fish | source
+end
+
+# Untracked machine-specific overrides, loaded after the shared configuration.
+if test -f "$__fish_config_dir/local.fish"
+    source "$__fish_config_dir/local.fish"
 end

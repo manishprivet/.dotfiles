@@ -1,0 +1,40 @@
+# Houses desktop palette, aligned with .config/houses/palette.json.
+mode = "dark"
+
+accent = "#EA6962"
+cursor = "#EA6962"
+selection = "#3C3836"
+selection_background = "#3C3836"
+selection_foreground = "#D4BE98"
+muted = "#928374"
+
+background = "#1D2021"
+# Deeper shades derived from the Houses background for Omarchy's surfaces.
+dark_background = "#171A1B"
+darker_background = "#111314"
+lighter_background = "#282828"
+
+foreground = "#D4BE98"
+dark_foreground = "#928374"
+light_foreground = "#DDC7A1"
+bright_foreground = "#DDC7A1"
+
+red = "#EA6962"
+yellow = "#D8A657"
+orange = "#E78A4E"
+green = "#A9B665"
+cyan = "#89B482"
+blue = "#7DAEA3"
+magenta = "#D3869B"
+brown = "#504945"
+
+bright_red = "#EA6962"
+bright_yellow = "#D8A657"
+bright_green = "#A9B665"
+bright_cyan = "#89B482"
+bright_blue = "#7DAEA3"
+bright_magenta = "#D3869B"
+
+# Match the original Mac border palette without changing border thickness.
+hyprland_active_border = "#EA6962"
+hyprland_inactive_border = "#504945"

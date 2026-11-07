@@ -1,0 +1,51 @@
+packages:
+  omarchy:
+    - fish
+    - neovim
+    - tmux
+    - starship
+    - lazygit
+    - ghostty
+    - mise
+    - github-cli
+    - git
+    - git-lfs
+    - diff-so-fancy
+    - eza
+    - zoxide
+    - direnv
+    - fzf
+    - bat
+    - ripgrep
+    - fd
+    - unzip
+    - gcc
+    - make
+  darwin:
+    brews:
+      - fish
+      - neovim
+      - tmux
+      - starship
+      - lazygit
+      - btop
+      - mise
+      - gh
+      - git
+      - git-lfs
+      - diff-so-fancy
+      - eza
+      - zoxide
+      - direnv
+      - fzf
+      - bat
+      - ripgrep
+      - fd
+      - anomalyco/tap/opencode
+      - felixkratz/formulae/borders
+      - felixkratz/formulae/sketchybar
+    casks:
+      - ghostty
+      - nikitabobko/tap/aerospace
+      - font-jetbrains-mono-nerd-font
+      - font-hack-nerd-font

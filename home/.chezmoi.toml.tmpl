@@ -1,0 +1,15 @@
+{{- $omarchy := false -}}
+{{- if and (eq .chezmoi.os "linux") (stat "/usr/share/omarchy") -}}
+{{- $omarchy = true -}}
+{{- end -}}
+{{- if and (ne .chezmoi.os "darwin") (not $omarchy) -}}
+{{- fail "This setup supports macOS and installed Omarchy systems." -}}
+{{- end }}
+sourceDir = {{ .chezmoi.workingTree | quote }}
+
+[data]
+    omarchy = {{ $omarchy }}
+
+[add]
+    secrets = "error"
+    templateSymlinks = true

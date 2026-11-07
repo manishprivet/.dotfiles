@@ -1,0 +1,24 @@
+[".tmux/plugins/tpm"]
+type = "git-repo"
+url = "https://github.com/tmux-plugins/tpm.git"
+refreshPeriod = "168h"
+
+[".tmux/plugins/tmux-sensible"]
+type = "git-repo"
+url = "https://github.com/tmux-plugins/tmux-sensible.git"
+refreshPeriod = "168h"
+
+[".tmux/plugins/tmux-weather"]
+type = "git-repo"
+url = "https://github.com/xamut/tmux-weather.git"
+refreshPeriod = "168h"
+
+[".tmux/plugins/tmux-resurrect"]
+type = "git-repo"
+url = "https://github.com/tmux-plugins/tmux-resurrect.git"
+refreshPeriod = "168h"
+
+[".tmux/plugins/tmux-continuum"]
+type = "git-repo"
+url = "https://github.com/tmux-plugins/tmux-continuum.git"
+refreshPeriod = "168h"

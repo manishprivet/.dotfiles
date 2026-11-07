@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+# Dependencies: {{ include (joinPath .chezmoi.workingTree ".config/opencode/package-lock.json") | sha256sum }}
+cd {{ .chezmoi.workingTree | quote }}
+mise exec node -- npm --prefix .config/opencode ci --ignore-scripts --no-audit --no-fund

@@ -1,0 +1,21 @@
+{{ if .omarchy -}}
+#!/bin/bash
+set -euo pipefail
+repo={{ .chezmoi.workingTree | quote }}
+read -r theme < "$repo/omarchy/theme"
+[[ $theme =~ ^[a-z0-9-]+$ ]]
+mkdir -p "$repo/omarchy/.config/btop/themes"
+ln -sfn "$HOME/.local/state/omarchy/current/theme/btop.theme" "$repo/omarchy/.config/btop/themes/current.theme"
+export OMARCHY_THEME_WAIT=1 OMARCHY_THEME_SYNC_FROM=dotfiles-local
+[[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || export OMARCHY_THEME_HEADLESS=1
+if [[ $(cat "$HOME/.local/state/omarchy/current/theme.name" 2>/dev/null || true) == "$theme" ]]; then
+  omarchy theme refresh
+else
+  omarchy theme set "$theme"
+fi
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  hyprctl reload
+  errors=$(hyprctl configerrors)
+  [[ -z $errors ]] || { printf '%s\n' "$errors" >&2; exit 1; }
+fi
+{{ end -}}

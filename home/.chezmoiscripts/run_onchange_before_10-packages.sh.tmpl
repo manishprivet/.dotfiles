@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+{{ if .omarchy -}}
+omarchy pkg add {{ range .packages.omarchy }}{{ . | quote }} {{ end }}
+{{ else if eq .chezmoi.os "darwin" -}}
+if ! command -v brew >/dev/null 2>&1; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  [[ ! -x /opt/homebrew/bin/brew ]] || eval "$(/opt/homebrew/bin/brew shellenv)"
+  [[ ! -x /usr/local/bin/brew ]] || eval "$(/usr/local/bin/brew shellenv)"
+fi
+brew bundle --file=/dev/stdin <<'BREWFILE'
+{{ range .packages.darwin.brews -}}
+brew {{ . | quote }}
+{{ end -}}
+{{ range .packages.darwin.casks -}}
+cask {{ . | quote }}
+{{ end -}}
+BREWFILE
+{{ end -}}

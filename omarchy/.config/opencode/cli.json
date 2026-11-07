@@ -1,0 +1,34 @@
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "theme": {
+    "name": "houses",
+    "mode": "dark"
+  },
+  "plugins": ["./herdr-opencode", "./openui", "./rex-session"],
+  "tabs": {
+    "mode": "off"
+  },
+  "diffs": {
+    "wrap": "word",
+    "single": false
+  },
+  "session": {
+    "sidebar": "hide",
+    "scrollbar": false,
+    "thinking": "show",
+    "image_preview": true,
+    "markdown": "rendered"
+  },
+  "animations": true,
+  "attention": {
+    "notifications": true,
+    "sound": false,
+    "volume": 1
+  },
+  "scroll": {
+    "acceleration": true
+  },
+  "prompt": {
+    "image_preview": true
+  }
+}

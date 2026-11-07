@@ -1,0 +1,39 @@
+#!/bin/bash
+set -eo pipefail
+# Backup again if the managed symlink definitions change.
+{{ range glob (joinPath .chezmoi.sourceDir "dot_config/symlink_*.tmpl") -}}
+# {{ base . }}: {{ include . | sha256sum }}
+{{ end -}}
+dest={{ .chezmoi.destDir | quote }}
+repo={{ .chezmoi.workingTree | quote }}
+variant={{ if .omarchy }}omarchy{{ else }}macos{{ end }}
+if [[ -L $dest/.config ]]; then
+  printf 'Refusing to apply through a whole ~/.config symlink. Unfold the old Stow layout first; see README.\n' >&2
+  exit 1
+fi
+targets=()
+listing=$(mktemp)
+trap 'rm -f "$listing"' EXIT
+{{ .chezmoi.executable | quote }} \
+  --config {{ .chezmoi.configFile | quote }} \
+  --source {{ .chezmoi.sourceDir | quote }} \
+  --working-tree "$repo" --destination "$dest" \
+  --persistent-state {{ .chezmoi.config.persistentState | quote }} \
+  managed --include=symlinks --exclude=externals --path-style=absolute --nul-path-separator > "$listing"
+while IFS= read -r -d '' path; do
+  [[ ! -e $path || -L $path ]] || targets+=("${path#"$dest"/}")
+done < "$listing"
+if [[ ${#targets[@]} -gt 0 ]]; then
+  backup="$dest/.local/state/dotfiles/backups/chezmoi-$(date +%Y%m%d-%H%M%S)-$$"
+  (umask 077; mkdir -p "$backup"; tar -C "$dest" -chzf "$backup/configs.tar.gz" "${targets[@]}")
+  printf 'Existing configs archived in %s\n' "$backup"
+fi
+# Preserve machine-local state before chezmoi replaces old config directories.
+for file in fish/fish_variables fish/secrets.fish fish/local.fish opencode/service.json; do
+  from="$dest/.config/$file"
+  to="$repo/$variant/.config/$file"
+  if [[ -f $from && ! $from -ef $to ]]; then mkdir -p "$(dirname "$to")"; cp -p "$from" "$to"; fi
+done
+from="$dest/.config/git/local.config"
+to="$repo/.config/git/local.config"
+if [[ -f $from && ! $from -ef $to ]]; then cp -p "$from" "$to"; fi
