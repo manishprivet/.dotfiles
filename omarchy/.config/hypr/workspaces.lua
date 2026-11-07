@@ -11,6 +11,9 @@ function M.workspace_for_class(class)
       or class:match("^chrome%-app%.slack%.com") or class:match("^chrome%-web%.whatsapp%.com")
       or class:match("^chrome%-web%.telegram%.org") or class:match("^chrome%-discord%.com") then
     return 4
+  elseif class == "com.github.th-ch.youtube-music" or class == "youtube-music"
+      or class:match("^chrome%-music%.youtube%.com") then
+    return 5
   elseif class == "obsidian" or class == "md.obsidian" or class == "notion"
       or class:match("^chrome%-www%.notion%.so") or class:match("^chrome%-notion%.so") then
     return 5

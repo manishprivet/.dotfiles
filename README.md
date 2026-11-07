@@ -121,6 +121,10 @@ is split between `bindings.lua` (essentials and Command-style shortcuts),
 `workspaces.lua` (app placement), `looknfeel.lua`, `input.lua` and `monitors.lua`.
 No implementations under `/usr/share/omarchy` are copied or edited.
 
+`autostart.lua` opens Notion Calendar, Ghostty, Google Chrome, Discord (web app)
+and YouTube Music on each Hyprland login, on workspace slots 1–5 respectively.
+Config reloads do not relaunch them; `workspaces.lua` handles placement.
+
 Command/Super shortcuts translate to Linux equivalents in GUI apps, including
 Chrome, web apps and Obsidian. Each app decides what its Ctrl shortcut does.
 

@@ -77,6 +77,11 @@ assert(workspaces.workspace_for_class("google-chrome") == 3)
 assert(workspaces.workspace_for_class("chrome-discord.com__channels_@me-Default") == 4)
 assert(workspaces.workspace_for_class("obsidian") == 5)
 assert(workspaces.workspace_for_class("chrome-calendar.google.com__-Default") == 1)
+assert(workspaces.workspace_for_class("chrome-calendar.notion.so__-Default") == 1)
+assert(workspaces.workspace_for_class("discord") == 4)
+assert(workspaces.workspace_for_class("com.github.th-ch.youtube-music") == 5)
+assert(workspaces.workspace_for_class("YouTube-Music") == 5)
+assert(workspaces.workspace_for_class("chrome-music.youtube.com__-Default") == 5)
 assert(workspaces.workspace_for_class("unknown-app") == nil)
 
 local window = { class = "com.mitchellh.ghostty", address = "0x123", monitor = { block = 1 }, workspace = { id = 11 } }
@@ -96,6 +101,21 @@ binds["aerospace-service:F"].dispatcher()
 assert(dispatched[#dispatched - 1].name == "submap" and dispatched[#dispatched - 1].args == "reset")
 assert(dispatched[#dispatched].name == "float")
 print("Hyprland Alt bindings, service mode and per-monitor app placement passed")
+
+local startup_commands = {}
+o.launch_on_start = function(command) startup_commands[#startup_commands + 1] = command end
+local before_startup = #dispatched
+dofile("omarchy/.config/hypr/autostart.lua")
+local expected_startup = {
+  "notioncalendar", "ghostty", "google-chrome-stable --new-window",
+  "omarchy-launch-webapp https://discord.com/channels/@me", "youtube-music",
+}
+assert(#startup_commands == #expected_startup)
+for index, command in ipairs(expected_startup) do
+  assert(startup_commands[index] == command, "Unexpected startup command at " .. index)
+end
+assert(#dispatched == before_startup, "Reloading startup config must not launch apps")
+print("The five default apps are registered with Omarchy's session-start helper")
 
 local appearance
 hl.config = function(spec) appearance = spec end
