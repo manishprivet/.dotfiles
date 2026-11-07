@@ -1,4 +1,4 @@
-# Omarchy binds Super+I. Leave Ctrl+Space to tmux/Herdr and other Super keys to the desktop.
+# Omarchy binds Super+I. Leave Ctrl+Space to tmux and other Super keys to the desktop.
 [Hotkey/TriggerKeys]
 0=Zenkaku_Hankaku
 1=Hangul

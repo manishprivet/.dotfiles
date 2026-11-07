@@ -1,5 +1,5 @@
--- One persistent scratch terminal per tab. Detaching hides it without stopping
--- its shell; its label lets us find it again even after a config reload.
+-- One persistent scratch terminal per tab. Minimizing hides its floating layer
+-- without stopping its shell; its label survives config reloads.
 local bounds = { 0.6, 0, 0.4, 1 }
 
 local function checked(result, err)
@@ -31,16 +31,35 @@ rex.action{
             end
         end
 
-        if scratch and scratch.placement == "placed" then
-            return checked(rex.session.detach_block{
-                session_id = ctx.session_id,
-                block_id = scratch.block_id,
-            })
+        if scratch then
+            for _, layer in ipairs(window.layers or {}) do
+                if layer.kind == "floating" then
+                    for _, block in ipairs(layer.blocks or {}) do
+                        if block.block_id == scratch.block_id then
+                            if layer.state ~= "minimized" then
+                                -- The native action minimizes the focused float.
+                                checked(rex.session.focus_block{
+                                    session_id = ctx.session_id,
+                                    block_id = scratch.block_id,
+                                })
+                                rex.client.queue("pane.minimize_floating", {})
+                                return
+                            end
+                            return checked(rex.session.set_layer_state{
+                                session_id = ctx.session_id,
+                                layer_id = layer.layer_id,
+                                state = "normal",
+                                focus = true,
+                            })
+                        end
+                    end
+                end
+            end
         end
 
         if scratch then
-            -- Rex cannot float a detached block directly. Place it beside a
-            -- tiled block first, then immediately move it into a floating layer.
+            -- Migrate a scratch terminal detached by the old implementation.
+            -- Rex must place it beside a tiled block before it can float it.
             local anchor
             for _, layer in ipairs(window.layers or {}) do
                 if layer.kind == "tiled" then

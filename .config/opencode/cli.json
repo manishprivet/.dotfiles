@@ -4,7 +4,7 @@
     "name": "houses",
     "mode": "dark"
   },
-  "plugins": ["./herdr-opencode", "./openui", "./rex-session"],
+  "plugins": ["./openui", "./rex-session"],
   "tabs": {
     "mode": "off"
   },

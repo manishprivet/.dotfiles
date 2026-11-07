@@ -2,6 +2,10 @@
 .config/aerospace
 .config/borders
 .config/sketchybar
+.config/evans
+.config/gh
+.config/htop
+.config/rex
 {{ end }}
 {{ if not .omarchy }}
 .config/alacritty

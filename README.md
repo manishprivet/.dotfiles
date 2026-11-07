@@ -44,6 +44,16 @@ The migration hook refuses this case. Back up the old layout, replace only the
 parent link with a real config directory containing copies of the old settings,
 then review `chezmoi diff`. Do not blindly use `--force` or skip the backup hook.
 
+For an existing machine, separate the link migration from setup hooks: after
+running and checking the backup hook, preview and apply with
+`--exclude=scripts,externals`. A plain `chezmoi apply` also runs package/tool
+installation and reload hooks; review these before enabling them.
+
+The macOS declarations retain the legacy Evans, GitHub CLI, htop and Rex
+roots. The macOS OpenCode root also links existing shared settings and plugins;
+ignored local extensions and dependencies stay local. Unmanaged config roots
+must be retained when unfolding the parent link, not deleted with the old layout.
+
 ## Layout
 
 ```text

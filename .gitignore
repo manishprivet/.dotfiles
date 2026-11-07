@@ -27,14 +27,6 @@
 .agents/skills/synced/
 /repro.sh
 
-# Herdr runtime state and generated plugin metadata
-/.config/herdr/*.log
-/.config/herdr/*.sock*
-/.config/herdr/.plugins.lock
-/.config/herdr/plugins.json
-/.config/herdr/plugins/config/
-/.config/herdr/session.json
-/.config/herdr/session-snapshots/
 
 # Machine-local runtime files inside repo-owned Omarchy config directories.
 /omarchy/.config/opencode/service.json
@@ -66,3 +58,9 @@
 /macos/.config/**/*.lock
 /macos/.config/**/*.log
 /macos/.config/**/*.bak*
+
+# Existing machine-local OpenCode extensions and integration state.
+/macos/.config/opencode/.claude
+/macos/.config/opencode/lib
+/macos/.config/opencode/plugin
+/macos/.config/opencode/plugins/notify

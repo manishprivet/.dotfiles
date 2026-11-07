@@ -1,1 +1,0 @@
-../../../../.config/opencode/plugins/herdr-agent-state.js

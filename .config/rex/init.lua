@@ -59,7 +59,7 @@ end
 
 require("extensions.tab-navigation")
 
--- Herdr-style navigation: let Vim handle its splits, otherwise focus Rex panes.
+-- Let Vim handle its splits, otherwise focus Rex panes.
 -- Neovim's matching edge handoff lives in plugins/vim-tmux-navigator.lua.
 local function is_vim(process)
     if not process then return false end

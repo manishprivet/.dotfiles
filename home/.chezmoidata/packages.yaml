@@ -41,7 +41,6 @@ packages:
       - bat
       - ripgrep
       - fd
-      - anomalyco/tap/opencode
       - felixkratz/formulae/borders
       - felixkratz/formulae/sketchybar
     casks:

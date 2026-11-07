@@ -5,6 +5,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd -P)
 tmp_base=${TMPDIR:-/tmp}
 [[ ! -d /tmp/opencode ]] || tmp_base=/tmp/opencode
 scratch=$(mktemp -d "$tmp_base/chezmoi-test.XXXXXX")
+scratch=$(cd "$scratch" && pwd -P)
 trap 'rm -rf "$scratch"' EXIT
 repo=$scratch/source
 mkdir -p "$repo"
@@ -57,6 +58,9 @@ home=$scratch/omarchy/home
 [[ -L $home/.config/hypr && -L $home/.config/omarchy ]] || fail 'Omarchy config roots missing'
 [[ $(readlink "$home/.config/ghostty") == "$repo/omarchy/.config/ghostty" ]] || fail 'Wrong Linux variant'
 [[ ! -e $home/.config/aerospace && ! -L $home/.config/aerospace ]] || fail 'Mac desktop leaked into Linux'
+for app in evans gh htop rex; do
+  [[ ! -L $home/.config/$app ]] || fail "Mac legacy root leaked into Linux: $app"
+done
 cm verify --exclude=scripts,externals
 echo 'PASS Omarchy links and OS exclusions'
 
@@ -74,6 +78,9 @@ home=$scratch/macos/home
 [[ -L $home/.config/aerospace && -L $home/.config/sketchybar ]] || fail 'Mac desktop links missing'
 [[ ! -e $home/.config/hypr && ! -L $home/.config/hypr ]] || fail 'Hyprland leaked into macOS'
 [[ $(readlink "$home/.config/opencode") == "$repo/macos/.config/opencode" ]] || fail 'Wrong Mac variant'
+for app in evans gh htop rex; do
+  [[ $(readlink "$home/.config/$app") == "$repo/.config/$app" ]] || fail "Missing Mac legacy root: $app"
+done
 cm verify --exclude=scripts,externals
 echo 'PASS macOS links and OS exclusions'
 

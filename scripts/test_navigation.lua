@@ -3,7 +3,6 @@
 package.preload["config.rex-navigation"] = function()
   return { keys = function() return nil end }
 end
-vim.env.HERDR_PANE_ID = nil
 
 local spec = dofile(".config/nvim/lua/plugins/vim-tmux-navigator.lua")
 local called = {}

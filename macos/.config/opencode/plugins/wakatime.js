@@ -1,0 +1,1 @@
+../../../../.config/opencode/plugins/wakatime.js
