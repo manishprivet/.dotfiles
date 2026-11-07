@@ -1,0 +1,29 @@
+pkgname=notioncalendar
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Unofficial Notion Calendar web-app launcher for Omarchy'
+arch=('x86_64' 'aarch64')
+license=('MIT')
+depends=('qt6-base' 'qt6-declarative' 'qt6-wayland' 'qt6-svg' 'omarchy')
+makedepends=('gcc' 'make')
+optdepends=('google-chrome: Chromium-based browser for the calendar' 'chromium: alternative Chromium-based browser')
+source=()
+sha256sums=()
+
+build() {
+  cd "$startdir/.."
+  ./bin/build
+}
+
+check() {
+  cd "$startdir/.."
+  ./bin/test
+}
+
+package() {
+  cd "$startdir/.."
+  install -Dm755 build/notioncalendar "$pkgdir/usr/bin/notioncalendar"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 pkgbuild/notioncalendar.desktop "$pkgdir/usr/share/applications/notioncalendar.desktop"
+  install -Dm644 pkgbuild/notioncalendar.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/notioncalendar.svg"
+}

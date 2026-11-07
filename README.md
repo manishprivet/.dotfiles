@@ -4,7 +4,8 @@
 
 Managed with [chezmoi](https://www.chezmoi.io/), using its standard symlink
 templates, OS-specific ignores, package data, externals and setup scripts.
-There is no custom deployment framework or Python tooling.
+There is no custom deployment framework. The calendar integration uses a pinned
+third-party IndexedDB decoder rather than maintaining custom Python tooling.
 
 ## Set up a machine
 
@@ -68,6 +69,7 @@ home/
 .config/                     existing shared/Mac config contents
 macos/.config/               Mac app roots with mutable local state
 omarchy/.config/             complete native Omarchy config roots
+omarchy/apps/notioncalendar/ local Notion Calendar app source and Arch package
 omarchy/theme                desired desktop theme (houses)
 ```
 
@@ -112,18 +114,138 @@ into source control. Review `git status` before committing.
 ## Omarchy stays native
 
 The Hyprland loader imports Omarchy's helpers, services, workspaces, dynamic
-theme and toggles. Its preset bindings are disabled. Personal behavior is split
-between `bindings.lua` (four agreed essentials), `aerospace.lua` (Mac Alt bindings),
+theme and toggles. Its preset bindings are disabled, except for explicit
+imports of native media, clipboard and input-method controls. Personal behavior
+is split between `bindings.lua` (essentials and Command-style shortcuts),
+`aerospace.lua` (Mac Alt bindings),
 `workspaces.lua` (app placement), `looknfeel.lua`, `input.lua` and `monitors.lua`.
 No implementations under `/usr/share/omarchy` are copied or edited.
+
+Command/Super shortcuts translate to Linux equivalents in GUI apps, including
+Chrome, web apps and Obsidian. Each app decides what its Ctrl shortcut does.
+
+| Shortcut | Action |
+| --- | --- |
+| Super+C/V/X/A | Copy, paste, cut, select all; native terminal-aware copy/paste |
+| Super+Z / Shift+Z, S, O, P | Undo/redo, save, open, print |
+| Super+T / Shift+T, W | New/reopen/close tab |
+| Super+N / Shift+N, L, F, R / Shift+R | New window/document, incognito/new folder, address bar, find, reload/hard reload |
+| Super+D, +/−/0, 1–9 | Bookmark, zoom/reset, select tab |
+| Super+[ / ], Super+Shift+[ / ] | Back/forward, previous/next tab |
+| Super+arrows, Alt+Left/Right | Line/document navigation, word navigation; add Shift to select |
+| Alt+Backspace/Delete, Super+Backspace/Delete | Delete word, delete to line start/end (GUI apps) |
+| Super+Q, Super+Ctrl+F | Close focused window, toggle fullscreen |
+| Super+Shift+L | Cycle workspace layout: tiling → scrolling → floating |
+| Super+Tab, Super+` / Super+Shift+` | Last focused window, next/previous window on current workspace |
+| Super+M | Native minimize to dock (floating workspaces only) |
+| Super+Shift+3/4/5, Print | Fullscreen screenshot, region screenshot, capture menu, screenshot |
+| Super+Ctrl+V, Super+Ctrl+Space | Clipboard history, emojis |
+| Super+I / Shift+I | Next/previous input language |
+| Power key, Super+mouse drag/right-drag | System menu, move/resize window |
+
+Ghostty gets its native equivalents for select-all, new tab/window, close tab,
+find, zoom and tab switching. Other editing/navigation chords pass through in
+terminals: they must not inject shell controls such as Ctrl+S or Ctrl+Z.
+Super+Tab is a last-window toggle, not a macOS application-switcher UI, and
+Super+backtick cycles workspace windows rather than filtering by application.
+Alt-based AeroSpace bindings and the working lid behavior are unchanged.
 
 Ghostty, Foot, Kitty, Alacritty and btop retain native theme connections. Houses
 sources are in `omarchy/.config/omarchy/themes/houses/`; `omarchy/theme` selects
 the theme. Reapply refreshes it without cycling the wallpaper. Generated themes
-stay in `~/.local/state`. The bar's original layout is preserved and remains deferred.
+stay in `~/.local/state`. The bar's original widgets are preserved; the clock,
+agenda and neighbouring middle widgets are centered together as one group.
 
 OpenCode retains separate server configs, shared portable plugins and Houses UI
 settings. Work-only endpoints and WakaTime are not activated automatically.
+
+### Notion Calendar
+
+Omarchy setup builds and installs the local **Notion Calendar** app from
+`omarchy/apps/notioncalendar/`, including its app-launcher entry and icon.
+The package hook installs its Qt/build dependencies first; the focused
+`run_onchange_after_35-notioncalendar` hook rebuilds and reinstalls it when
+its source or packaging changes. Unchanged applies skip the build. Build output
+and package archives are ignored, and macOS setup skips this app entirely.
+
+Open **Notion Calendar** from the app launcher. It is an unofficial wrapper for
+the official website, using Omarchy’s Chromium-based browser and existing
+browser profile. Accounts, cookies, and calendar data never enter dotfiles.
+Edit the source here, not the original `~/Work/notioncalendar` scaffold, then
+review `chezmoi diff` and run `chezmoi apply` to rebuild. Setup can prompt for
+sudo to install the Arch package. To build/test without applying dotfiles:
+
+```bash
+omarchy/apps/notioncalendar/bin/build
+omarchy/apps/notioncalendar/bin/test
+```
+
+### Agenda bar widget
+
+`omarchy/.config/omarchy/plugins/manish.agenda/` is a local Quickshell plugin.
+Chezmoi's existing whole-root Omarchy symlink deploys it, and the tracked
+`shell.json` enables it beside the stock clock in the centered group on Omarchy only. No extra
+installer or copied stock clock is needed. Existing setup supplies Fish and
+Node through mise. A focused chezmoi hook installs the pinned `rrule` dependency
+with npm lifecycle scripts disabled.
+
+It reads Notion Calendar's **local IndexedDB cache** every two minutes. There
+is no agenda API client, token, OAuth flow, or network access in the reader.
+Reads are shared across monitors. Dates not cached by Notion Calendar may have
+no events; open the app and sync before relying on the agenda. The UI calls out
+cached data, old cache timestamps, and failed reads. Remove the `manish.agenda`
+bar entry to stop reads.
+
+- **Click** the widget for the day's agenda; use **Previous / Today / Next** to
+  move one day at a time. Browsing does not change today's next-event bar label.
+- **Hover** for the next event's full title, time, and location.
+- **Click an event**, or select it with **Up/Down** and press **Enter**, to open
+  its Google Meet link. If there is no Meet link, nothing opens.
+- **Middle-click** the bar widget to open today's next event's Meet link, if present.
+- **Right-click** to refresh. In the popup, **Left/Right** change the day,
+  **T** returns to today, **R** refreshes, and **Escape** closes it.
+- All-day and past events appear in the popup; the next-event label uses
+  ongoing/upcoming timed events. The footer button focuses the existing Notion
+  Calendar window, or opens the app if it is not already running.
+
+### Shared Notion Calendar reader (Omarchy + AeroSpace/SketchyBar)
+
+`.config/notion-calendar/indexeddb.mjs` owns cache discovery, snapshotting,
+decoding and meeting normalization for **both** the Omarchy widget and the
+macOS SketchyBar calendar item used alongside AeroSpace. The adapters only
+format their own UI; the macOS item retains its account filter, three-hour
+horizon, and Meet-link action. Workspace indicators are unchanged.
+
+Chezmoi links the shared root to `~/.config/notion-calendar` on both platforms.
+The `run_onchange_after_36-calendar-parser` hook runs `scripts/setup-calendar.sh`,
+which installs the same pinned external `dfindexeddb` decoder in an isolated
+environment under `~/.local/share/notion-calendar/dfindexeddb`. Package setup
+provides Python and Snappy; no custom Python parser is maintained. The decoder's
+installation needs network access; routine calendar reads do not.
+
+On macOS the source is the native Notion Calendar app's IndexedDB. On Omarchy
+the reader discovers supported Chromium-based browser profiles. If more than
+one profile has a cache, set an explicit `databasePath` on the `manish.agenda`
+entry in `omarchy/.config/omarchy/shell.json` to the desired `.indexeddb.leveldb`
+directory. The reader shows only events you created, organize, or attend, and
+excludes declined/cancelled and recovered/deleted records.
+Recurring series are expanded for the requested day in the event's timezone;
+cached cancellations and moved instances override the generated occurrences.
+
+The decoder runs against a private temporary copy, not the live database; source
+changes during copying cause a retry. Copies are removed after each read. This
+is a best-effort snapshot, not a transactional browser API, and cache format
+changes can still require a decoder update. No browser profiles, parsed meeting
+data, or credentials belong in dotfiles. There is no live API fallback.
+
+Manual checks:
+
+```bash
+bash scripts/setup-calendar.sh
+node ~/.config/notion-calendar/cli.mjs --date 2026-11-07
+```
+
+The CLI prints private meeting data as JSON; do not commit or publish its output.
 
 ### YouTube Music (macOS + Omarchy)
 
@@ -189,9 +311,13 @@ bash scripts/test-music-ui.sh
 chezmoi verify --exclude=scripts,externals
 bash scripts/test-chezmoi.sh
 lua scripts/test_hyprland.lua
+node scripts/check-hyprland-bindings.mjs # read-only check; requires running Hyprland
 node scripts/test-theme.mjs
 nvim --clean --headless -l scripts/test_navigation.lua
 node --test .config/opencode/rex-session/test.mjs
+node --test omarchy/.config/omarchy/plugins/manish.agenda/tests/agenda.test.mjs
+node --test .config/notion-calendar/tests/*.test.mjs
+bash scripts/test-agenda-ui.sh
 ```
 
 The filesystem checks apply real chezmoi state to isolated macOS/Omarchy test

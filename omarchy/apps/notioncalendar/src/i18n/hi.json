@@ -1,0 +1,14 @@
+{
+  "Your calendar, in its own window.": "आपका कैलेंडर, अपनी अलग विंडो में।",
+  "Open the official Notion Calendar website using your existing browser profile. Sign in there to access your calendars.": "अपनी मौजूदा ब्राउज़र प्रोफ़ाइल से आधिकारिक Notion Calendar वेबसाइट खोलें। अपने कैलेंडर देखने के लिए वहाँ साइन इन करें।",
+  "Opening…": "खुल रहा है…",
+  "Open Notion Calendar": "Notion Calendar खोलें",
+  "Unofficial launcher. Calendar appearance, shortcuts, and account settings are managed by Notion.": "अनौपचारिक लॉन्चर। कैलेंडर का रूप, शॉर्टकट और खाता सेटिंग Notion द्वारा प्रबंधित होते हैं।",
+  "Keyboard shortcuts": "कीबोर्ड शॉर्टकट",
+  "Space — Open calendar\n? — Show shortcuts\nQ — Quit launcher\nEscape — Close help": "Space — कैलेंडर खोलें\n? — शॉर्टकट दिखाएँ\nQ — लॉन्चर बंद करें\nEscape — सहायता बंद करें",
+  "These shortcuts apply to this launcher only. Inside the calendar, use Notion’s own shortcuts.": "ये शॉर्टकट केवल इस लॉन्चर में काम करते हैं। कैलेंडर में Notion के अपने शॉर्टकट इस्तेमाल करें।",
+  "Close": "बंद करें",
+  "Could not start the web-app launcher: %1": "वेब ऐप लॉन्चर शुरू नहीं हो सका: %1",
+  "Could not open Notion Calendar. Check that a Chromium-based browser is installed.\n%1": "Notion Calendar नहीं खुल सका। जाँचें कि Chromium आधारित ब्राउज़र इंस्टॉल है।\n%1",
+  "Omarchy’s launcher was not found. This app requires Omarchy.": "Omarchy का लॉन्चर नहीं मिला। इस ऐप के लिए Omarchy ज़रूरी है।"
+}

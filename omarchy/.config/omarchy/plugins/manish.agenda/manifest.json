@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "manish.agenda",
+  "name": "Agenda",
+  "version": "1.0.0",
+  "author": "manishprivet",
+  "description": "Upcoming meetings from Notion Calendar’s local IndexedDB cache, with a daily agenda popup.",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "BarWidget.qml" },
+  "barWidget": {
+    "displayName": "Agenda",
+    "description": "Next event and a daily agenda with previous, today, and next controls",
+    "category": "Time",
+    "allowMultiple": false
+  }
+}

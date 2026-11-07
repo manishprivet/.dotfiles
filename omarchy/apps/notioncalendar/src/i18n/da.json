@@ -1,0 +1,14 @@
+{
+  "Your calendar, in its own window.": "Din kalender i sit eget vindue.",
+  "Open the official Notion Calendar website using your existing browser profile. Sign in there to access your calendars.": "Åbn den officielle Notion Calendar-hjemmeside med din eksisterende browserprofil. Log ind der for at få adgang til dine kalendere.",
+  "Opening…": "Åbner…",
+  "Open Notion Calendar": "Åbn Notion Calendar",
+  "Unofficial launcher. Calendar appearance, shortcuts, and account settings are managed by Notion.": "Uofficiel startapp. Kalenderens udseende, genveje og kontoindstillinger administreres af Notion.",
+  "Keyboard shortcuts": "Tastaturgenveje",
+  "Space — Open calendar\n? — Show shortcuts\nQ — Quit launcher\nEscape — Close help": "Space — Åbn kalender\n? — Vis genveje\nQ — Afslut startappen\nEscape — Luk hjælp",
+  "These shortcuts apply to this launcher only. Inside the calendar, use Notion’s own shortcuts.": "Disse genveje gælder kun i startappen. Brug Notions egne genveje i kalenderen.",
+  "Close": "Luk",
+  "Could not start the web-app launcher: %1": "Kunne ikke starte webappen: %1",
+  "Could not open Notion Calendar. Check that a Chromium-based browser is installed.\n%1": "Kunne ikke åbne Notion Calendar. Kontrollér, at en Chromium-baseret browser er installeret.\n%1",
+  "Omarchy’s launcher was not found. This app requires Omarchy.": "Omarchys startprogram blev ikke fundet. Denne app kræver Omarchy."
+}

@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+# Calendar recurrence dependency: {{ include (joinPath .chezmoi.workingTree ".config/notion-calendar/package-lock.json") | sha256sum }}
+mise exec node -- npm --prefix {{ joinPath .chezmoi.workingTree ".config/notion-calendar" | quote }} ci --ignore-scripts --no-audit --no-fund

@@ -1,6 +1,7 @@
 -- Personal input settings; all other input behavior stays native to Omarchy.
 hl.config({
   input = {
+    follow_mouse = 0,
     sensitivity = 0.35,
     touchpad = {
       natural_scroll = true,

@@ -28,8 +28,8 @@ function M.setup()
   o.bind("ALT + slash", "AeroSpace: toggle tile orientation", hl.dsp.layout("togglesplit"))
   o.bind("ALT + comma", "AeroSpace: toggle tabbed group (accordion alternative)", hl.dsp.group.toggle())
   -- A relative split ratio follows the current split's axis, unlike fixed x/y resizing.
-  o.bind("ALT + SHIFT + code:20", "AeroSpace: shrink split", hl.dsp.layout("splitratio -0.05"), { repeating = true })
-  o.bind("ALT + SHIFT + code:21", "AeroSpace: grow split", hl.dsp.layout("splitratio +0.05"), { repeating = true })
+  o.bind("ALT + SHIFT + minus", "AeroSpace: shrink split", hl.dsp.layout("splitratio -0.05"), { repeating = true })
+  o.bind("ALT + SHIFT + equal", "AeroSpace: grow split", hl.dsp.layout("splitratio +0.05"), { repeating = true })
 
   o.bind("ALT + SHIFT + semicolon", "AeroSpace: service mode", hl.dsp.submap("aerospace-service"))
   hl.define_submap("aerospace-service", function()

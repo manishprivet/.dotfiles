@@ -1,0 +1,8 @@
+{
+  "name": "dotfiles-notion-calendar",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "rrule": "2.8.1"
+  }
+}

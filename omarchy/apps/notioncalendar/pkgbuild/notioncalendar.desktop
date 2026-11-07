@@ -1,0 +1,24 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Notion Calendar
+Name[da]=Notion Calendar
+Name[hi]=Notion Calendar
+Comment=Open Notion Calendar in its own browser window
+Comment[da]=Åbn Notion Calendar i sit eget browservindue
+Comment[hi]=Notion Calendar अपनी अलग ब्राउज़र विंडो में खोलें
+Exec=notioncalendar
+TryExec=notioncalendar
+Icon=notioncalendar
+Terminal=false
+Categories=Office;Calendar;
+Keywords=Notion;Calendar;Schedule;Agenda;
+StartupNotify=false
+StartupWMClass=chrome-calendar.notion.so__-Default
+Actions=Launcher;
+
+[Desktop Action Launcher]
+Name=Launcher and help
+Name[da]=Startapp og hjælp
+Name[hi]=लॉन्चर और सहायता
+Exec=notioncalendar --settings

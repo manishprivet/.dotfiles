@@ -21,10 +21,19 @@ packages:
     - unzip
     - gcc
     - make
+    - base-devel
+    - qt6-base
+    - qt6-declarative
+    - qt6-wayland
+    - qt6-svg
+    - python
+    - snappy
   omarchy_aur:
     - pear-desktop-bin
   darwin:
     brews:
+      - python
+      - snappy
       - fish
       - neovim
       - tmux

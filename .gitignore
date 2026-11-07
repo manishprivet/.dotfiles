@@ -16,6 +16,7 @@
 .pi/agent/auth.json
 .pi/agent/sessions/
 .config/opencode/node_modules/
+.config/notion-calendar/node_modules/
 .config/opencode/bun.lock
 .config/opencode/service.json
 .config/argocd/config

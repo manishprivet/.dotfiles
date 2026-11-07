@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+# Shared parser setup: {{ include (joinPath .chezmoi.workingTree "scripts/setup-calendar.sh") | sha256sum }}
+bash {{ joinPath .chezmoi.workingTree "scripts/setup-calendar.sh" | quote }}
