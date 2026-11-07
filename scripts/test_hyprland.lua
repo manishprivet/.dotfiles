@@ -120,6 +120,10 @@ for _, class in ipairs({ "google-chrome", "chromium", "firefox", "obsidian", "ch
   check_shortcut("SUPER + SHIFT + bracketright", "CTRL", "Tab")
   check_shortcut("SUPER + 1", "CTRL", "1")
   check_shortcut("SUPER + Left", "", "Home")
+  check_shortcut("SHIFT + SUPER + Left", " SHIFT", "Home")
+  check_shortcut("SHIFT + SUPER + Right", " SHIFT", "End")
+  check_shortcut("SUPER + Up", "CTRL", "Home")
+  check_shortcut("SUPER + Down", "CTRL", "End")
   check_shortcut("SHIFT + SUPER + Up", "CTRL SHIFT", "Home")
   check_shortcut("ALT + Right", "CTRL", "Right")
   check_shortcut("ALT + BackSpace", "CTRL", "BackSpace")
@@ -145,13 +149,27 @@ for _, key in ipairs({ "A", "T", "N", "W", "F" }) do
 end
 check_shortcut("SUPER + 2", "ALT", "2")
 check_shortcut("SUPER + equal", "CTRL", "equal")
-for _, chord in ipairs({ "SUPER + S", "SUPER + Z", "SUPER + R", "SUPER + D", "SUPER + BackSpace", "ALT + Left", "SUPER + SHIFT + N" }) do
+check_shortcut("SUPER + Left", "", "Home")
+check_shortcut("SUPER + Right", "", "End")
+check_shortcut("SHIFT + SUPER + Left", "CTRL SHIFT", "Home")
+check_shortcut("SHIFT + SUPER + Right", "CTRL SHIFT", "End")
+check_shortcut("SUPER + Up", "CTRL", "Home")
+check_shortcut("SUPER + Down", "CTRL", "End")
+for _, chord in ipairs({ "SUPER + S", "SUPER + Z", "SUPER + R", "SUPER + D", "SUPER + BackSpace", "ALT + Left", "SUPER + SHIFT + N", "SHIFT + SUPER + Up", "SHIFT + SUPER + Down" }) do
   check_passthrough(chord)
 end
 active_window = { class = "another-terminal", tags = { "terminal*" } }
 check_passthrough("SUPER + T")
+check_passthrough("SUPER + Left")
+check_passthrough("SUPER + Right")
+check_passthrough("SHIFT + SUPER + Left")
+check_passthrough("SHIFT + SUPER + Right")
+check_passthrough("SUPER + Up")
+check_passthrough("SUPER + Down")
 active_window = { class = "com.mitchellh.ghostty" }
 check_shortcut("SUPER + T", "CTRL SHIFT", "T")
+check_shortcut("SUPER + Left", "", "Home")
+check_shortcut("SUPER + Right", "", "End")
 active_window = nil
 check_shortcut("SUPER + F", "CTRL", "F")
 assert(#timers == 0, "Every synthetic key press must have a matching release")

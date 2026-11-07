@@ -103,16 +103,17 @@ for index = 1, 9 do
 end
 
 -- Mac text navigation in GUI apps, including Shift to extend the selection.
+-- Ghostty's Shift+Home/End scrolls history; use Ctrl+Shift for TUI selection.
 for _, spec in ipairs({
-  { "SUPER + Left", "Line start", "", "Home" },
-  { "SUPER + Right", "Line end", "", "End" },
-  { "SUPER + Up", "Document start", "CTRL", "Home" },
-  { "SUPER + Down", "Document end", "CTRL", "End" },
+  { "SUPER + Left", "Line start", "", "Home", "", "CTRL SHIFT" },
+  { "SUPER + Right", "Line end", "", "End", "", "CTRL SHIFT" },
+  { "SUPER + Up", "Document start", "CTRL", "Home", "CTRL" },
+  { "SUPER + Down", "Document end", "CTRL", "End", "CTRL" },
   { "ALT + Left", "Previous word", "CTRL", "Left" },
   { "ALT + Right", "Next word", "CTRL", "Right" },
 }) do
-  o.bind(spec[1], spec[2], shortcut(spec[3], spec[4]))
-  o.bind("SHIFT + " .. spec[1], "Select to " .. spec[2]:lower(), shortcut(spec[3] .. " SHIFT", spec[4]))
+  o.bind(spec[1], spec[2], shortcut(spec[3], spec[4], spec[5]))
+  o.bind("SHIFT + " .. spec[1], "Select to " .. spec[2]:lower(), shortcut(spec[3] .. " SHIFT", spec[4], spec[6]))
 end
 o.bind("ALT + BackSpace", "Delete previous word", shortcut("CTRL", "BackSpace"))
 o.bind("ALT + Delete", "Delete next word", shortcut("CTRL", "Delete"))

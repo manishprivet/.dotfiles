@@ -8,6 +8,16 @@
   "tabs": {
     "mode": "off"
   },
+  "keybinds": {
+    "session.first": "ctrl+g,alt+home",
+    "session.last": "ctrl+alt+g",
+    "input.line.home": "ctrl+a,home",
+    "input.line.end": "ctrl+e,end",
+    "input.select.line.home": "ctrl+shift+a,ctrl+shift+home",
+    "input.select.line.end": "ctrl+shift+e,ctrl+shift+end",
+    "input.buffer.home": "ctrl+home",
+    "input.buffer.end": "ctrl+end"
+  },
   "diffs": {
     "wrap": "word",
     "single": false
