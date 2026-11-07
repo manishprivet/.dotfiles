@@ -1,0 +1,16 @@
+{
+  "playing": "Playing",
+  "paused": "Paused",
+  "unavailable": "YouTube Music unavailable. Enable the desktop app’s API server on port 26538.",
+  "previous": "Previous track",
+  "next": "Next track",
+  "play": "Play",
+  "pause": "Pause",
+  "seek": "Track position",
+  "close": "Close player",
+  "notPlaying": "Nothing playing",
+  "openApp": "Open YouTube Music",
+  "switching": "Switching track…",
+  "updating": "Updating playback…",
+  "notConfirmed": "The player hasn’t reported the change yet."
+}

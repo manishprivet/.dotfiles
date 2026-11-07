@@ -125,6 +125,64 @@ stay in `~/.local/state`. The bar's original layout is preserved and remains def
 OpenCode retains separate server configs, shared portable plugins and Houses UI
 settings. Work-only endpoints and WakaTime are not activated automatically.
 
+### YouTube Music (macOS + Omarchy)
+
+`.config/youtube-music/client.mjs` shares the local API client, song normalization,
+controls and app launcher between SketchyBar and Omarchy. Chezmoi links this
+dependency-free Node root on both platforms. The SketchyBar shell script is a
+thin entry point; its text and artwork items use the same adapter. macOS keeps
+its artwork, cached outside dotfiles with bounded HTTPS downloads from YouTube
+image hosts. No authentication data or playback state is saved in the repo.
+
+The local `manish.youtube-music` Omarchy plugin appears after the workspaces,
+without moving any existing widgets. It shows a bounded song/artist label,
+playback state, and the full title on hover. On Omarchy, **left-click** opens a
+player popup with album art, title/artist/album, **Previous / Play–Pause / Next**
+and an app-launch button. **Space** toggles playback and **Escape** closes it;
+buttons also support Tab and Enter. SketchyBar keeps left-click play/pause.
+Both bars retain **right-click** for next and **middle-click** to open the app.
+The Omarchy popup also has an elapsed/total-time seek slider: click or drag and
+release to choose a position. A drag sends just one absolute seek, not a request
+per pixel. Tab to the slider and use **Left/Right** for five-second steps or
+**Home/End** for the beginning/end. Seeking is disabled for unknown-duration
+tracks and during track switches; a drag bound to an old track is discarded.
+The displayed position advances locally while playing and is corrected by API
+snapshots. Seek requests use the same immediate refresh and confirmation path
+as the other playback controls.
+Omarchy launches `youtube-music` if installed, otherwise the Music website;
+the website fallback alone does not supply playback controls.
+
+Use a compatible YouTube Music desktop app with its **API server enabled on
+port 26538**. Requests target only `127.0.0.1`; neither adapter starts a server
+or installs the app. A missing API clears stale track data and leaves a dimmed
+launcher on Omarchy. The plugin polls every ten seconds, shared across monitors;
+remove its `shell.json` bar entry to stop polling. Omarchy fetches artwork only
+when the player is opened or its track changes while open. Covers use the same
+bounded, validated local cache as macOS; image downloads never block controls.
+
+Clicks do not wait for that poll: opening/closing the player or launching the
+app requests status immediately. Playback clicks queue in order, each issuing
+one control POST followed by a status GET, even if the POST fails. Refresh clicks
+during an in-flight request are coalesced into a pending read, not dropped.
+After a control, status is checked every 200 ms until the track identity or
+playback state actually changes, with an eight-second confirmation deadline.
+The popup shows “Switching track…” while waiting and reports an unconfirmed
+change if the deadline expires. A command’s 204 acknowledgement is not proof
+that the player has switched. Queued controls wait for the preceding change
+to be confirmed, so one skip’s late result cannot falsely confirm the next.
+Only status reads are retried, never toggles or skips. Controls remain clickable while busy.
+The ten-second poll is just a fallback for changes made outside the widget.
+
+If an updated popup still behaves like the older version, run
+`omarchy restart shell`: the running QML component can remain cached despite a
+plugin rescan. This restarts the shell, not the music app or desktop session.
+
+```bash
+node ~/.config/youtube-music/cli.mjs status
+node --test .config/youtube-music/tests/*.test.mjs
+bash scripts/test-music-ui.sh
+```
+
 ## Verify
 
 ```bash

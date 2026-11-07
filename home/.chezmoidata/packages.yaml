@@ -21,6 +21,8 @@ packages:
     - unzip
     - gcc
     - make
+  omarchy_aur:
+    - pear-desktop-bin
   darwin:
     brews:
       - fish

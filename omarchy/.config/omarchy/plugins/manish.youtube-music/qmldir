@@ -1,0 +1,2 @@
+singleton MusicState 1.0 MusicState.qml
+PlayerContent 1.0 PlayerContent.qml

@@ -13,6 +13,9 @@ cp "$ROOT/.chezmoiroot" "$repo/"
 cp -R "$ROOT/home" "$repo/"
 git -C "$repo" init --quiet
 mkdir -p "$repo/.config/opencode" "$repo/.config/mise" "$repo/omarchy/.config/omarchy" "$repo/omarchy/.config/opencode"
+cp -R "$ROOT/.config/youtube-music" "$repo/.config/"
+mkdir -p "$repo/omarchy/.config/omarchy/plugins"
+cp -R "$ROOT/omarchy/.config/omarchy/plugins/manish.youtube-music" "$repo/omarchy/.config/omarchy/plugins/"
 printf '{}\n' > "$repo/.config/opencode/package-lock.json"
 printf '[tools]\nnode = "24"\n' > "$repo/.config/mise/config.toml"
 printf 'houses\n' > "$repo/omarchy/theme"
@@ -41,6 +44,20 @@ cm apply --dry-run --verbose --exclude=scripts,externals > "$scratch/preview"
 [[ -z $(ls -A "$scratch/omarchy/home") ]] || fail 'Preview wrote to the target'
 echo 'PASS native chezmoi preview is read-only'
 
+# Render the native package hook, but never install packages in this fixture.
+cm execute-template --file "$repo/home/.chezmoiscripts/run_onchange_before_10-packages.sh.tmpl" > "$scratch/packages.sh"
+bash -n "$scratch/packages.sh"
+mkdir -p "$scratch/package-bin"
+cat > "$scratch/package-bin/omarchy" <<'PACKAGES'
+#!/bin/bash
+set -euo pipefail
+printf '%s\n' "$*" >> "$PACKAGE_CALLS"
+PACKAGES
+chmod +x "$scratch/package-bin/omarchy"
+PACKAGE_CALLS="$scratch/package-calls" PATH="$scratch/package-bin:$PATH" bash "$scratch/packages.sh"
+grep -Fxq 'pkg aur add pear-desktop-bin' "$scratch/package-calls" || fail 'Pear Desktop is not installed through the native AUR hook'
+echo 'PASS Pear Desktop is wired through the native AUR hook without a real install'
+
 # Run only the backup hook in this fixture, never package/GUI hooks.
 mkdir -p "$scratch/omarchy/home/.config/omarchy" "$scratch/omarchy/home/.config/opencode"
 printf 'old shell\n' > "$scratch/omarchy/home/.config/omarchy/shell.json"
@@ -56,6 +73,8 @@ echo 'PASS migration hook archives current config and preserves service registra
 cm apply --force --exclude=scripts,externals
 home=$scratch/omarchy/home
 [[ -L $home/.config/hypr && -L $home/.config/omarchy ]] || fail 'Omarchy config roots missing'
+[[ -f $home/.config/youtube-music/cli.mjs ]] || fail 'Shared music client missing on Omarchy'
+[[ -f $home/.config/omarchy/plugins/manish.youtube-music/manifest.json ]] || fail 'Music plugin missing on Omarchy'
 [[ $(readlink "$home/.config/ghostty") == "$repo/omarchy/.config/ghostty" ]] || fail 'Wrong Linux variant'
 [[ ! -e $home/.config/aerospace && ! -L $home/.config/aerospace ]] || fail 'Mac desktop leaked into Linux'
 for app in evans gh htop rex; do
@@ -73,9 +92,12 @@ grep -qx 'new app preference' "$repo/omarchy/.config/omarchy/shell.json" || fail
 echo 'PASS app-saved edits remain in dotfiles; reapply preserves them'
 
 scenario macos false darwin
+cm execute-template --file "$repo/home/.chezmoiscripts/run_onchange_before_10-packages.sh.tmpl" > "$scratch/packages-macos.sh"
+if grep -q 'pear-desktop-bin' "$scratch/packages-macos.sh"; then fail 'Pear Desktop AUR package leaked into macOS'; fi
 cm apply --force --exclude=scripts,externals
 home=$scratch/macos/home
 [[ -L $home/.config/aerospace && -L $home/.config/sketchybar ]] || fail 'Mac desktop links missing'
+[[ -f $home/.config/youtube-music/sketchybar.mjs ]] || fail 'Shared music adapter missing on macOS'
 [[ ! -e $home/.config/hypr && ! -L $home/.config/hypr ]] || fail 'Hyprland leaked into macOS'
 [[ $(readlink "$home/.config/opencode") == "$repo/macos/.config/opencode" ]] || fail 'Wrong Mac variant'
 for app in evans gh htop rex; do

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "manish.youtube-music",
+  "name": "YouTube Music",
+  "version": "1.0.0",
+  "author": "manishprivet",
+  "description": "Now playing and playback controls through YouTube Music’s local API.",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "BarWidget.qml" },
+  "barWidget": {
+    "displayName": "YouTube Music",
+    "description": "Album art and playback popup, right-click next, middle-click open",
+    "category": "Media",
+    "allowMultiple": false
+  }
+}
