@@ -31,9 +31,165 @@ packages:
   omarchy_aur:
     - pear-desktop-bin
   darwin:
+    # Preserve the old inventory first; prune dependencies in a separate change.
+    taps:
+      - { name: anomalyco/tap, url: "https://github.com/anomalyco/homebrew-tap.git", trusted: true }
+      - { name: asmvik/formulae, url: "https://github.com/asmvik/homebrew-formulae.git", trusted: true }
+      - { name: charmbracelet/tap, trusted: true }
+      - { name: chmouel/lazyworktree, url: "https://github.com/chmouel/lazyworktree", trusted: true }
+      - { name: codecrafters-io/tap, trusted: true }
+      - { name: datadog-labs/pack, url: "https://github.com/datadog-labs/homebrew-pack.git", trusted: true }
+      - { name: derailed/k9s, trusted: true }
+      - { name: emqx/mqttx, trusted: true }
+      - { name: felixkratz/formulae, trusted: true }
+      - { name: grafana/pyroscope, url: "https://github.com/grafana/homebrew-pyroscope.git", trusted: true }
+      - { name: hashicorp/tap, trusted: true }
+      - { name: heroku/brew, trusted: true }
+      - { name: homeport/tap, trusted: true }
+      - { name: jesseduffield/lazydocker, trusted: true }
+      - { name: julien-cpsn/atac, trusted: true }
+      - { name: kitlangton/tap }
+      - { name: ktr0731/evans, trusted: true }
+      - { name: metalbear-co/mirrord, trusted: true }
+      - { name: mike-engel/jwt-cli, trusted: true }
+      - { name: modem-dev/tap, trusted: true }
+      - { name: mongodb/brew, trusted: true }
+      - { name: nikitabobko/tap, trusted: true }
+      - { name: octopusdeploy/taps, trusted: true }
+      - { name: pear-devs/pear, trusted: true }
+      - { name: pyroscope-io/brew, url: "https://github.com/grafana/homebrew-pyroscope.git", trusted: true }
+      - { name: saiyam1814/tap, trusted: true }
+      - { name: sourcegraph/src-cli, trusted: true }
+      - { name: teamookla/speedtest, trusted: true }
+      - { name: us/tap }
+      - { name: waydabber/betterdisplay, trusted: true }
+      - { name: xwmx/taps, trusted: true }
     brews:
       - python
       - snappy
+      - act
+      - actionlint
+      - aom
+      - argocd
+      - gcc
+      - open-mpi
+      - automake
+      - bash
+      - binutils
+      - boost
+      - freetype
+      - glib
+      - commitizen
+      - conftest
+      - coreutils
+      - cryptography
+      - webp
+      - libtiff
+      - little-cms2
+      - diffutils
+      - folly
+      - fizz
+      - wangle
+      - fbthrift
+      - fb303
+      - edencommon
+      - fribidi
+      - harfbuzz
+      - leptonica
+      - libarchive
+      - pango
+      - tesseract
+      - ghostscript
+      - ffmpeg
+      - ffmpegthumbnailer
+      - fftw
+      - netpbm
+      - findutils
+      - git-delta
+      - git-filter-repo
+      - gnu-sed
+      - gnu-time
+      - gnupg
+      - go
+      - gobject-introspection
+      - jpeg-xl
+      - libheif
+      - graphicsmagick
+      - grpcurl
+      - gum
+      - hdf5
+      - helm
+      - htop
+      - ifstat
+      - imagemagick
+      - jq
+      - kind
+      - kubecolor
+      - kubectx
+      - lazysql
+      - libraw
+      - libxmlsec1
+      - mas
+      - mkcert
+      - node
+      - mongosh
+      - mvfst
+      - nmap
+      - node-build
+      - oath-toolkit
+      - qscintilla2
+      - suite-sparse
+      - sundials
+      - octave
+      - onefetch
+      - opa
+      - openjdk
+      - pass
+      - pass-otp
+      - pinentry-mac
+      - poppler
+      - protobuf
+      - pup
+      - ruby-build
+      - rbenv
+      - ruby
+      - sevenzip
+      - smartmontools
+      - sqlcmd
+      - tbb
+      - telnet
+      - terminal-notifier
+      - tldr
+      - virtualfish
+      - w3m
+      - wakatime-cli
+      - watch
+      - watchman
+      - wget
+      - worktrunk
+      - xclip
+      - { name: yarn, link: false }
+      - yazi
+      - yq
+      - yt-dlp
+      - { name: codecrafters-io/tap/codecrafters, trusted: true }
+      - { name: derailed/k9s/k9s, trusted: true }
+      - { name: hashicorp/tap/terraform, trusted: true }
+      - { name: homeport/tap/dyff, trusted: true }
+      - { name: jesseduffield/lazydocker/lazydocker, trusted: true }
+      - { name: julien-cpsn/atac/atac, trusted: true }
+      - { name: kitlangton/tap/ghui, trusted: true }
+      - { name: ktr0731/evans/evans, trusted: true }
+      - { name: metalbear-co/mirrord/mirrord, trusted: true }
+      - { name: mike-engel/jwt-cli/jwt-cli, trusted: true }
+      - { name: modem-dev/tap/hunk, trusted: true }
+      - pyroscope-io/brew/profilecli
+      - { name: sourcegraph/src-cli/src-cli, trusted: true }
+      - { name: teamookla/speedtest/speedtest, trusted: true }
+      - { name: us/tap/mocker, trusted: true }
+      - { name: waydabber/betterdisplay/betterdisplaycli, trusted: true }
+      - { name: xwmx/taps/nb, trusted: true }
+      - chezmoi
       - fish
       - neovim
       - tmux
@@ -52,10 +208,11 @@ packages:
       - bat
       - ripgrep
       - fd
-      - felixkratz/formulae/borders
-      - felixkratz/formulae/sketchybar
-    casks:
-      - ghostty
-      - nikitabobko/tap/aerospace
-      - font-jetbrains-mono-nerd-font
-      - font-hack-nerd-font
+      - { name: felixkratz/formulae/borders, trusted: true }
+      - { name: felixkratz/formulae/sketchybar, trusted: true }
+    npm:
+      - "@anthropic-ai/claude-code"
+      - "@googleworkspace/cli"
+      - "@openai/codex"
+      - corepack
+      - opencode-with-claude

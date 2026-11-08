@@ -10,11 +10,18 @@ if ! command -v brew >/dev/null 2>&1; then
   [[ ! -x /usr/local/bin/brew ]] || eval "$(/usr/local/bin/brew shellenv)"
 fi
 brew bundle --file=/dev/stdin <<'BREWFILE'
-{{ range .packages.darwin.brews -}}
-brew {{ . | quote }}
+{{ range .packages.darwin.taps -}}
+tap {{ .name | quote }}{{ if hasKey . "url" }}, {{ .url | quote }}{{ end }}{{ if hasKey . "trusted" }}, trusted: {{ .trusted }}{{ end }}
 {{ end -}}
-{{ range .packages.darwin.casks -}}
-cask {{ . | quote }}
+{{ range .packages.darwin.brews -}}
+{{ if kindIs "string" . -}}
+brew {{ . | quote }}
+{{ else -}}
+brew {{ .name | quote }}{{ if hasKey . "trusted" }}, trusted: {{ .trusted }}{{ end }}{{ if hasKey . "link" }}, link: {{ .link }}{{ end }}
+{{ end -}}
+{{ end -}}
+{{ range .packages.darwin.npm -}}
+npm {{ . | quote }}
 {{ end -}}
 BREWFILE
 {{ end -}}
